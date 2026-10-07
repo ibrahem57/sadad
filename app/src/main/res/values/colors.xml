@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sadad Design System -->
+    <color name="primary">#002f2a</color>
+    <color name="on_primary">#ffffff</color>
+    <color name="primary_container">#0d4740</color>
+    <color name="on_primary_container">#80b5ab</color>
+    <color name="inverse_primary">#9cd1c7</color>
+    <color name="primary_fixed">#b7ede3</color>
+    <color name="primary_fixed_dim">#9cd1c7</color>
+    <color name="secondary">#006b5e</color>
+    <color name="on_secondary">#ffffff</color>
+    <color name="secondary_container">#96f0df</color>
+    <color name="on_secondary_container">#006f62</color>
+    <color name="secondary_fixed">#99f3e2</color>
+    <color name="secondary_fixed_dim">#7cd6c6</color>
+    <color name="tertiary">#003026</color>
+    <color name="tertiary_container">#00483b</color>
+    <color name="tertiary_fixed">#8ff5da</color>
+    <color name="surface">#effcf7</color>
+    <color name="surface_dim">#cfddd8</color>
+    <color name="surface_container_lowest">#ffffff</color>
+    <color name="surface_container_low">#e9f7f2</color>
+    <color name="surface_container">#e3f1ec</color>
+    <color name="surface_container_high">#ddebe6</color>
+    <color name="surface_container_highest">#d8e6e1</color>
+    <color name="surface_variant">#d8e6e1</color>
+    <color name="on_surface">#121e1b</color>
+    <color name="on_surface_variant">#404946</color>
+    <color name="inverse_surface">#273330</color>
+    <color name="inverse_on_surface">#e6f4ef</color>
+    <color name="outline">#707977</color>
+    <color name="outline_variant">#bfc8c5</color>
+    <color name="error">#ba1a1a</color>
+    <color name="on_error">#ffffff</color>
+    <color name="error_container">#ffdad6</color>
+    <color name="on_error_container">#93000a</color>
+    <!-- Financial direction semantics -->
+    <color name="receivable_text">#0D6659</color>
+    <color name="receivable_bg">#D9F5ED</color>
+    <color name="payable_text">#B45309</color>
+    <color name="payable_bg">#FEF3C7</color>
+    <!-- Helper surfaces -->
+    <color name="hero_sub_bg">#1AFFFFFF</color>
+    <color name="chip_dark_bg">#26FFFFFF</color>
+    <color name="summary_ok_bg">#4099F3E2</color>
+    <color name="summary_payable_bg">#40FEF3C7</color>
+    <color name="divider_soft">#E5EFEB</color>
+</resources>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>إدارة سدد</title>
+  <link rel="stylesheet" href="admin.css">
+  <script defer src="admin.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <section id="authView" class="auth-wrap hidden">
+      <div class="auth-card">
+        <img src="/logo-light.jpeg" alt="سدد" class="brand">
+        <p class="eyebrow">لوحة التحكم المركزية</p>
+        <h1 id="authTitle">دخول الأدمن</h1>
+        <p id="authHint" class="muted">هذه اللوحة خاصة بمدير النظام.</p>
+        <form id="authForm" class="stack">
+          <label id="setupKeyWrap" class="hidden">مفتاح تأسيس الخادم<input id="setupKey" autocomplete="off"></label>
+          <label>اسم المستخدم<input id="authUsername" autocomplete="username" required minlength="3"></label>
+          <label>كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" required></label>
+          <button class="button primary" id="authSubmit">دخول آمن</button>
+          <p class="form-error" id="authError" role="alert"></p>
+        </form>
+        <form id="adminPasswordChangeForm" class="stack hidden">
+          <label>كلمة المرور الحالية<input id="adminCurrentPassword" type="password" autocomplete="current-password" required></label>
+          <label>كلمة المرور الجديدة<input id="adminNewPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128"></label>
+          <button class="button primary">حفظ كلمة المرور الجديدة</button>
+          <p class="form-error" id="adminPasswordError" role="alert"></p>
+          <p class="small muted">استخدم عبارة مرور لا تقل عن 12 خانة.</p>
+        </form>
+        <p class="small muted">لا يوجد تسجيل عام. ينشأ حساب مالك المتجر حصراً من الأدمن.</p>
+      </div>
+    </section>
+
+    <section id="appView" class="hidden">
+      <header class="topbar">
+        <div class="brand-line"><img src="/logo-light.jpeg" alt="" class="brand-small"><div><strong>سدد</strong><span>إدارة المتاجر والصلاحيات</span></div></div>
+        <div class="top-actions"><span id="adminName" class="pill">أدمن</span><button class="button secondary" id="changeAdminPasswordBtn" type="button">تغيير كلمة المرور</button><button class="button quiet" id="logoutBtn">خروج</button></div>
+      </header>
+      <div id="notice" class="notice hidden" role="status"></div>
+
+      <section class="hero">
+        <div><p class="eyebrow">إدارة المنصة</p><h1>مرحباً بك في لوحة سدد</h1><p class="muted">أنشئ حسابات المتاجر، تحكم بالميزات، وتابع نشاط المنصة من مكان واحد.</p></div>
+        <button class="button primary" id="newStoreBtn">＋ إنشاء حساب متجر</button>
+      </section>
+
+      <section class="metrics" id="metrics"></section>
+      <section class="panel">
+        <div class="panel-head"><div><h2>حسابات المتاجر</h2><p class="muted">الحسابات التي أنشأها الأدمن فقط</p></div><input id="searchStores" class="search" placeholder="بحث بالمتجر أو اسم المستخدم"></div>
+        <div class="table-wrap"><table><thead><tr><th>المتجر</th><th>اسم الدخول</th><th>الحالة</th><th>الاشتراك</th><th>الأجهزة</th><th>التوثيق</th><th>الأشخاص</th><th>الديون</th><th></th></tr></thead><tbody id="storesBody"></tbody></table></div>
+        <div id="emptyStores" class="empty hidden">لا توجد حسابات متاجر. أنشئ أول حساب من زر الأعلى.</div>
+      </section>
+
+      <section id="storePanel" class="panel hidden">
+        <div class="panel-head"><div><p class="eyebrow">إدارة حساب</p><h2 id="storeHeading"></h2><p id="storeMeta" class="muted"></p></div><button class="button quiet" id="closeStore">إغلاق</button></div>
+        <div class="admin-grid">
+          <form id="storeSettings" class="stack panel-inset">
+            <h3>بيانات وصلاحيات الحساب</h3>
+            <label>اسم المتجر<input id="storeName" required></label>
+            <label>اسم المستخدم<input id="storeUsername" required></label>
+            <label>حد الأشخاص ذوي الديون المفتوحة<input id="debtorLimit" type="number" min="0" max="1000000"></label>
+            <label>عدد الأجهزة المسموح دخولها لهذا المتجر<input id="maxDevices" type="number" min="1" max="50" step="1" value="1"></label>
+            <label class="switch-row"><span><b>توثيق الحساب</b><small>شارة الموثوقية تظهر لهذا المتجر فقط</small></span><input id="verified" type="checkbox"></label>
+            <label class="switch-row"><span><b>تفعيل ربط WhatsApp</b><small>يسمح لهذا المتجر بإعداد ربط WhatsApp Cloud API</small></span><input id="whatsappEnabled" type="checkbox"></label>
+            <fieldset><legend>الميزات المسموحة</legend><div id="permissions" class="checks"></div></fieldset>
+            <button class="button primary">حفظ إعدادات المتجر</button>
+          </form>
+          <div class="stack">
+            <section class="panel-inset stack">
+              <h3>حالة الحساب</h3>
+              <p id="freezeState" class="muted"></p>
+              <div class="button-row"><button class="button success" id="activateStore">تفعيل</button><button class="button danger" id="freezeHour">تجميد ساعة</button><button class="button danger" id="freezeDay">تجميد يوم</button><button class="button danger" id="freezeForever">تجميد حتى التفعيل</button></div>
+              <hr>
+              <h3>إعادة تعيين كلمة المرور</h3>
+              <p class="muted">يُنشأ رمز مؤقت، ويطلب التطبيق تغييره عند أول دخول.</p>
+              <div class="button-row"><input id="newTempPassword" autocomplete="new-password" placeholder="كلمة مؤقتة (12 محرفاً على الأقل)"><button class="button secondary" id="resetPassword">إنشاء كلمة مؤقتة</button></div>
+              <p id="tempPasswordResult" class="result hidden"></p>
+              <hr>
+              <button class="button danger" id="deleteStore">حذف الحساب والبيانات نهائياً</button>
+            </section>
+            <section class="panel-inset stack">
+              <h3>الاشتراك والمدة</h3>
+              <p id="subscriptionState" class="muted"></p>
+              <label>حالة الاشتراك<select id="subscriptionMode"><option value="permanent">فعال دائمًا</option><option value="timed">محدد بعدد أيام</option><option value="paused">إيقاف الاشتراك</option></select></label>
+              <label>عدد الأيام<input id="subscriptionDays" type="number" min="1" max="36500" value="30"></label>
+              <button class="button secondary" id="saveSubscription">حفظ حالة الاشتراك</button>
+              <hr>
+              <label>أيام إضافية<input id="extendDays" type="number" min="1" max="36500" value="30"></label>
+              <button class="button success" id="extendSubscription">تمديد الاشتراك</button>
+            </section>
+            <section class="panel-inset stack">
+              <h3>الأجهزة المسجلة</h3>
+              <p class="muted">اسم الموظف يثبت على الجهاز بعد أول دخول. غيّره بإزالة ربط الجهاز ثم تسجيله من جديد.</p>
+              <div id="deviceList" class="record-list"></div>
+              <button class="button danger" id="revokeAllDevices">إلغاء كل الأجهزة المسجلة</button>
+            </section>
+            <section class="panel-inset stack">
+              <h3>سجل نشاط المتجر</h3>
+              <p class="muted">يعرض اسم المستخدم الذي أضاف الأشخاص والديون والدفعات أو حذف السجلات.</p>
+              <div id="deviceAuditList" class="record-list"></div>
+            </section>
+            <section class="panel-inset stack">
+              <h3>استعادة سجل محفوظ</h3>
+              <p class="muted">يحفظ الخادم نسخة قبل كل مزامنة. يمكنك استعادة المتجر كاملًا أو شخصًا واحدًا.</p>
+              <label>نسخة الاستعادة<select id="backupSelect"><option value="">لا توجد نسخ محفوظة</option></select></label>
+              <label>الشخص من النسخة المختارة<select id="restoreContact"><option value="">اختر النسخة أولًا</option></select></label>
+              <div class="button-row"><button class="button secondary" id="restoreStore">إرجاع بيانات التاجر كاملة</button><button class="button secondary" id="restorePerson">استعادة هذا الشخص</button></div>
+              <p id="restoreInfo" class="small muted"></p>
+            </section>
+            <section class="panel-inset stack">
+              <h3>أرشيف الزبائن المحذوفين</h3>
+              <p class="muted">تُحفظ نسخة مستقلة لكل زبون يحذفه التاجر، بما فيها بياناته والديون والدفعات. استخدم الاستعادة لإرجاع سجله إلى حساب المتجر.</p>
+              <div id="deletedContactArchives" class="record-list"></div>
+            </section>
+            <section class="panel-inset stack">
+              <div class="panel-head"><h3>ملخص السجل</h3><button class="button quiet" id="downloadReport">تنزيل CSV</button></div>
+              <div id="storeStats" class="mini-metrics"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+      <footer>سدد · لوحة الإدارة · الإصدار 1.0</footer>
+    </section>
+
+    <dialog id="createDialog" class="dialog">
+      <form id="createStoreForm" class="stack">
+        <div class="panel-head"><div><p class="eyebrow">حساب جديد</p><h2>إنشاء متجر</h2></div><button type="button" class="icon-button" id="cancelCreate" aria-label="إغلاق">×</button></div>
+        <label>اسم المتجر<input id="newName" required maxlength="120"></label>
+        <label>اسم المستخدم<input id="newUsername" required minlength="3" maxlength="80" autocomplete="off"></label>
+        <label>كلمة مرور مؤقتة<input id="newPassword" required minlength="12" autocomplete="new-password"></label>
+        <label>حد الأشخاص ذوي الديون المفتوحة<input id="newLimit" type="number" min="0" value="100"></label>
+        <label>عدد الأجهزة المسموحة<input id="newMaxDevices" type="number" min="1" max="50" value="1"></label>
+        <label>نوع الاشتراك<select id="newSubscriptionMode"><option value="timed">مدة محددة</option><option value="permanent">فعال دائمًا</option><option value="paused">إنشاء موقوف</option></select></label>
+        <label id="newSubscriptionDaysWrap">مدة الاشتراك بالأيام<input id="newSubscriptionDays" type="number" min="1" max="36500" value="30"></label>
+        <button type="button" class="button quiet" id="generatePassword">إنشاء كلمة مرور قوية</button>
+        <button class="button primary">إنشاء الحساب</button>
+        <p class="muted small">كلمة المرور المؤقتة ستظهر بعد الإنشاء. انسخها وأرسلها لصاحب المتجر بطريقة آمنة.</p>
+      </form>
+    </dialog>
+
+    <dialog id="adminPasswordDialog" class="dialog">
+      <form id="adminPasswordDialogForm" class="stack">
+        <div class="panel-head"><div><p class="eyebrow">حساب الأدمن</p><h2>تغيير كلمة المرور</h2></div><button type="button" class="icon-button" id="cancelAdminPassword" aria-label="إغلاق">×</button></div>
+        <label>كلمة المرور الحالية<input id="dialogCurrentPassword" type="password" autocomplete="current-password" required></label>
+        <label>كلمة المرور الجديدة<input id="dialogNewPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+        <label>تأكيد كلمة المرور الجديدة<input id="dialogConfirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+        <p id="dialogPasswordError" class="form-error" role="alert"></p>
+        <p class="small muted">استخدم عبارة مرور لا تقل عن 12 خانة.</p>
+        <button class="button primary">حفظ كلمة المرور</button>
+      </form>
+    </dialog>
+  </main>
+</body>
+</html>
+

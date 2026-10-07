@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Sadad.Dialog.Light" parent="android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:colorAccent">#064B42</item>
+        <item name="android:colorControlActivated">#159D89</item>
+        <item name="android:colorControlNormal">#63796B</item>
+        <item name="android:colorBackground">#F1F7F0</item>
+        <item name="android:textColorPrimary">#142C24</item>
+        <item name="android:textColorSecondary">#65796C</item>
+        <item name="android:windowBackground">#F1F7F0</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+    <style name="Sadad.Dialog.Dark" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:colorAccent">#397D66</item>
+        <item name="android:colorControlActivated">#78DEC0</item>
+        <item name="android:colorControlNormal">#B5CEC0</item>
+        <item name="android:colorBackground">#1C3931</item>
+        <item name="android:textColorPrimary">#F0F7EF</item>
+        <item name="android:textColorSecondary">#B5CEC0</item>
+        <item name="android:windowBackground">#1C3931</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
