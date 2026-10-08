@@ -94,6 +94,12 @@ public final class MainActivity extends Activity {
     private NativeScreens screens;
     private volatile String currentRoute = "welcome";
     private String contactFormOrigin = "home";
+    private static final class NavigationEntry {
+        final String route; final long contact,editing; final int scroll;
+        NavigationEntry(String route,long contact,long editing,int scroll){this.route=route;this.contact=contact;this.editing=editing;this.scroll=scroll;}
+    }
+    private final java.util.ArrayDeque<NavigationEntry> navigation = new java.util.ArrayDeque<>();
+    private long routeContact,routeEditing;
     String contactFormBackTarget() { return contactFormOrigin; }
     private volatile boolean biometricPromptInProgress;
     private volatile boolean demoCustomerSession;
@@ -152,13 +158,16 @@ public final class MainActivity extends Activity {
         if (route == null || route.isEmpty() || route.equals(currentRoute)) return;
         if ("customer_login".equals(route) || "customer_portal".equals(route)) { show(sessions.isActive() ? "home" : "login"); return; }
         if (route.equals("login") || route.equals("welcome") || route.equals("unlock") || route.equals("force_password") || route.equals("customer_login")) {
-            currentRoute = route; screens.show(route); return;
+            navigation.clear(); currentRoute = route; screens.show(route); return;
         }
         if (route.equals("customer_portal") && BuildConfig.STANDALONE_MODE && demoCustomerSession) {
             currentRoute = route; screens.show(route); return;
         }
         if (!sessions.isActive()) { currentRoute = "login"; screens.show("login"); return; }
         if ("contact_form".equals(route)) contactFormOrigin = currentRoute;
+        if (!currentRoute.equals("login") && !currentRoute.equals("welcome") && !currentRoute.equals("unlock") && !currentRoute.equals("force_password"))
+            navigation.push(new NavigationEntry(currentRoute,routeContact,routeEditing,screens.scrollPosition()));
+        routeContact=screens.contactId;routeEditing=screens.editingContactId;
         currentRoute = route;
         screens.show(route);
         if ("home".equals(route)) maybeRequestNotificationPermission();
@@ -273,7 +282,7 @@ public final class MainActivity extends Activity {
     interface ActionCallback { void complete(boolean success, String message); }
 
     void changeServerPassword(String previous, String next, ActionCallback callback) {
-        if (next == null || next.length() < 12) { callback.complete(false, "كلمة المرور الجديدة يجب ألا تقل عن 12 محرفًا."); return; }
+        if (next == null || next.length() < 4) { callback.complete(false, "كلمة المرور الجديدة يجب ألا تقل عن 4 خانات."); return; }
         if (BuildConfig.STANDALONE_MODE) {
             network.execute(() -> {
                 if (!localSecurity.verifyLoginPassword(username(), previous, "123")) {
@@ -1214,18 +1223,17 @@ public final class MainActivity extends Activity {
         if ("customer_login".equals(route)) { show("login"); return; }
         if ("force_password".equals(route)) { showBrandedMessage("غيّر كلمة المرور المؤقتة أولًا للمتابعة."); return; }
         if ("welcome".equals(route)) { finishWelcome(); return; }
-        if ("contact_detail".equals(route)) { show("contacts"); return; }
-        if ("contact_form".equals(route)) { show(contactFormBackTarget()); return; }
-        if ("debt_form".equals(route) || "payment_form".equals(route)) { show("contact_detail"); return; }
-        if ("trash".equals(route)) { show("settings"); return; }
-        if ("notifications".equals(route)) { show("home"); return; }
-        if ("history_results".equals(route) || "reports".equals(route)) { show("history"); return; }
-        if ("contacts".equals(route) || "history".equals(route) || "reports".equals(route) || "settings".equals(route)) { show("home"); return; }
+        if (!navigation.isEmpty()) {
+            NavigationEntry previous=navigation.pop();currentRoute=previous.route;routeContact=previous.contact;routeEditing=previous.editing;
+            screens.contactId=previous.contact;screens.editingContactId=previous.editing;screens.show(currentRoute);screens.restoreScroll(previous.scroll);return;
+        }
+        if (!"home".equals(route) && sessions.isActive()) { currentRoute="home";screens.show("home");return; }
         super.onBackPressed();
     }
 
     @Override protected void onDestroy() {
         if (activeInstance.get() == this) activeInstance = EMPTY_INSTANCE;
+        if(screens != null) screens.closeHistory();
         exports.shutdown();
 
         if (connectivityManager != null && connectivityCallback != null) {

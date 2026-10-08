@@ -896,7 +896,7 @@ async function route(req, res) {
     }
     if (req.method==='POST' && pathname==='/api/admin/stores') {
       const b=await bodyJson(req); const name=text(b.name,120); const username=text(b.username,80); const password=String(b.password||'');
-      if(!name || !/^[\p{L}\p{N}._-]{3,80}$/u.test(username) || password.length<12 || password.length>ADMIN_PASSWORD_MAX) throw new HttpError(400,'أدخل اسم المتجر واسم مستخدم وكلمة مؤقتة بين 12 و128 محرفًا.');
+      if(!name || !/^[\p{L}\p{N}._-]{3,80}$/u.test(username) || password.length<4 || password.length>ADMIN_PASSWORD_MAX) throw new HttpError(400,'أدخل اسم المتجر واسم مستخدم وكلمة مؤقتة بين 4 و128 محرفًا.');
       const mode=['permanent','timed','paused'].includes(b.subscriptionMode)?b.subscriptionMode:'timed';
       const days=Math.floor(Number(b.subscriptionDays)||0); const maxDevices=parseDeviceLimit(b.maxDevices, 1); const now=Date.now();
       if(mode==='timed'&&(days<1||days>36500)) throw new HttpError(400,'حدد مدة اشتراك بين يوم واحد و100 سنة، أو اختر فعال دائمًا.');
@@ -984,7 +984,7 @@ async function route(req, res) {
         return ok(res,{store:{...db.prepare('SELECT id,name,username,status,suspend_until,verified,debtor_limit,permissions,whatsapp_enabled FROM stores WHERE id=?').get(id),maxDevices,allowedDevices:maxDevices}});
       }
       if(req.method==='POST' && action==='reset-password'){
-        const b=await bodyJson(req); const password=String(b.password||''); if(password.length<12||password.length>ADMIN_PASSWORD_MAX) throw new HttpError(400,'كلمة المرور المؤقتة يجب أن تكون بين 12 و128 محرفًا.');
+        const b=await bodyJson(req); const password=String(b.password||''); if(password.length<4||password.length>ADMIN_PASSWORD_MAX) throw new HttpError(400,'كلمة المرور المؤقتة يجب أن تكون بين 4 و128 محرفًا.');
         const ph=await passwordHash(password); db.prepare('UPDATE stores SET salt=?,password_hash=?,force_password_change=1 WHERE id=?').run(ph.salt,ph.hash,id); db.prepare("DELETE FROM sessions WHERE kind='store' AND principal_id=?").run(id); return ok(res,{username:store.username,password,forcePasswordChange:true});
       }
       if(req.method==='DELETE' && action==='permanent'){
@@ -998,7 +998,7 @@ async function route(req, res) {
     const auth=requireSession(req,'store'); const store=db.prepare('SELECT * FROM stores WHERE id=?').get(auth.principal.id);
     if(req.method==='GET' && pathname==='/api/mobile/session') return ok(res,{account:accountForStore(store),forcePasswordChange:!!store.force_password_change,revision:store.revision});
     if(req.method==='POST' && pathname==='/api/mobile/change-password'){
-      const b=await bodyJson(req); const currentPassword=String(b.currentPassword||''); const password=String(b.password||''); if(password.length<12||password.length>ADMIN_PASSWORD_MAX) throw new HttpError(400,'كلمة المرور الجديدة يجب أن تكون بين 12 و128 محرفًا.');
+      const b=await bodyJson(req); const currentPassword=String(b.currentPassword||''); const password=String(b.password||''); if(password.length<4||password.length>ADMIN_PASSWORD_MAX) throw new HttpError(400,'كلمة المرور الجديدة يجب أن تكون بين 4 و128 محرفًا.');
       if(currentPassword.length>ADMIN_PASSWORD_MAX) throw new HttpError(403,'كلمة المرور الحالية غير صحيحة.');
       const current=await passwordHash(currentPassword,store.salt); if(!safeEqual(current.hash,store.password_hash)) throw new HttpError(403,'كلمة المرور الحالية غير صحيحة.');
       const ph=await passwordHash(password); db.prepare('UPDATE stores SET salt=?,password_hash=?,force_password_change=0 WHERE id=?').run(ph.salt,ph.hash,store.id);

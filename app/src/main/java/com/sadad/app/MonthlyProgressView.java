@@ -27,6 +27,7 @@ final class MonthlyProgressView extends View {
     @Override protected void onDraw(Canvas canvas) {
         paint.setColor(color); paint.setAlpha(30); canvas.drawRoundRect(0, 0, getWidth(), getHeight(), getHeight()/2f, getHeight()/2f, paint);
         paint.setAlpha(255); float width = getWidth() * progress;
+        if (width > 0) width=Math.max(width,Math.min(getWidth(),getResources().getDisplayMetrics().density*5));
         if (width > 0) canvas.drawRoundRect(getWidth()-width, 0, getWidth(), getHeight(), getHeight()/2f, getHeight()/2f, paint);
     }
 }

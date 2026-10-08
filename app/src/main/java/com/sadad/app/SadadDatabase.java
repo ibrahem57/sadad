@@ -620,6 +620,9 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         try(Cursor c=getReadableDatabase().rawQuery("SELECT amount_cents FROM debts WHERE contact_id=? AND direction='receivable' ORDER BY created_at DESC,id DESC LIMIT 1",new String[]{String.valueOf(id)})){return c.moveToFirst()?new JSONObject().put("amount",fromCents(c.getLong(0))):null;}
     }
     public synchronized JSONObject getSnapshot() throws JSONException { return buildSnapshot(false,0,0); }
+    synchronized Cursor openHomeHistory() {
+        return getReadableDatabase().rawQuery("SELECT d.id*2 AS _id,d.contact_id,c.name,'debt' AS kind,d.amount_cents,d.created_at,d.created_by FROM debts d JOIN contacts c ON c.id=d.contact_id WHERE d.direction='receivable' UNION ALL SELECT MIN(p.id)*2+1,d.contact_id,c.name,'payment',SUM(p.amount_cents),p.created_at,p.created_by FROM payments p JOIN debts d ON d.id=p.debt_id JOIN contacts c ON c.id=d.contact_id WHERE d.direction='receivable' GROUP BY p.created_at,d.contact_id,p.note,p.method,p.created_by ORDER BY 6 DESC,1 DESC",null);
+    }
     synchronized JSONObject getRecentHistory(int limit) throws JSONException { return buildSnapshot(true,0,Math.max(1,limit)); }
     synchronized JSONObject getOverview() throws JSONException { return buildSnapshot(true,0,1000); }
     synchronized JSONObject getPersonSnapshot(long id) throws JSONException { return buildSnapshot(false,id,0); }
@@ -962,3 +965,4 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         return result.toString();
     }
 }
+

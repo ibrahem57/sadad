@@ -68,8 +68,11 @@ final class NativeScreens {
     private int contactLimit = 60;
     private int historyLimit = 100;
     private int personHistoryPage; private long personHistoryOwner;
-    private int homeHistoryLimit = 10;
-    private static final int HOME_HISTORY_BATCH = 50;
+    private android.database.Cursor homeCursor;
+    private ScrollView pageScroll;
+    int scrollPosition() { return pageScroll == null ? 0 : pageScroll.getScrollY(); }
+    void restoreScroll(int y) { if(pageScroll != null) pageScroll.post(() -> pageScroll.scrollTo(0,y)); }
+    void closeHistory() { if(homeCursor != null) { homeCursor.close(); homeCursor=null; } }
     private int reportContactLimit = 60;
     private String reportSearchText = "";
     private long reportStartMillis = Long.MIN_VALUE;
@@ -87,6 +90,7 @@ final class NativeScreens {
     NativeScreens(MainActivity host) { this.host = host; }
 
     void show(String page) {
+        closeHistory(); pageScroll=null;
         route = page;
         palette();
         if ("welcome".equals(page)) { buildWelcome(); return; }
@@ -319,12 +323,12 @@ final class NativeScreens {
         TextView title = label("غيّر كلمة المرور المؤقتة", 23, text, true); title.setGravity(Gravity.CENTER); title.setPadding(0, dp(16), 0, dp(6)); card.addView(title);
         TextView hint = label("يجب تعيين كلمة مرور جديدة للمتابعة إلى التطبيق.", 14, muted, false); hint.setGravity(Gravity.CENTER); hint.setPadding(0, 0, 0, dp(18)); card.addView(hint);
         EditText previous = input("كلمة المرور المؤقتة", true); card.addView(previous, matchWithBottom(10));
-        EditText next = input("كلمة المرور الجديدة (12 محرفًا على الأقل)", true); card.addView(next, matchWithBottom(10));
+        EditText next = input("كلمة المرور الجديدة (4 خانات على الأقل)", true); card.addView(next, matchWithBottom(10));
         EditText confirm = input("تأكيد كلمة المرور الجديدة", true); card.addView(confirm, matchWithBottom(16));
         card.addView(button("حفظ ومتابعة", primary, Color.WHITE, () -> {
             String newPassword = next.getText().toString();
             if (!newPassword.equals(confirm.getText().toString())) { confirm.setError("كلمتا المرور غير متطابقتين."); return; }
-            if (newPassword.length() < 12) { next.setError("استخدم 12 محرفًا على الأقل."); return; }
+            if (newPassword.length() < 4) { next.setError("استخدم 4 خانات على الأقل."); return; }
             host.changeServerPassword(previous.getText().toString(), newPassword, (success, message) -> {
                 if (!success) { previous.setError(message); host.showBrandedMessage(message); }
             });
@@ -393,7 +397,7 @@ final class NativeScreens {
         View headerDivider = new View(host);
         headerDivider.setBackgroundColor(Color.argb(72, Color.red(line), Color.green(line), Color.blue(line)));
         root.addView(headerDivider, new LinearLayout.LayoutParams(-1, dp(1)));
-        ScrollView scroller = scroll(); content = new LinearLayout(host); content.setOrientation(LinearLayout.VERTICAL);
+        ScrollView scroller = scroll(); pageScroll=scroller; content = new LinearLayout(host); content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(18), dp(6), dp(18), dp(22)); content.setClipToPadding(false); scroller.addView(content);
         root.addView(scroller, new LinearLayout.LayoutParams(-1, 0, 1));
         addPage(page);
@@ -432,9 +436,8 @@ final class NativeScreens {
         hero.setBackground(new GradientDrawable(GradientDrawable.Orientation.TR_BL, new int[]{primary, Color.rgb(2, 48, 43)}));
         ((GradientDrawable) hero.getBackground()).setCornerRadius(dp(18)); hero.setElevation(dp(4));
         LinearLayout balance = new LinearLayout(host); balance.setOrientation(LinearLayout.VERTICAL);
-        TextView badge = label("▤  إجمالي الدين", 11, Color.rgb(198, 240, 224), false);
-        badge.setPadding(dp(10), dp(5), dp(10), dp(5)); badge.setBackground(shape(Color.argb(40, 255, 255, 255), 12)); balance.addView(badge, new LinearLayout.LayoutParams(-2, -2));
-        balance.addView(label("لك عند الزبائن", 12, Color.rgb(198, 240, 224), false), topMargin(14));
+        balance.addView(label("إجمالي الديون", 21, Color.WHITE, true));
+        balance.addView(label("عند الزبائن", 12, Color.rgb(198, 240, 224), false), topMargin(14));
         balance.addView(label(money(totals.optDouble("receivable")), 34, Color.WHITE, true), topMargin(2));
         hero.addView(balance, new LinearLayout.LayoutParams(0, -2, 1));
         ImageView book = iconView(R.drawable.ledger_art, Color.WHITE); book.clearColorFilter();
@@ -449,16 +452,25 @@ final class NativeScreens {
         LinearLayout metrics = new LinearLayout(host); metrics.setOrientation(LinearLayout.HORIZONTAL);
         metrics.addView(monthMetric("ديون مسجلة", debt, debt + paid == 0 ? 0 : debt / (debt + paid), host.isDarkTheme() ? Color.rgb(245, 154, 159) : Color.rgb(171, 50, 58)), new LinearLayout.LayoutParams(0, -2, 1)); metrics.addView(spaceWidth(10));
         metrics.addView(monthMetric("دفعات مستلمة", paid, debt + paid == 0 ? 0 : paid / (debt + paid), accent), new LinearLayout.LayoutParams(0, -2, 1)); content.addView(metrics, bottomMargin(20));
-        content.addView(button((homeHistoryOpen?"⌃  ":"⌄  ")+"سجل آخر الحركات",soft,softForeground(),()->{homeHistoryOpen=!homeHistoryOpen;host.refreshCurrentScreen();}),bottomMargin(10));
+        content.addView(button(homeHistoryOpen ? "⌃  إغلاق سجل الحركات" : "⌄  عرض سجل الحركات",soft,softForeground(),()->{homeHistoryOpen=!homeHistoryOpen;host.refreshCurrentScreen();}),bottomMargin(10));
         if(homeHistoryOpen) {
-            try {
-                JSONObject recent=host.database.getRecentHistory(homeHistoryLimit+1);
-                JSONArray rows=recent.getJSONArray("transactions");int shown=0;
-                for(int i=0;i<rows.length()&&shown<homeHistoryLimit;i++){JSONObject tx=rows.optJSONObject(i);if(isReceivableTransaction(tx)){addDashboardTransaction(tx);shown++;}}
-                if(shown==0)emptyCard("لا توجد حركات بعد","تظهر هنا جميع الديون والدفعات من الأحدث.");
-                if(rows.length()>homeHistoryLimit)content.addView(button("عرض 10 حركات إضافية",soft,softForeground(),()->{homeHistoryLimit+=10;host.refreshCurrentScreen();}),bottomMargin(8));
-                content.addView(button("⌃  إغلاق الحركات",soft,softForeground(),()->{homeHistoryOpen=false;host.refreshCurrentScreen();}),bottomMargin(8));
-            }catch(JSONException error){host.showBrandedMessage("تعذر قراءة الحركات.");}
+            homeCursor=host.database.openHomeHistory();
+            if(homeCursor.getCount()==0) emptyCard("لا توجد حركات بعد","تظهر هنا جميع الديون والدفعات من الأحدث.");
+            else {
+                android.widget.ListView list=new android.widget.ListView(host);
+                list.setDivider(null); list.setContentDescription("سجل الحركات الكامل");
+                list.setOnTouchListener((v,event)->{v.getParent().requestDisallowInterceptTouchEvent(event.getAction()!=android.view.MotionEvent.ACTION_UP && event.getAction()!=android.view.MotionEvent.ACTION_CANCEL);return false;});
+                list.setAdapter(new android.widget.CursorAdapter(host,homeCursor,0) {
+                    public View newView(android.content.Context context,android.database.Cursor c,ViewGroup parent) { return new LinearLayout(host); }
+                    public void bindView(View view,android.content.Context context,android.database.Cursor c) {
+                        LinearLayout holder=(LinearLayout)view; holder.removeAllViews(); holder.setOrientation(LinearLayout.VERTICAL);
+                        JSONObject tx=new JSONObject();try{tx.put("contactId",c.getLong(1)).put("contactName",c.getString(2)).put("kind",c.getString(3)).put("amount",c.getLong(4)/100d).put("createdAt",c.getLong(5)).put("createdBy",c.getString(6));}catch(JSONException ignored){}
+                        holder.addView(dashboardTransaction(tx));
+                    }
+                });
+                content.addView(list,new LinearLayout.LayoutParams(-1,dp(420)));
+                content.addView(button("⌃  إغلاق سجل الحركات",soft,softForeground(),()->{homeHistoryOpen=false;host.refreshCurrentScreen();}),topMargin(10));
+            }
         }
 
     }
@@ -474,7 +486,7 @@ final class NativeScreens {
         MonthlyProgressView bar = new MonthlyProgressView(host, color, ratio); box.addView(bar, new LinearLayout.LayoutParams(-1, dp(4))); return box;
     }
 
-    private void addDashboardTransaction(JSONObject tx) {
+    private LinearLayout dashboardTransaction(JSONObject tx) {
         boolean payment = "payment".equals(tx.optString("kind")); int color = payment ? (host.isDarkTheme() ? Color.rgb(249, 165, 168) : Color.rgb(172, 47, 60)) : (host.isDarkTheme() ? accent : primary);
         LinearLayout row = card(host.isDarkTheme() ? surface : Color.WHITE); row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL); row.setPadding(dp(12), dp(10), dp(12), dp(10));
         TextView arrow = label(payment ? "↗" : "↙", 23, color, true); arrow.setGravity(Gravity.CENTER); arrow.setBackground(shape(payment ? (host.isDarkTheme() ? Color.rgb(88, 59, 61) : Color.rgb(255, 225, 225)) : soft, 12)); row.addView(arrow, new LinearLayout.LayoutParams(dp(38), dp(38)));
@@ -483,33 +495,7 @@ final class NativeScreens {
         names.addView(label((payment ? "دفعة مستلمة" : "دين مسجل") + " · " + new SimpleDateFormat("HH:mm", Locale.US).format(new Date(tx.optLong("createdAt"))), 10, muted, false), topMargin(3));
         if (payment && !tx.optString("createdBy").trim().isEmpty()) names.addView(label("سجّلها: " + tx.optString("createdBy"), 11, accent, false), topMargin(3));
         row.addView(names, new LinearLayout.LayoutParams(0, -2, 1)); row.addView(label((payment ? "−" : "+") + money(tx.optDouble("amount")), 16, color, true));
-        row.setOnClickListener(v -> { contactId = tx.optLong("contactId"); host.show("contact_detail"); }); content.addView(row, bottomMargin(8));
-    }
-
-    private void renderHomeHistory(LinearLayout holder, JSONArray transactions, int total) {
-        holder.removeAllViews();
-        if (total == 0) {
-            emptyCardInto(holder, "لا توجد حركات بعد", "أضف شخصاً ثم سجّل ديناً أو دفعة.");
-            return;
-        }
-        int visibleLimit = Math.min(homeHistoryLimit, total);
-        int shown = 0;
-        for (int i = 0; i < transactions.length() && shown < visibleLimit; i++) {
-            JSONObject tx = transactions.optJSONObject(i);
-            if (isReceivableTransaction(tx)) { addTransactionTo(holder, tx, false); shown++; }
-        }
-        if (visibleLimit < total) {
-            String label = homeHistoryLimit <= 5 ? "عرض كل السجل" : "عرض المزيد من الحركات";
-            holder.addView(button(label, soft, softForeground(), () -> {
-                homeHistoryLimit = Math.min(total, homeHistoryLimit + HOME_HISTORY_BATCH);
-                renderHomeHistory(holder, transactions, total);
-            }), topMargin(8));
-        } else if (homeHistoryLimit > 5) {
-            holder.addView(button("عرض أقل", soft, softForeground(), () -> {
-                homeHistoryLimit = 5;
-                renderHomeHistory(holder, transactions, total);
-            }), topMargin(8));
-        }
+        row.setOnClickListener(v -> { contactId = tx.optLong("contactId"); host.show("contact_detail"); }); return row;
     }
 
     private void buildContacts() {
@@ -1074,6 +1060,7 @@ final class NativeScreens {
         JSONObject snapshot = snapshot(); JSONObject totals = snapshot.optJSONObject("totals"); if (totals == null) totals = new JSONObject();
         JSONArray contacts = array(snapshot, "contacts"), transactions = array(snapshot, "transactions");
         pageHeading("التقارير والكشوفات", "اختر المدة لعرض السجل والكشوفات");
+        content.addView(button("إغلاق سجل التقارير",soft,softForeground(),host::onBackPressed),bottomMargin(10));
         addDateFilterControls();
         reportContactIds = new HashSet<>(); double debtTotal = 0d, paymentTotal = 0d; int debtCount = 0, paymentCount = 0;
         for (int i = 0; i < transactions.length(); i++) {
@@ -1100,18 +1087,20 @@ final class NativeScreens {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) { reportSearchText = s.toString(); renderReportPeople(results, contacts); }
             @Override public void afterTextChanged(Editable s) { }
         });
-        content.addView(button("إغلاق سجل التقارير",soft,softForeground(),()->host.show("history")),topBottom(12,12));
+        content.addView(button("إغلاق سجل التقارير",soft,softForeground(),host::onBackPressed),topBottom(12,12));
         sectionTitle("التصدير","اختر PDF أو Excel بعد الضغط على الحفظ.");
         content.addView(button("حفظ كشف السجلات",primary,Color.WHITE,()->exportCompletePdf(false)),bottomMargin(9));
 
     }
 
     private void addDateFilterControls() {
-        content.addView(button("فلتر السجل: "+reportRangeLabel+"  ⌄",soft,softForeground(),()->
+        TextView filter=button("فلتر السجل: "+reportRangeLabel+"  ⌄",soft,softForeground(),()->
             new SadadDialog.Builder(host).setTitle("مدة السجل").setItems(new String[]{"الكل","يومي","شهري","سنوي","فترة مخصصة"},(d,which)->{
                 if(which==0){reportStartMillis=Long.MIN_VALUE;reportEndMillis=Long.MAX_VALUE;reportRangeLabel="كل المدة";openFilteredHistory();}
                 else if(which==4)selectCustomReportPeriod();else selectReportPreset(which==1?"daily":which==2?"monthly":"yearly");
-            }).show()),bottomMargin(12));
+            }).show());
+        filter.setTextSize(12); filter.setPadding(dp(10),dp(7),dp(10),dp(7)); filter.setMinHeight(dp(38));
+        LinearLayout.LayoutParams position=bottomMargin(12);position.width=-2;position.gravity=Gravity.LEFT;content.addView(filter,position);
     }
 
     private void openFilteredHistory() {
@@ -1292,13 +1281,13 @@ final class NativeScreens {
 
     private void buildSettings() {
         if (!settingsPeriodInitialized) { settingsPeriodInitialized = true; setReportPreset("monthly"); }
-        TextView back = backArrow(() -> host.show("home")); content.addView(back, new LinearLayout.LayoutParams(dp(38), dp(38)));
+        TextView back = backArrow(host::onBackPressed); content.addView(back, new LinearLayout.LayoutParams(dp(38), dp(38)));
         LinearLayout profile = card(primary); profile.setOrientation(LinearLayout.HORIZONTAL); profile.setGravity(Gravity.CENTER_VERTICAL); profile.setPadding(dp(18), dp(22), dp(18), dp(22));
         GradientDrawable profileFill = new GradientDrawable(GradientDrawable.Orientation.TR_BL, new int[]{primary, Color.rgb(2, 48, 43)}); profileFill.setCornerRadius(dp(18)); profile.setBackground(profileFill); profile.setElevation(dp(4));
         LinearLayout details = new LinearLayout(host); details.setOrientation(LinearLayout.VERTICAL);
         LinearLayout heading = new LinearLayout(host); heading.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         heading.addView(label("بيانات المتجر", 20, Color.WHITE, true), new LinearLayout.LayoutParams(-2, -2)); heading.addView(spaceWidth(6));
-        TextView edit = button("✎", Color.argb(45, 255, 255, 255), Color.WHITE, this::promptStoreProfile); edit.setPadding(0, 0, 0, 0); edit.setMinHeight(0); edit.setContentDescription("تعديل اسم المتجر وصاحب المتجر"); heading.addView(edit, new LinearLayout.LayoutParams(dp(40), dp(40))); details.addView(heading);
+        TextView edit = button("", Color.argb(45, 255, 255, 255), Color.WHITE, this::promptStoreProfile); edit.setPadding(0, 0, 0, 0); edit.setMinHeight(0); edit.setContentDescription("تعديل اسم المتجر وصاحب المتجر"); Drawable pencil=host.getDrawable(R.drawable.ic_edit_thin).mutate();pencil.setTint(Color.WHITE);pencil.setBounds(0,0,dp(22),dp(22));edit.setCompoundDrawables(null,null,pencil,null);edit.setGravity(Gravity.CENTER); heading.addView(edit, new LinearLayout.LayoutParams(dp(40), dp(40))); details.addView(heading);
         TextView store = label("اسم المتجر: " + (host.storeName().isEmpty() ? "متجري" : host.storeName()), 18, Color.WHITE, true); store.setContentDescription("تعديل بيانات المتجر"); store.setOnClickListener(v -> promptStoreProfile()); details.addView(store, topMargin(12));
         TextView owner = label("اسم صاحب المتجر: " + (host.ownerName().isEmpty() ? "غير مسجل" : host.ownerName()), 14, Color.rgb(198, 240, 224), false); owner.setOnClickListener(v -> promptStoreProfile()); details.addView(owner, topMargin(7));
         profile.addView(details, new LinearLayout.LayoutParams(0, -2, 1)); profile.addView(spaceWidth(12));
@@ -1336,7 +1325,7 @@ final class NativeScreens {
         LinearLayout account = new LinearLayout(host); account.setGravity(Gravity.CENTER_VERTICAL);
         account.addView(button("تغيير كلمة المرور", surface, text, this::promptChangeServerPassword), new LinearLayout.LayoutParams(0, -2, 1)); account.addView(spaceWidth(10));
         account.addView(button("تسجيل الخروج", surface, text, () -> new SadadDialog.Builder(host).setTitle("تسجيل الخروج").setMessage("هل تريد تسجيل الخروج؟").setNegativeButton("إلغاء", null).setPositiveButton("تسجيل الخروج", (d, w) -> host.logout()).show()), new LinearLayout.LayoutParams(0, -2, 1)); content.addView(account, bottomMargin(14));
-        TextView developer = label("المطور : شركة AORCA", 14, primary, true); developer.setGravity(Gravity.CENTER); developer.setOnClickListener(v -> host.openSupportWhatsApp()); content.addView(developer, topBottom(15, 10));
+        TextView developer = label("المطور : orca", 14, primary, true); developer.setGravity(Gravity.CENTER); developer.setOnClickListener(v -> host.openSupportWhatsApp()); content.addView(developer, topBottom(15, 10));
     }
 
     private void divider() { View divider = new View(host); divider.setBackgroundColor(line); content.addView(divider, topBottom(16, 16)); divider.getLayoutParams().height = dp(1); }
@@ -1473,12 +1462,12 @@ final class NativeScreens {
     private void promptChangeServerPassword() {
         LinearLayout box = new LinearLayout(host); box.setOrientation(LinearLayout.VERTICAL); box.setPadding(dp(18), dp(6), dp(18), 0);
         EditText previous = input("كلمة المرور السابقة", true); box.addView(previous, bottomMargin(9));
-        EditText next = input("كلمة المرور الجديدة (12 محرفًا على الأقل)", true); box.addView(next, bottomMargin(9));
+        EditText next = input("كلمة المرور الجديدة (4 خانات على الأقل)", true); box.addView(next, bottomMargin(9));
         EditText confirm = input("تأكيد كلمة المرور الجديدة", true); box.addView(confirm);
         AlertDialog dialog = new SadadDialog.Builder(host).setTitle("تغيير كلمة المرور").setView(box).setNegativeButton("إلغاء", null).setPositiveButton("تغيير", null).create();
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             if (!next.getText().toString().equals(confirm.getText().toString())) { confirm.setError("كلمتا المرور غير متطابقتين"); return; }
-            if (next.getText().toString().length() < 12) { next.setError("استخدم 12 محرفًا على الأقل."); return; }
+            if (next.getText().toString().length() < 4) { next.setError("استخدم 4 خانات على الأقل."); return; }
             host.changeServerPassword(previous.getText().toString(), next.getText().toString(), (success, message) -> {
                 if (success) dialog.dismiss(); else previous.setError(message);
             });
@@ -1589,7 +1578,7 @@ final class NativeScreens {
     private void pageHeading(String heading, String sub) {
         LinearLayout row = new LinearLayout(host); row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL);
         String target = backTarget(route);
-        if (target != null) { TextView back = backArrow(() -> host.show(target)); row.addView(back, new LinearLayout.LayoutParams(dp(38), dp(38))); row.addView(spaceWidth(10)); }
+        if (target != null) { TextView back = backArrow(host::onBackPressed); row.addView(back, new LinearLayout.LayoutParams(dp(38), dp(38))); row.addView(spaceWidth(10)); }
         TextView h = label(heading, 23, text, true); h.setGravity(Gravity.RIGHT); row.addView(h, new LinearLayout.LayoutParams(0, -2, 1));
         content.addView(row, topBottom(8, 5)); if (sub != null && !sub.isEmpty()) content.addView(label(sub, 13, muted, false), bottomMargin(15));
     }
@@ -1795,3 +1784,4 @@ final class NativeScreens {
     private View spaceWidth(int width) { View v = new View(host); v.setLayoutParams(new LinearLayout.LayoutParams(dp(width), 1)); return v; }
     private static void addGap(LinearLayout parent, int height) { View v = new View(parent.getContext()); parent.addView(v, new LinearLayout.LayoutParams(1, Math.round(height * parent.getResources().getDisplayMetrics().density))); }
 }
+
