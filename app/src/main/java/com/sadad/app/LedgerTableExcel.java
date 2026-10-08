@@ -28,7 +28,7 @@ final class LedgerTableExcel {
             long opening=0;for(JSONObject tx:rows)if(tx.optLong("createdAt")<from)opening+=("payment".equals(tx.optString("kind"))?-1:1)*Math.round(tx.optDouble("amount")*100);
             StringBuilder xml=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><worksheet xmlns=\""+NS+"\"><sheetViews><sheetView workbookViewId=\"0\" rightToLeft=\"1\"><pane ySplit=\"6\" topLeftCell=\"A7\" activePane=\"bottomLeft\" state=\"frozen\"/></sheetView></sheetViews><cols><col min=\"1\" max=\"1\" width=\"23\" customWidth=\"1\"/><col min=\"2\" max=\"6\" width=\"18\" customWidth=\"1\"/><col min=\"7\" max=\"7\" width=\"48\" customWidth=\"1\"/></cols><sheetData>");
             row(xml,1,new String[]{"المتجر: "+store,"صاحب المتجر: "+owner},false);
-            row(xml,2,new String[]{"اسم الشخص: "+person.optString("name"),"الهاتف: "+person.optString("phone")},false);
+            row(xml,2,new String[]{"اسم الزبون: "+person.optString("name"),"واتساب: "+person.optString("phone"),"التصنيف: "+person.optString("category"),"سقف الائتمان: "+person.optString("creditLimit"),"تاريخ الإضافة: "+new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US).format(new Date(person.optLong("createdAt"))),"أضافه: "+person.optString("createdBy"),"موافقة الواتساب: "+(person.optBoolean("whatsappOptIn")?"نعم":"لا")},false);
             row(xml,3,new String[]{"الفترة: "+period},false);
             row(xml,4,new String[]{"الرصيد الافتتاحي",null,null,null,number(opening)},true);
             row(xml,5,new String[]{"ملاحظات الشخص: "+person.optString("note")},false);
@@ -42,6 +42,7 @@ final class LedgerTableExcel {
             int last=line-1;
             row(xml,line,new String[]{"","الإجمالي",number(totalDebt),number(totalPaid),number(running),"","رصيد نهاية الفترة"},true);
             xml.append("</sheetData>");if(last>=7)xml.append("<autoFilter ref=\"A6:G").append(last).append("\"/>");
+            xml.append("<mergeCells count=\"1\"><mergeCell ref=\"A5:G5\"/></mergeCells>");
             xml.append("<pageMargins left=\"0.3\" right=\"0.3\" top=\"0.5\" bottom=\"0.5\" header=\"0.2\" footer=\"0.2\"/></worksheet>");sheets.add(xml.toString());
         }
         if(sheets.isEmpty())throw new IllegalArgumentException("لا توجد بيانات");
@@ -57,7 +58,7 @@ final class LedgerTableExcel {
         }return output.toByteArray();
     }
     private static String number(long cents){return java.math.BigDecimal.valueOf(cents,2).toPlainString();}
-    private static void row(StringBuilder xml,int row,String[] cells,boolean numeric){xml.append("<row r=\"").append(row).append("\">");for(int i=0;i<cells.length;i++){if(cells[i]==null)continue;String ref=""+(char)('A'+i)+row;boolean number=numeric&&i>=2&&i<=4;xml.append("<c r=\"").append(ref).append("\" s=\"").append(row==6?1:number?2:0).append("\"");if(number)xml.append("><v>").append(cells[i]).append("</v></c>");else xml.append(" t=\"inlineStr\"><is><t xml:space=\"preserve\">").append(escape(cells[i])).append("</t></is></c>");}xml.append("</row>");}
+    private static void row(StringBuilder xml,int row,String[] cells,boolean numeric){xml.append("<row r=\"").append(row).append("\"");if(row==1||row==2||row==5){int longest=0;for(String cell:cells)if(cell!=null)longest=Math.max(longest,cell.length());int height=Math.max(24,((longest+(row==5?79:24))/(row==5?80:25))*15);xml.append(" ht=\"").append(Math.min(240,height)).append("\" customHeight=\"1\"");}xml.append(">");for(int i=0;i<cells.length;i++){if(cells[i]==null)continue;String ref=""+(char)('A'+i)+row;boolean number=numeric&&i>=2&&i<=4;xml.append("<c r=\"").append(ref).append("\" s=\"").append(row==6?1:number?2:0).append("\"");if(number)xml.append("><v>").append(cells[i]).append("</v></c>");else xml.append(" t=\"inlineStr\"><is><t xml:space=\"preserve\">").append(escape(cells[i])).append("</t></is></c>");}xml.append("</row>");}
     private static String escape(String s){return s.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]", "").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\"","&quot;");}
     private static void put(ZipOutputStream zip,String name,String value)throws Exception{zip.putNextEntry(new ZipEntry(name));zip.write(value.getBytes(StandardCharsets.UTF_8));zip.closeEntry();}
 }

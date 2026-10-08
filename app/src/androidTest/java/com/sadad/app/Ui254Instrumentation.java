@@ -17,14 +17,15 @@ public final class Ui254Instrumentation extends Instrumentation {
   JSONArray payments=host.database.getSnapshot().getJSONArray("payments");check(payments.length()==4,"Methods not saved");for(int i=0;i<4;i++)check(payments.getJSONObject(i).getString("createdBy").equals("رامي"),"Operator lost");
   screens.contactId=person;show("payment_form");Spinner method=spinner(root());check(method!=null&&method.getCount()==4,"Payment choices");check(method.getItemAtPosition(2).equals("محفظة جوال")&&method.getItemAtPosition(3).equals("محفظة بال بي"),"Wallet labels");capture(root(),"payment-form");
   show("contact_detail");check(text(root(),"المدفوع")==null&&text(root(),"المتبقي")==null,"Crowded details");check(text(root(),"سجّلها: رامي")!=null,"Person ledger operator");capture(root(),"person-ledger");
-  show("home");check(text(root(),"مرحبًا بك")!=null&&text(root(),"متجر الاختبار")!=null&&text(root(),"سجّلها: رامي")!=null,"Home greeting/operator");capture(root(),"home");
+  show("home");runOnMainSync(()->text(root(),"سجل آخر الحركات").performClick());waitForIdleSync();check(text(root(),"مرحبًا بك")!=null&&text(root(),"متجر الاختبار")!=null&&text(root(),"سجّلها: رامي")!=null,"Home greeting/operator");capture(root(),"home");
   show("contacts");check(text(root(),"متجر الاختبار")==null,"Header store badge remained");
   Bitmap image=Bitmap.createBitmap(400,200,Bitmap.Config.ARGB_8888);Canvas paint=new Canvas(image);paint.drawColor(Color.rgb(80,190,150));Paint blue=new Paint();blue.setColor(Color.rgb(20,100,210));paint.drawRect(200,0,400,200,blue);
   final ProfilePhotoEditor.CropView[] crop={null};runOnMainSync(()->{crop[0]=new ProfilePhotoEditor.CropView(host,image);crop[0].layout(0,0,200,200);crop[0].setZoom(3);crop[0].offsetX=99999;crop[0].offsetY=-99999;});Bitmap exported=crop[0].export();check(Color.alpha(exported.getPixel(0,0))==255&&Color.alpha(exported.getPixel(1023,1023))==255,"Crop empty border");exported.recycle();runOnMainSync(()->{crop[0].rotate();crop[0].center();});exported=crop[0].export();check(exported.getWidth()==1024&&crop[0].source.getWidth()==200,"Crop rotation");exported.recycle();crop[0].release();
   show("settings");final AlertDialog[] editor={null};runOnMainSync(()->editor[0]=ProfilePhotoEditor.show(host,image,host.sessions.syncAccountId()));waitForIdleSync();capture(editor[0].getWindow().getDecorView(),"photo-editor");runOnMainSync(()->editor[0].getButton(-1).performClick());waitForIdleSync();image.recycle();check(host.profilePhoto(true)!=null&&host.profilePhoto(false)!=null,"Shared portrait");capture(root(),"settings-light");
   runOnMainSync(()->host.setTheme(true));show("settings");capture(root(),"settings-dark");runOnMainSync(()->host.setTheme(false));show("login");check(text(root(),"دخول الزبون")==null,"Customer login visible");capture(root(),"login");show("customer_login");check(!host.currentRoute().startsWith("customer"),"Customer route accessible");
   latestChecks();
-  result.putString("stream","PASS: 2.5.4 greeting, no reminder, store editor, simple appearance icons, monthly shares, snapshot invalidation, XLSX/PDF exports; old payment migration, four payment channels, first login operator and ledger/home display, compact details, hidden customer entry/header badge, greeting, photo crop/zoom/alignment/rotation/save and shared portrait\n");finish(-1,result);
+  updated256();
+  result.putString("stream","PASS: 2.5.6 WhatsApp fields, compact filters, full export metadata, home history and prioritized deletion queue; greeting, no reminder, store editor, simple appearance icons, monthly shares, snapshot invalidation, XLSX/PDF exports; old payment migration, four payment channels, first login operator and ledger/home display, compact details, hidden customer entry/header badge, greeting, photo crop/zoom/alignment/rotation/save and shared portrait\n");finish(-1,result);
  }catch(Throwable error){result.putString("stream","FAIL: "+android.util.Log.getStackTraceString(error));finish(0,result);}}
  void latestChecks() throws Exception {
   show("home");check(text(root(),"مرحبًا بك، متجر الاختبار")!=null,"Inline greeting");check(text(root(),"تذكير ذكي") == null,"Reminder remained");
@@ -41,6 +42,23 @@ public final class Ui254Instrumentation extends Instrumentation {
   runOnMainSync(()->{fields.get(0).setText("متجر جديد");fields.get(1).setText("مالك جديد");dialog[0].getButton(-1).performClick();});waitForIdleSync();check(host.storeName().equals("متجر جديد")&&host.ownerName().equals("مالك جديد"),"Profile edits saved");capture(root(),"settings-updated");
   Method appearance=NativeScreens.class.getDeclaredMethod("showAppearancePicker");appearance.setAccessible(true);runOnMainSync(()->{try{dialog[0]=(AlertDialog)appearance.invoke(screens);}catch(Exception e){throw new RuntimeException(e);}});waitForIdleSync();check(text(dialog[0].getWindow().getDecorView(),"قمر")==null&&text(dialog[0].getWindow().getDecorView(),"عصافير")==null,"Decorative labels remained");capture(dialog[0].getWindow().getDecorView(),"appearance");runOnMainSync(()->dialog[0].dismiss());
   show("home");capture(root(),"home-updated");
+ }
+ void updated256() throws Exception {
+  getTargetContext().deleteDatabase("queue256.db");try(SadadDatabase queue=new SadadDatabase(getTargetContext(),"queue256.db")) {
+   long customer=queue.saveContact(new JSONObject().put("name","اختبار الحذف الكبير")).getLong("id");SQLiteDatabase ledger=queue.getWritableDatabase();ledger.beginTransaction();try{
+    for(int n=1;n<=600;n++){ledger.execSQL("INSERT INTO debts(id,contact_id,direction,amount_cents,created_at) VALUES(?,?,'receivable',100,1)",new Object[]{n,customer});ledger.execSQL("INSERT INTO payments(debt_id,amount_cents,method,created_at) VALUES(?,100,'cash',1)",new Object[]{n});}ledger.setTransactionSuccessful();
+   }finally{ledger.endTransaction();}
+   queue.acknowledgeDelta(queue.outboxWatermark());queue.saveContact(new JSONObject().put("name","تعديل يجب أن يبقى"));queue.deleteContactToTrash(customer);
+   JSONObject packet=queue.pendingDelta();check(packet.getJSONObject("delta").getJSONObject("deleted").getJSONArray("contacts").length()==1,"Deleted parent not prioritized");queue.acknowledgeDelta(packet);
+   try(android.database.Cursor c=ledger.rawQuery("SELECT COUNT(*) FROM sync_outbox q JOIN contacts r ON r.id=q.row_id WHERE q.entity='contacts'",null)){c.moveToFirst();check(c.getInt(0)==1,"Priority acknowledgment lost unrelated write");}
+  }
+
+  check(WhatsAppPhone.normalize("٠٥٩٩١٢٣٤٥٦","970").equals("+970599123456"),"Palestinian normalization");check(WhatsAppPhone.normalize("0541234567","972").equals("+972541234567"),"Israeli normalization");
+  show("contact_form");check(text(root(),"مقدمة الواتساب")!=null&&text(root(),"رقم الواتساب")!=null,"WhatsApp fields");
+  show("history");check(text(root(),"فلتر السجل:")!=null&&text(root(),"حفظ كشف السجلات")!=null,"Compact filter/export");
+  show("settings");check(text(root(),"حفظ كشف السجلات")==null&&text(root(),"مشاركة كشف السجلات")!=null,"Settings export removal");
+  show("reports");check(text(root(),"إغلاق سجل التقارير")!=null&&text(root(),"حفظ كشف السجلات")!=null&&text(root(),"حفظ كشف السجلات الكامل PDF")==null,"Reports save/close");
+  show("home");check(text(root(),"آخر الزبائن")==null&&text(root(),"حركات اليوم")==null,"Old headings removed");capture(root(),"home-256");
  }
  void collectBars(View v,java.util.ArrayList<MonthlyProgressView> out){if(v instanceof MonthlyProgressView)out.add((MonthlyProgressView)v);if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++)collectBars(((ViewGroup)v).getChildAt(i),out);}
  void collectInputs(View v,java.util.ArrayList<EditText> out){if(v instanceof EditText)out.add((EditText)v);if(v instanceof ViewGroup)for(int i=0;i<((ViewGroup)v).getChildCount();i++)collectInputs(((ViewGroup)v).getChildAt(i),out);}

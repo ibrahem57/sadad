@@ -57,12 +57,20 @@ public final class SadadDatabase extends SQLiteOpenHelper {
     synchronized boolean deltaReady() { return scalarLong(getReadableDatabase(), "SELECT ready FROM sync_control WHERE id=1", null) == 1; }
     synchronized boolean hasPendingSync() { return scalarLong(getReadableDatabase(), "SELECT EXISTS(SELECT 1 FROM sync_outbox)", null) == 1; }
     synchronized void acknowledgeDelta(long watermark) { getWritableDatabase().delete("sync_outbox", "seq<=?", new String[]{String.valueOf(watermark)}); }
+    synchronized void acknowledgeDelta(JSONObject packet) throws JSONException {
+        JSONArray sequences=packet.getJSONArray("sequences");SQLiteDatabase db=getWritableDatabase();db.beginTransaction();try {
+            for(int n=0;n<sequences.length();n++)db.delete("sync_outbox","seq=?",new String[]{String.valueOf(sequences.getLong(n))});
+            db.setTransactionSuccessful();
+        }finally{db.endTransaction();}
+    }
     /** Only queued rows are read, capped at 500 changes, including deletions and cascades. */
     synchronized JSONObject pendingDelta() throws JSONException {
         SQLiteDatabase db = getReadableDatabase();
-        java.util.LinkedHashMap<String, Long> changes = new java.util.LinkedHashMap<>(); long watermark = 0;
-        try (Cursor cursor = db.rawQuery("SELECT seq,entity,row_id FROM sync_outbox ORDER BY seq LIMIT 500", null)) {
-            while (cursor.moveToNext()) { watermark = cursor.getLong(0); changes.put(cursor.getString(1) + ":" + cursor.getLong(2), cursor.getLong(2)); }
+        java.util.LinkedHashMap<String, Long> changes = new java.util.LinkedHashMap<>(); long watermark = 0; JSONArray sequences=new JSONArray();
+        String parents="SELECT q.seq,q.entity,q.row_id FROM sync_outbox q WHERE (q.entity='contacts' AND NOT EXISTS(SELECT 1 FROM contacts r WHERE r.id=q.row_id)) OR (q.entity='debts' AND NOT EXISTS(SELECT 1 FROM debts r WHERE r.id=q.row_id)) ORDER BY CASE q.entity WHEN 'contacts' THEN 0 ELSE 1 END,q.seq LIMIT 500";
+        String query=scalarLong(db,"SELECT EXISTS("+parents+")",null)==1?parents:"SELECT seq,entity,row_id FROM sync_outbox ORDER BY seq LIMIT 500";
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            while (cursor.moveToNext()) { watermark = Math.max(watermark,cursor.getLong(0)); sequences.put(cursor.getLong(0)); changes.put(cursor.getString(1) + ":" + cursor.getLong(2), cursor.getLong(2)); }
         }
         JSONObject delta = new JSONObject(), deleted = new JSONObject();
         for (String table : new String[]{"contacts", "debts", "payments"}) { delta.put(table, new JSONArray()); deleted.put(table, new JSONArray()); }
@@ -83,7 +91,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
                 delta.getJSONArray(table).put(row);
             }
         }
-        delta.put("deleted", deleted); return new JSONObject().put("delta", delta).put("watermark", watermark);
+        delta.put("deleted", deleted); return new JSONObject().put("delta", delta).put("watermark", watermark).put("sequences",sequences);
     }
 
     synchronized long outboxWatermark() { return scalarLong(getReadableDatabase(), "SELECT COALESCE(MAX(seq),0) FROM sync_outbox", null); }
@@ -611,10 +619,11 @@ public final class SadadDatabase extends SQLiteOpenHelper {
     synchronized JSONObject latestPersonDebt(long id) throws JSONException {
         try(Cursor c=getReadableDatabase().rawQuery("SELECT amount_cents FROM debts WHERE contact_id=? AND direction='receivable' ORDER BY created_at DESC,id DESC LIMIT 1",new String[]{String.valueOf(id)})){return c.moveToFirst()?new JSONObject().put("amount",fromCents(c.getLong(0))):null;}
     }
-    public synchronized JSONObject getSnapshot() throws JSONException { return buildSnapshot(false,0); }
-    synchronized JSONObject getOverview() throws JSONException { return buildSnapshot(true,0); }
-    synchronized JSONObject getPersonSnapshot(long id) throws JSONException { return buildSnapshot(false,id); }
-    private JSONObject buildSnapshot(boolean overview, long onlyPerson) throws JSONException {
+    public synchronized JSONObject getSnapshot() throws JSONException { return buildSnapshot(false,0,0); }
+    synchronized JSONObject getRecentHistory(int limit) throws JSONException { return buildSnapshot(true,0,Math.max(1,limit)); }
+    synchronized JSONObject getOverview() throws JSONException { return buildSnapshot(true,0,1000); }
+    synchronized JSONObject getPersonSnapshot(long id) throws JSONException { return buildSnapshot(false,id,0); }
+    private JSONObject buildSnapshot(boolean overview, long onlyPerson, int limit) throws JSONException {
         SQLiteDatabase db = getReadableDatabase();
         Map<Long, JSONObject> contactById = new HashMap<>();
         JSONArray contacts = new JSONArray();
@@ -647,7 +656,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         String debtQuery = "SELECT d.id,d.contact_id,d.direction,d.amount_cents,d.note,d.due_date,d.created_at," +
                 "COALESCE(SUM(p.amount_cents),0),d.created_by FROM debts d LEFT JOIN payments p ON p.debt_id=d.id " +
                 (onlyPerson>0?"WHERE d.contact_id="+onlyPerson+" ":"")+"GROUP BY d.id ORDER BY d.created_at DESC,d.id DESC";
-        if (overview) debtQuery += " LIMIT 1000";
+        if (limit>0) debtQuery += " LIMIT "+limit;
         try (Cursor cursor = db.rawQuery(debtQuery, null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
@@ -699,7 +708,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         String paymentQuery = "SELECT p.id,p.debt_id,p.amount_cents,p.method,p.note,p.created_at," +
                 "d.contact_id,d.direction,c.name,p.created_by FROM payments p JOIN debts d ON d.id=p.debt_id " +
                 "JOIN contacts c ON c.id=d.contact_id "+(onlyPerson>0?"WHERE d.contact_id="+onlyPerson+" ":"")+"ORDER BY p.created_at DESC,p.id DESC";
-        if (overview) paymentQuery += " LIMIT 1000";
+        if (limit>0) paymentQuery += " LIMIT "+limit;
         try (Cursor cursor = db.rawQuery(paymentQuery, null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
@@ -726,7 +735,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
                 "JOIN contacts c ON c.id=d.contact_id " +
                 (onlyPerson>0?"WHERE d.contact_id="+onlyPerson+" ":"")+"GROUP BY p.created_at,d.contact_id,d.direction,p.note,p.method " +
                 "ORDER BY p.created_at DESC,MIN(p.id) DESC";
-        if (overview) groupedPaymentQuery += " LIMIT 1000";
+        if (limit>0) groupedPaymentQuery += " LIMIT "+limit;
         try (Cursor cursor = db.rawQuery(groupedPaymentQuery, null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0), debtId = cursor.getLong(1), contactId = cursor.getLong(2), createdAt = cursor.getLong(7);

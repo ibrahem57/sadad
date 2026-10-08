@@ -27,7 +27,7 @@ public final class LedgerSyncService extends JobService {
                         if (db.deltaReady()) {
                             JSONObject packet=db.pendingDelta(); result=request(session,"POST","/mobile/sync-delta",new JSONObject().put("baseRevision",session.revision()).put("delta",packet.getJSONObject("delta")).put("batchId",session.deviceId()+":"+packet.optLong("watermark")),token);
                             if(!account.equals(session.syncAccountId())||!token.equals(session.token()))return;
-                            db.acknowledgeDelta(packet.optLong("watermark")); session.setRevision(result.optLong("revision",session.revision()));
+                            db.acknowledgeDelta(packet); session.setRevision(result.optLong("revision",session.revision()));
                             session.setUnsyncedChanges(db.hasPendingSync());session.setSyncBlocked(false);
                             if(session.hasUnsyncedChanges())retry=true;
                             return;

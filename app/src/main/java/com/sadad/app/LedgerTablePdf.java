@@ -86,6 +86,9 @@ final class LedgerTablePdf {
         block("المتجر: " + (store.isEmpty() ? "متجري" : store) + (owner.isEmpty() ? "" : "   |   صاحب المتجر: " + owner), 12, false);
         block("اسم الشخص: " + person.optString("name"), 16, true);
         block("الهاتف: " + (person.optString("phone").isEmpty() ? "غير مسجل" : person.optString("phone")), 12, false);
+        block("التصنيف: "+person.optString("category")+"   |   سقف الائتمان: "+person.optString("creditLimit","0")+" ₪",11,false);
+        block("تاريخ الإضافة: "+date(person.optLong("createdAt"))+"   |   أضافه: "+person.optString("createdBy"),11,false);
+        block("موافقة إشعارات واتساب: "+(person.optBoolean("whatsappOptIn")?"نعم":"لا"),11,false);
         if (!person.optString("note").trim().isEmpty()) block("ملاحظات الشخص: " + person.optString("note").trim(), 11, false);
         block("الفترة: " + period + "   |   إعداد الكشف: " + date(System.currentTimeMillis()), 11, false);
         block("الرصيد الافتتاحي: " + number(opening) + " ₪   |   رصيد نهاية الفترة: " + number(closing) + " ₪", 12, true);

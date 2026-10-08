@@ -68,12 +68,13 @@ final class NativeScreens {
     private int contactLimit = 60;
     private int historyLimit = 100;
     private int personHistoryPage; private long personHistoryOwner;
-    private int homeHistoryLimit = 5;
+    private int homeHistoryLimit = 10;
     private static final int HOME_HISTORY_BATCH = 50;
     private int reportContactLimit = 60;
     private String reportSearchText = "";
     private long reportStartMillis = Long.MIN_VALUE;
     private long reportEndMillis = Long.MAX_VALUE;
+    private boolean homeHistoryOpen;
     private String reportRangeLabel = "كل المدة";
     private Set<Long> reportContactIds = new HashSet<>();
     private boolean onlyReceivableDebtors;
@@ -412,7 +413,7 @@ final class NativeScreens {
             case "contact_form": buildContactForm(); break;
             case "debt_form": buildDebtForm(); break;
             case "payment_form": buildPaymentForm(); break;
-            case "history": historyOpened = false; buildHistory(); break;
+            case "history": historyOpened = true; buildHistory(); break;
             case "history_results": historyOpened = true; buildHistory(); break;
             case "reports": buildReports(); break;
             case "notifications": buildNotifications(); break;
@@ -448,12 +449,17 @@ final class NativeScreens {
         LinearLayout metrics = new LinearLayout(host); metrics.setOrientation(LinearLayout.HORIZONTAL);
         metrics.addView(monthMetric("ديون مسجلة", debt, debt + paid == 0 ? 0 : debt / (debt + paid), host.isDarkTheme() ? Color.rgb(245, 154, 159) : Color.rgb(171, 50, 58)), new LinearLayout.LayoutParams(0, -2, 1)); metrics.addView(spaceWidth(10));
         metrics.addView(monthMetric("دفعات مستلمة", paid, debt + paid == 0 ? 0 : paid / (debt + paid), accent), new LinearLayout.LayoutParams(0, -2, 1)); content.addView(metrics, bottomMargin(20));
-        dashboardHeading("آخر الزبائن", String.valueOf(contacts.length()));
-        dashboardHeading("حركات اليوم", new SimpleDateFormat("EEEE، d MMMM", new Locale("ar")).format(new Date()));
-        Calendar today = Calendar.getInstance(); today.set(Calendar.HOUR_OF_DAY, 0); today.set(Calendar.MINUTE, 0); today.set(Calendar.SECOND, 0); today.set(Calendar.MILLISECOND, 0);
-        int shown = 0;
-        for (int i = 0; i < transactions.length() && shown < 3; i++) { JSONObject tx = transactions.optJSONObject(i); if (!isReceivableTransaction(tx) || tx.optLong("createdAt") < today.getTimeInMillis()) continue; addDashboardTransaction(tx); shown++; }
-        if (shown == 0) { TextView empty = label("لا توجد حركات اليوم", 13, muted, false); empty.setGravity(Gravity.CENTER); empty.setPadding(0, dp(18), 0, dp(18)); content.addView(empty, bottomMargin(10)); }
+        content.addView(button((homeHistoryOpen?"⌃  ":"⌄  ")+"سجل آخر الحركات",soft,softForeground(),()->{homeHistoryOpen=!homeHistoryOpen;host.refreshCurrentScreen();}),bottomMargin(10));
+        if(homeHistoryOpen) {
+            try {
+                JSONObject recent=host.database.getRecentHistory(homeHistoryLimit+1);
+                JSONArray rows=recent.getJSONArray("transactions");int shown=0;
+                for(int i=0;i<rows.length()&&shown<homeHistoryLimit;i++){JSONObject tx=rows.optJSONObject(i);if(isReceivableTransaction(tx)){addDashboardTransaction(tx);shown++;}}
+                if(shown==0)emptyCard("لا توجد حركات بعد","تظهر هنا جميع الديون والدفعات من الأحدث.");
+                if(rows.length()>homeHistoryLimit)content.addView(button("عرض 10 حركات إضافية",soft,softForeground(),()->{homeHistoryLimit+=10;host.refreshCurrentScreen();}),bottomMargin(8));
+                content.addView(button("⌃  إغلاق الحركات",soft,softForeground(),()->{homeHistoryOpen=false;host.refreshCurrentScreen();}),bottomMargin(8));
+            }catch(JSONException error){host.showBrandedMessage("تعذر قراءة الحركات.");}
+        }
 
     }
 
@@ -571,7 +577,10 @@ final class NativeScreens {
         actions.addView(spaceWidth(8));
         actions.addView(button("تسجيل دفعة", soft, softForeground(), () -> { contactId = person.optLong("id"); host.show("payment_form"); }), new LinearLayout.LayoutParams(0, dp(50), 1));
         content.addView(actions, bottomMargin(9));
-        content.addView(button("تعديل بيانات الشخص", soft, softForeground(), () -> { editingContactId = person.optLong("id"); host.show("contact_form"); }), bottomMargin(18));
+        LinearLayout contactActions=new LinearLayout(host);contactActions.setOrientation(LinearLayout.HORIZONTAL);
+        contactActions.addView(button("تعديل البيانات",soft,softForeground(),()->{editingContactId=person.optLong("id");host.show("contact_form");}),new LinearLayout.LayoutParams(0,-2,1));
+        contactActions.addView(spaceWidth(8));contactActions.addView(button("تواصل على واتساب",soft,softForeground(),()->openCustomerWhatsApp(person)),new LinearLayout.LayoutParams(0,-2,1));
+        content.addView(contactActions,bottomMargin(18));
         JSONArray transactions = array(snapshot(), "transactions"); int personTransactions = 0;
         for (int i = 0; i < transactions.length(); i++) if (isReceivableTransaction(transactions.optJSONObject(i)) && transactions.optJSONObject(i).optLong("contactId") == person.optLong("id")) personTransactions++;
         sectionTitle("سجل حركات هذا الشخص", personTransactions + " حركة، مرتبة من الأحدث");
@@ -584,7 +593,7 @@ final class NativeScreens {
         if(personHistoryPage>0)content.addView(button("الحركات الأحدث",soft,softForeground(),()->{personHistoryPage--;host.show("contact_detail");}),bottomMargin(8));
         if((personHistoryPage+1)*100<personTransactions)content.addView(button("الحركات الأقدم",soft,softForeground(),()->{personHistoryPage++;host.show("contact_detail");}),bottomMargin(8));
         if (personTransactions == 0) emptyCard("لا توجد حركات لهذا الشخص", "ستظهر الديون والدفعات هنا عند تسجيلها.");
-        content.addView(button("مشاركة كشف PDF لهذا الشخص", soft, softForeground(), () -> shareContactPdf(person.optLong("id"))), topMargin(12));
+        content.addView(button("مشاركة كشف الشخص", soft, softForeground(), () -> shareContactPdf(person.optLong("id"))), topMargin(12));
         if (host.devicePermissionAllowed("deleteRecords")) content.addView(button("حذف السجل", Color.rgb(255, 238, 235), Color.rgb(157, 47, 43), () -> confirmDeleteLedger(person)), topMargin(16));
         if (host.devicePermissionAllowed("deleteContacts")) content.addView(button("حذف الزبون", Color.rgb(255, 228, 223), Color.rgb(157, 47, 43), () -> confirmDeleteContact(person)), topMargin(8));
     }
@@ -741,13 +750,27 @@ final class NativeScreens {
         void finish() { if (page != null) { document.finishPage(page); page = null; } }
     }
 
+    private void openCustomerWhatsApp(JSONObject person) {
+        String value=person.optString("phone");
+        try {
+            String digits=WhatsAppPhone.normalize(value,value.replaceAll("[^0-9]","").startsWith("972")?"972":"970").substring(1);
+            host.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,android.net.Uri.parse("https://wa.me/"+digits)));
+        }catch(IllegalArgumentException invalid){host.showBrandedMessage("أضف رقم واتساب صحيحًا من تعديل البيانات أولًا.");}
+        catch(android.content.ActivityNotFoundException unavailable){host.showBrandedMessage("لا يوجد تطبيق لفتح رابط واتساب.");}
+    }
+
     private void buildContactForm() {
         boolean edit = editingContactId > 0;
         JSONObject old = edit ? findContact(editingContactId) : null;
         pageHeading(edit ? "تعديل بيانات الشخص" : "إضافة شخص", "الاسم ورقم الهاتف يساعدان على وضوح الكشوفات");
         EditText name = input("الاسم الكامل", false); name.setSingleLine(true); name.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         name.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_NEXT); if (old != null) name.setText(old.optString("name")); addField("اسم الشخص", name);
-        EditText phone = input("رقم الهاتف", false); phone.setInputType(3); if (old != null) phone.setText(old.optString("phone")); addField("رقم الهاتف", phone);
+        Spinner country=spinner(new String[]{"فلسطين (+970)","إسرائيل (+972)"});
+        String oldNumber=old==null?"":westernDigits(old.optString("phone")).replaceAll("[^0-9]","");
+        if(oldNumber.startsWith("972"))country.setSelection(1);
+        if(oldNumber.startsWith("970")||oldNumber.startsWith("972"))oldNumber=oldNumber.substring(3);
+        addField("مقدمة الواتساب",country);
+        EditText phone=input("رقم الواتساب، مثال 0599123456",false);phone.setInputType(3);phone.setText(oldNumber);addField("رقم الواتساب",phone);
         EditText category = input("مثال: عميل، مورد، صديق", false); category.setText(old == null ? "عميل" : old.optString("category", "عميل"));
         EditText creditLimit = input("0.00 — اتركه فارغاً بلا حد", false); creditLimit.setInputType(8194 | 4096);
         if (old != null && old.optDouble("creditLimit") > 0d) creditLimit.setText(String.format(Locale.US, "%.2f", old.optDouble("creditLimit")));
@@ -784,7 +807,9 @@ final class NativeScreens {
         final View[] saveButton = {null};
         saveButton[0] = button(edit ? "حفظ التعديلات" : "حفظ الشخص", primary, Color.WHITE, () -> {
             String personName = name.getText().toString().trim();
-            String personPhone = phone.getText().toString().trim();
+            String personPhone;
+            try{personPhone=WhatsAppPhone.normalize(phone.getText().toString(),country.getSelectedItemPosition()==1?"972":"970");}
+            catch(IllegalArgumentException invalid){phone.setError(invalid.getMessage());return;}
             boolean withDebt = !edit && initialDebtSwitch != null && initialDebtSwitch.isChecked();
             String amount = withDebt && firstDebtAmount != null ? firstDebtAmount.getText().toString().trim() : "";
             if (withDebt && amount.isEmpty()) { firstDebtAmount.setError("أدخل مبلغ الدين أو أوقف خيار تسجيل الدين."); return; }
@@ -970,15 +995,8 @@ final class NativeScreens {
                         .put("method", methodName).put("note", note.getText().toString()).put("createdBy", host.currentOperatorName()));
                 host.markLedgerChanged();
                 new SadadDialog.Builder(host).setTitle("تم تسجيل الدفعة")
-                        .setMessage("تم خصم " + money(receipt.optDouble("amount")) + " من إجمالي حساب " + person.optString("name") + ". هل تريد طباعة سند قبض؟")
-                        .setNegativeButton("لاحقاً", (d, w) -> host.show("contact_detail"))
-                        .setPositiveButton("طباعة سند قبض", (d, w) -> {
-                            try { host.printPdf(createVoucherPdf("سند قبض", person.optString("name"), person.optString("phone"),
-                                    receipt.optDouble("amount"), method.getSelectedItem().toString(), note.getText().toString(), receipt.optLong("createdAt")),
-                                    "سند قبض " + person.optString("name")); }
-                            catch (Exception error) { host.showBrandedMessage("تعذر تجهيز سند القبض للطباعة."); }
-                            host.show("contact_detail");
-                        }).show();
+                        .setMessage("تم حفظ الدفعة وخصم "+money(receipt.optDouble("amount"))+" من حساب "+person.optString("name")+".")
+                        .setPositiveButton("إغلاق",(d,w)->host.show("contact_detail")).show();
             } catch (Exception e) {
                 String message = e.getMessage() == null ? "تحقق من المبلغ" : e.getMessage();
                 amount.setError(message); host.showBrandedMessage(message);
@@ -1009,6 +1027,9 @@ final class NativeScreens {
             }
             if (latest.size() > historyLimit) content.addView(button("عرض المزيد من الأشخاص", soft, softForeground(), () -> { historyLimit += 100; show("history_results"); }), bottomMargin(10));
         }
+        sectionTitle("التصدير","اختر الصيغة عند الحفظ.");
+        content.addView(button("حفظ كشف السجلات",primary,Color.WHITE,()->exportCompletePdf(false)),topMargin(12));
+
     }
 
     private void addHistoryPersonSummary(long id, JSONObject latest) {
@@ -1066,10 +1087,6 @@ final class NativeScreens {
         content.addView(metric("الديون المسجلة بالفترة", money(debtTotal), debtCount + " عملية دين", primary), bottomMargin(10));
         content.addView(metric("الدفعات المسجلة بالفترة", money(paymentTotal), paymentCount + " حركة سداد", accent), bottomMargin(16));
         content.addView(label("الرصيد المفتوح الآن لكل المتجر: " + money(totals.optDouble("receivable")), 13, muted, true), bottomMargin(12));
-        sectionTitle("التصدير", "احفظ كشفاً كاملاً ومنسقاً بصيغة PDF.");
-        content.addView(button("حفظ كشف السجلات الكامل PDF", primary, Color.WHITE, this::shareCompletePdf), bottomMargin(9));
-        content.addView(button("طباعة سند صرف", soft, softForeground(), this::promptPrintDisbursement), bottomMargin(9));
-        content.addView(button("عرض سجل الحركات", soft, softForeground(), () -> host.show("history")), bottomMargin(16));
         sectionTitle("كشوفات الأشخاص", "ابحث بالاسم أو رقم الهاتف وافتح كشف الشخص بصيغة PDF.");
         LinearLayout searchRow = new LinearLayout(host); searchRow.setGravity(Gravity.CENTER_VERTICAL); searchRow.setOrientation(LinearLayout.HORIZONTAL);
         searchRow.setPadding(dp(11), 0, dp(11), 0); searchRow.setBackground(shape(surface, 13));
@@ -1083,17 +1100,18 @@ final class NativeScreens {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) { reportSearchText = s.toString(); renderReportPeople(results, contacts); }
             @Override public void afterTextChanged(Editable s) { }
         });
+        content.addView(button("إغلاق سجل التقارير",soft,softForeground(),()->host.show("history")),topBottom(12,12));
+        sectionTitle("التصدير","اختر PDF أو Excel بعد الضغط على الحفظ.");
+        content.addView(button("حفظ كشف السجلات",primary,Color.WHITE,()->exportCompletePdf(false)),bottomMargin(9));
+
     }
 
     private void addDateFilterControls() {
-        sectionTitle("مدة السجل", "اختر المدة لفتح السجل");
-        content.addView(button("يومي", "اليوم".equals(reportRangeLabel) ? primary : soft, "اليوم".equals(reportRangeLabel) ? Color.WHITE : softForeground(), () -> selectReportPreset("daily")), bottomMargin(8));
-        content.addView(button("شهري", "هذا الشهر".equals(reportRangeLabel) ? primary : soft, "هذا الشهر".equals(reportRangeLabel) ? Color.WHITE : softForeground(), () -> selectReportPreset("monthly")), bottomMargin(8));
-        content.addView(button("سنوي", "هذه السنة".equals(reportRangeLabel) ? primary : soft, "هذه السنة".equals(reportRangeLabel) ? Color.WHITE : softForeground(), () -> selectReportPreset("yearly")), bottomMargin(8));
-        content.addView(button("فترة مخصصة", soft, softForeground(), this::selectCustomReportPeriod), bottomMargin(8));
-        content.addView(button("عرض كل المدة", "كل المدة".equals(reportRangeLabel) ? primary : soft, "كل المدة".equals(reportRangeLabel) ? Color.WHITE : softForeground(), () -> {
-            reportStartMillis = Long.MIN_VALUE; reportEndMillis = Long.MAX_VALUE; reportRangeLabel = "كل المدة"; openFilteredHistory();
-        }), bottomMargin(12));
+        content.addView(button("فلتر السجل: "+reportRangeLabel+"  ⌄",soft,softForeground(),()->
+            new SadadDialog.Builder(host).setTitle("مدة السجل").setItems(new String[]{"الكل","يومي","شهري","سنوي","فترة مخصصة"},(d,which)->{
+                if(which==0){reportStartMillis=Long.MIN_VALUE;reportEndMillis=Long.MAX_VALUE;reportRangeLabel="كل المدة";openFilteredHistory();}
+                else if(which==4)selectCustomReportPeriod();else selectReportPreset(which==1?"daily":which==2?"monthly":"yearly");
+            }).show()),bottomMargin(12));
     }
 
     private void openFilteredHistory() {
@@ -1199,8 +1217,8 @@ final class NativeScreens {
         JSONObject snap = snapshot();
         if (array(snap, "contacts").length() == 0) { host.showBrandedMessage("أضف أشخاصًا وحركات قبل إنشاء كشف السجلات."); return; }
         new SadadDialog.Builder(host).setTitle("اختر صيغة التصدير").setItems(new String[]{"PDF", "Excel (.xlsx)"}, (dialog, which) -> {
-            final String store = host.storeName(), owner = host.ownerName(), period = reportRangeLabel;
-            final long from = reportStartMillis, to = reportEndMillis;
+            final String store = host.storeName(), owner = host.ownerName(), period = share ? "كل المدة" : reportRangeLabel;
+            final long from = share ? Long.MIN_VALUE : reportStartMillis, to = share ? Long.MAX_VALUE : reportEndMillis;
             final SadadDatabase reportDatabase = host.database;
             host.generateReport(() -> which == 0 ? LedgerTablePdf.create(store, owner, period, reportDatabase.getSnapshot(), 0L, from, to)
                     : LedgerTableExcel.create(store, owner, period, reportDatabase.getSnapshot(), 0L, from, to),
@@ -1302,7 +1320,6 @@ final class NativeScreens {
                 setReportPreset(position == 0 ? "daily" : position == 1 ? "monthly" : "yearly");
             }
         });
-        content.addView(button("حفظ كشف السجلات", surface, text, () -> exportCompletePdf(false)), bottomMargin(12));
         content.addView(button("مشاركة كشف السجلات", surface, text, () -> exportCompletePdf(true)), bottomMargin(12));
         content.addView(button("سلة المحذوفات", surface, text, () -> host.show("trash")), bottomMargin(12));
         content.addView(button("تواصل معنا على WhatsApp", surface, text, host::openSupportWhatsApp), bottomMargin(6));

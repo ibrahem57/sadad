@@ -762,6 +762,15 @@ function syncDelta(store, body, device) {
     for(const value of deleted[table]||[])rows.delete(id(value));
     snapshot[table]=[...rows.values()];
   }
+  // Parent removal is one atomic ledger operation, including children beyond this upload page.
+  const removedContacts=new Set((deleted.contacts||[]).map(id));
+  const removedDebts=new Set((deleted.debts||[]).map(id));
+  for(const debt of snapshot.debts)if(removedContacts.has(Number(debt.contactId)))removedDebts.add(Number(debt.id));
+  // The original scoped snapshot identifies children even if an explicit debt deletion removed its row.
+  const priorDebts=removedContacts.size?makeSnapshot(store,ids).debts:[];
+  for(const debt of priorDebts)if(removedContacts.has(Number(debt.contactId)))removedDebts.add(Number(debt.id));
+  snapshot.debts=snapshot.debts.filter(row=>!removedDebts.has(Number(row.id)));
+  snapshot.payments=snapshot.payments.filter(row=>!removedDebts.has(Number(row.debtId)));
   return syncSnapshot(store,snapshot,body.baseRevision,device,ids);
 }
 

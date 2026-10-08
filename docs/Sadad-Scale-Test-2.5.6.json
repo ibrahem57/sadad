@@ -1,0 +1,28 @@
+{
+  "syntheticStores": 1000,
+  "contacts": 1500001,
+  "debts": 600001,
+  "seedMs": 26244,
+  "pagedContacts": 1501,
+  "pageRequests": 4,
+  "pageDownloadMs": 182,
+  "deltaMs": 41,
+  "concurrentRequests": 600,
+  "concurrency": 10,
+  "trafficMs": 15006,
+  "requestsPerSecond": 40,
+  "p95Ms": 296,
+  "rssMiB": 10,
+  "tests": "delta, idempotency, stale revision, paged full download, cross-store isolation, complete backup restore",
+  "limitation": "Synthetic data on local node; no certification of concurrent production traffic.",
+  "volumeTestVersion": "2.5.5",
+  "updateVersion": "2.5.6",
+  "updateTests": [
+    "Both APK builds",
+    "International WhatsApp normalization and invalid-number rejection",
+    "600 settled debts and payments deleted atomically from a partial upload; full archive preserved",
+    "Unsettled deletion rejected and repeated receipt idempotent",
+    "Actual XLSX generated and reopened; complete metadata and numeric balance 75"
+  ],
+  "androidUi": "PASS on isolated Android emulator: WhatsApp fields, filter and export controls, settings share without save, reports close/save, home heading removal; prioritized parent deletion and exact acknowledgments preserve unrelated writes; XLSX/PDF generation, theme, crop and old payment migration."
+}
