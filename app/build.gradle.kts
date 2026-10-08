@@ -20,8 +20,8 @@ android {
         testInstrumentationRunner = providers.gradleProperty("SADAD_TEST_RUNNER").getOrElse("com.sadad.app.QaInstrumentation")
         minSdk = 24
         targetSdk = 34
-        versionCode = 33
-        versionName = providers.gradleProperty("SADAD_VERSION_NAME").getOrElse("2.5.7")
+        versionCode = 34
+        versionName = providers.gradleProperty("SADAD_VERSION_NAME").getOrElse("2.5.8")
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         manifestPlaceholders["allowCleartextTraffic"] = "false"
     }

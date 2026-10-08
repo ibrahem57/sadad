@@ -364,14 +364,15 @@ final class NativeScreens {
         root = new LinearLayout(host); root.setOrientation(LinearLayout.VERTICAL); root.setBackground(pageBackground()); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         String title = titleFor(page);
         FrameLayout header = new FrameLayout(host); header.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        header.setPadding(dp(16), dp(8), dp(16), dp(8)); header.setBackgroundColor(bg);
+        header.setPadding(dp(16), dp(8), dp(16), dp(8)); header.setMinimumHeight(dp(64)); header.setBackgroundColor(bg);
         LinearLayout brand = new LinearLayout(host); brand.setGravity(Gravity.CENTER_VERTICAL); brand.setOrientation(LinearLayout.HORIZONTAL);
         ImageView icon = logo(dp(42)); brand.addView(icon, new LinearLayout.LayoutParams(dp(42), dp(42)));
         View iconGap = new View(host); brand.addView(iconGap, new LinearLayout.LayoutParams(dp(10), 1));
         LinearLayout titleBox = new LinearLayout(host); titleBox.setOrientation(LinearLayout.VERTICAL);
-        titleBox.addView(label("سدد", 18, primary, true)); titleBox.addView(label(title, 12, muted, false));
-        brand.addView(titleBox, new LinearLayout.LayoutParams(-2, -2));
-        FrameLayout.LayoutParams brandParams = new FrameLayout.LayoutParams(-2, -2, Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        TextView appTitle=label("سدد",18,primary,true); appTitle.setSingleLine(true); titleBox.addView(appTitle);
+        TextView screenTitle=label(title,12,muted,false); screenTitle.setSingleLine(true);screenTitle.setEllipsize(android.text.TextUtils.TruncateAt.END);screenTitle.setContentDescription("اسم الشاشة: "+title); titleBox.addView(screenTitle);
+        brand.addView(titleBox, new LinearLayout.LayoutParams(0, -2,1));
+        FrameLayout.LayoutParams brandParams = new FrameLayout.LayoutParams(-1, -2, Gravity.RIGHT | Gravity.CENTER_VERTICAL);brandParams.leftMargin=dp(100);
         header.addView(brand, brandParams);
 
 
@@ -393,7 +394,7 @@ final class NativeScreens {
         ImageView account = portrait(false, 38); account.setContentDescription("حسابات المتجر");
         account.setOnClickListener(v -> showAccountMenu());
         header.addView(account, new FrameLayout.LayoutParams(dp(38), dp(38), Gravity.LEFT | Gravity.CENTER_VERTICAL));
-        root.addView(header, new LinearLayout.LayoutParams(-1, dp(58)));
+        root.addView(header, new LinearLayout.LayoutParams(-1, -2));
         View headerDivider = new View(host);
         headerDivider.setBackgroundColor(Color.argb(72, Color.red(line), Color.green(line), Color.blue(line)));
         root.addView(headerDivider, new LinearLayout.LayoutParams(-1, dp(1)));
@@ -1287,7 +1288,10 @@ final class NativeScreens {
         LinearLayout details = new LinearLayout(host); details.setOrientation(LinearLayout.VERTICAL);
         LinearLayout heading = new LinearLayout(host); heading.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         heading.addView(label("بيانات المتجر", 20, Color.WHITE, true), new LinearLayout.LayoutParams(-2, -2)); heading.addView(spaceWidth(6));
-        TextView edit = button("", Color.argb(45, 255, 255, 255), Color.WHITE, this::promptStoreProfile); edit.setPadding(0, 0, 0, 0); edit.setMinHeight(0); edit.setContentDescription("تعديل اسم المتجر وصاحب المتجر"); Drawable pencil=host.getDrawable(R.drawable.ic_edit_thin).mutate();pencil.setTint(Color.WHITE);pencil.setBounds(0,0,dp(22),dp(22));edit.setCompoundDrawables(null,null,pencil,null);edit.setGravity(Gravity.CENTER); heading.addView(edit, new LinearLayout.LayoutParams(dp(40), dp(40))); details.addView(heading);
+        ImageButton edit=new ImageButton(host);edit.setImageResource(R.drawable.ic_edit_thin);edit.setColorFilter(Color.WHITE);edit.setScaleType(ImageView.ScaleType.CENTER_INSIDE);edit.setPadding(dp(9),dp(9),dp(9),dp(9));edit.setMinimumWidth(0);edit.setMinimumHeight(0);
+        edit.setBackground(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(Color.argb(70,255,255,255)),shape(Color.argb(45,255,255,255),10),null));
+        edit.setContentDescription("تعديل اسم المتجر وصاحب المتجر");edit.setOnClickListener(v->promptStoreProfile());
+        LinearLayout.LayoutParams editPosition=new LinearLayout.LayoutParams(dp(40),dp(40));editPosition.gravity=Gravity.CENTER_VERTICAL;heading.addView(edit,editPosition);details.addView(heading);
         TextView store = label("اسم المتجر: " + (host.storeName().isEmpty() ? "متجري" : host.storeName()), 18, Color.WHITE, true); store.setContentDescription("تعديل بيانات المتجر"); store.setOnClickListener(v -> promptStoreProfile()); details.addView(store, topMargin(12));
         TextView owner = label("اسم صاحب المتجر: " + (host.ownerName().isEmpty() ? "غير مسجل" : host.ownerName()), 14, Color.rgb(198, 240, 224), false); owner.setOnClickListener(v -> promptStoreProfile()); details.addView(owner, topMargin(7));
         profile.addView(details, new LinearLayout.LayoutParams(0, -2, 1)); profile.addView(spaceWidth(12));
