@@ -488,14 +488,14 @@ final class NativeScreens {
     }
 
     private LinearLayout dashboardTransaction(JSONObject tx) {
-        boolean payment = "payment".equals(tx.optString("kind")); int color = payment ? (host.isDarkTheme() ? Color.rgb(249, 165, 168) : Color.rgb(172, 47, 60)) : (host.isDarkTheme() ? accent : primary);
+        boolean payment = "payment".equals(tx.optString("kind")); int color = payment ? accent : (host.isDarkTheme() ? Color.rgb(245, 154, 159) : Color.rgb(171, 50, 58));
         LinearLayout row = card(host.isDarkTheme() ? surface : Color.WHITE); row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL); row.setPadding(dp(12), dp(10), dp(12), dp(10));
-        TextView arrow = label(payment ? "↗" : "↙", 23, color, true); arrow.setGravity(Gravity.CENTER); arrow.setBackground(shape(payment ? (host.isDarkTheme() ? Color.rgb(88, 59, 61) : Color.rgb(255, 225, 225)) : soft, 12)); row.addView(arrow, new LinearLayout.LayoutParams(dp(38), dp(38)));
+        TextView arrow = label(payment ? "↙" : "↗", 23, color, true); arrow.setGravity(Gravity.CENTER); arrow.setBackground(shape(payment ? soft : (host.isDarkTheme() ? Color.rgb(88, 59, 61) : Color.rgb(255, 225, 225)), 12)); row.addView(arrow, new LinearLayout.LayoutParams(dp(38), dp(38)));
         LinearLayout names = new LinearLayout(host); names.setOrientation(LinearLayout.VERTICAL); names.setPadding(dp(10), 0, dp(6), 0);
         names.addView(label(tx.optString("contactName", "شخص"), 14, text, true));
         names.addView(label((payment ? "دفعة مستلمة" : "دين مسجل") + " · " + new SimpleDateFormat("HH:mm", Locale.US).format(new Date(tx.optLong("createdAt"))), 10, muted, false), topMargin(3));
         if (payment && !tx.optString("createdBy").trim().isEmpty()) names.addView(label("سجّلها: " + tx.optString("createdBy"), 11, accent, false), topMargin(3));
-        row.addView(names, new LinearLayout.LayoutParams(0, -2, 1)); row.addView(label((payment ? "−" : "+") + money(tx.optDouble("amount")), 16, color, true));
+        row.addView(names, new LinearLayout.LayoutParams(0, -2, 1)); row.addView(label((payment ? "+" : "−") + money(tx.optDouble("amount")), 16, color, true));
         row.setOnClickListener(v -> { contactId = tx.optLong("contactId"); host.show("contact_detail"); }); return row;
     }
 
