@@ -67,6 +67,7 @@ final class NativeScreens {
     private LinearLayout contactRows, contactChips;
     private int contactLimit = 60;
     private int historyLimit = 100;
+    private int personHistoryPage; private long personHistoryOwner;
     private int homeHistoryLimit = 5;
     private static final int HOME_HISTORY_BATCH = 50;
     private int reportContactLimit = 60;
@@ -443,6 +444,7 @@ final class NativeScreens {
         double debt = 0, paid = 0;
         for (int i = 0; i < transactions.length(); i++) { JSONObject tx = transactions.optJSONObject(i); if (!isReceivableTransaction(tx) || tx.optLong("createdAt") < month.getTimeInMillis()) continue;
             if ("payment".equals(tx.optString("kind"))) paid += tx.optDouble("amount"); else debt += tx.optDouble("amount"); }
+        JSONObject monthly = snap.optJSONObject("monthly"); if(monthly != null) { debt=monthly.optDouble("debt");paid=monthly.optDouble("paid"); }
         LinearLayout metrics = new LinearLayout(host); metrics.setOrientation(LinearLayout.HORIZONTAL);
         metrics.addView(monthMetric("ديون مسجلة", debt, debt + paid == 0 ? 0 : debt / (debt + paid), host.isDarkTheme() ? Color.rgb(245, 154, 159) : Color.rgb(171, 50, 58)), new LinearLayout.LayoutParams(0, -2, 1)); metrics.addView(spaceWidth(10));
         metrics.addView(monthMetric("دفعات مستلمة", paid, debt + paid == 0 ? 0 : paid / (debt + paid), accent), new LinearLayout.LayoutParams(0, -2, 1)); content.addView(metrics, bottomMargin(20));
@@ -573,11 +575,14 @@ final class NativeScreens {
         JSONArray transactions = array(snapshot(), "transactions"); int personTransactions = 0;
         for (int i = 0; i < transactions.length(); i++) if (isReceivableTransaction(transactions.optJSONObject(i)) && transactions.optJSONObject(i).optLong("contactId") == person.optLong("id")) personTransactions++;
         sectionTitle("سجل حركات هذا الشخص", personTransactions + " حركة، مرتبة من الأحدث");
-        int shown = 0;
+        if(personHistoryOwner != contactId) { personHistoryOwner=contactId;personHistoryPage=0; }
+        int shown = 0, skipped = 0;
         for (int i = 0; i < transactions.length() && shown < 100; i++) {
             JSONObject tx = transactions.optJSONObject(i);
-            if (isReceivableTransaction(tx) && tx.optLong("contactId") == person.optLong("id")) { addTransaction(tx, false); shown++; }
+            if (isReceivableTransaction(tx) && tx.optLong("contactId") == person.optLong("id")) { if(skipped++ < personHistoryPage*100)continue; addTransaction(tx, false); shown++; }
         }
+        if(personHistoryPage>0)content.addView(button("الحركات الأحدث",soft,softForeground(),()->{personHistoryPage--;host.show("contact_detail");}),bottomMargin(8));
+        if((personHistoryPage+1)*100<personTransactions)content.addView(button("الحركات الأقدم",soft,softForeground(),()->{personHistoryPage++;host.show("contact_detail");}),bottomMargin(8));
         if (personTransactions == 0) emptyCard("لا توجد حركات لهذا الشخص", "ستظهر الديون والدفعات هنا عند تسجيلها.");
         content.addView(button("مشاركة كشف PDF لهذا الشخص", soft, softForeground(), () -> shareContactPdf(person.optLong("id"))), topMargin(12));
         if (host.devicePermissionAllowed("deleteRecords")) content.addView(button("حذف السجل", Color.rgb(255, 238, 235), Color.rgb(157, 47, 43), () -> confirmDeleteLedger(person)), topMargin(16));
@@ -668,9 +673,10 @@ final class NativeScreens {
         new SadadDialog.Builder(host).setTitle("اختر صيغة التصدير").setItems(new String[]{"PDF", "Excel (.xlsx)"}, (dialog, which) -> {
             final String store = host.storeName(), owner = host.ownerName(), period = reportRangeLabel;
             final long from = reportStartMillis, to = reportEndMillis;
+            final SadadDatabase reportDatabase = host.database;
             String name = person.optString("name", "شخص").replaceAll("[\\/:*?<>|]", "_");
-            host.generateReport(() -> which == 0 ? LedgerTablePdf.create(store, owner, period, snap, onlyContactId, from, to)
-                    : LedgerTableExcel.create(store, owner, period, snap, onlyContactId, from, to),
+            host.generateReport(() -> which == 0 ? LedgerTablePdf.create(store, owner, period, reportDatabase.getSnapshot(), onlyContactId, from, to)
+                    : LedgerTableExcel.create(store, owner, period, reportDatabase.getSnapshot(), onlyContactId, from, to),
                     "كشف-" + name + (which == 0 ? ".pdf" : ".xlsx"), which == 0 ? "application/pdf" : LedgerTableExcel.MIME, true);
         }).show();
     }
@@ -982,7 +988,7 @@ final class NativeScreens {
     }
 
     private void buildHistory() {
-        JSONObject snapshot = snapshot(); JSONArray transactions = array(snapshot, "transactions");
+        JSONObject snapshot = snapshot(); JSONArray transactions;try{transactions=host.database.historyActivities(reportStartMillis,reportEndMillis);}catch(JSONException e){host.showBrandedMessage("تعذر فتح السجل.");return;}
         LinkedHashMap<Long, JSONObject> latest = new LinkedHashMap<>();
         for (int i = 0; i < transactions.length(); i++) {
             JSONObject tx = transactions.optJSONObject(i); if (!isReceivableTransaction(tx)) continue;
@@ -1008,8 +1014,7 @@ final class NativeScreens {
     private void addHistoryPersonSummary(long id, JSONObject latest) {
         JSONObject person = findContact(id); String name = person == null ? latest.optString("contactName", "شخص") : person.optString("name", "شخص");
         double remaining = person == null ? 0d : person.optDouble("receivable"); JSONObject lastDebt = null;
-        JSONArray transactions = array(snapshot(), "transactions");
-        for (int i = 0; i < transactions.length(); i++) { JSONObject tx = transactions.optJSONObject(i); if (!isReceivableTransaction(tx) || tx.optLong("contactId") != id || "payment".equals(tx.optString("kind"))) continue; if (lastDebt == null || tx.optLong("createdAt") > lastDebt.optLong("createdAt") || tx.optLong("createdAt") == lastDebt.optLong("createdAt") && tx.optLong("id") > lastDebt.optLong("id")) lastDebt = tx; }
+        try{lastDebt=host.database.latestPersonDebt(id);}catch(JSONException ignored){}
         Runnable open = () -> { contactId = id; host.show("contact_detail"); };
         LinearLayout row = card(surface); row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL); row.setPadding(dp(16), dp(15), dp(16), dp(15));
         LinearLayout names = new LinearLayout(host); names.setOrientation(LinearLayout.VERTICAL); TextView title = label(name, 16, text, true); title.setContentDescription("فتح سجل " + name); title.setOnClickListener(v -> open.run()); names.addView(title);
@@ -1196,8 +1201,9 @@ final class NativeScreens {
         new SadadDialog.Builder(host).setTitle("اختر صيغة التصدير").setItems(new String[]{"PDF", "Excel (.xlsx)"}, (dialog, which) -> {
             final String store = host.storeName(), owner = host.ownerName(), period = reportRangeLabel;
             final long from = reportStartMillis, to = reportEndMillis;
-            host.generateReport(() -> which == 0 ? LedgerTablePdf.create(store, owner, period, snap, 0L, from, to)
-                    : LedgerTableExcel.create(store, owner, period, snap, 0L, from, to),
+            final SadadDatabase reportDatabase = host.database;
+            host.generateReport(() -> which == 0 ? LedgerTablePdf.create(store, owner, period, reportDatabase.getSnapshot(), 0L, from, to)
+                    : LedgerTableExcel.create(store, owner, period, reportDatabase.getSnapshot(), 0L, from, to),
                     "كشف-سدد-" + new SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(new Date()) + (which == 0 ? ".pdf" : ".xlsx"),
                     which == 0 ? "application/pdf" : LedgerTableExcel.MIME, share);
         }).show();
@@ -1687,12 +1693,16 @@ final class NativeScreens {
     private int shapeButtonColor() { return Color.rgb(159, 46, 51); }
     private SadadDatabase cachedDatabase;
     private long cachedSnapshotToken = Long.MIN_VALUE;
+    private boolean cachedOverview;
+    private long cachedPerson;
     private JSONObject cachedSnapshot;
     private JSONObject snapshot() {
         try { synchronized (host.database) {
             long token = host.database.changeToken();
-            if (cachedSnapshot == null || cachedDatabase != host.database || token != cachedSnapshotToken) {
-                cachedSnapshot = host.database.getSnapshot(); cachedDatabase = host.database; cachedSnapshotToken = token;
+            boolean overview = "home".equals(host.currentRoute()) || "contacts".equals(host.currentRoute()) || "settings".equals(host.currentRoute()) || "history".equals(host.currentRoute()) || "history_results".equals(host.currentRoute());
+            long person=("contact_detail".equals(host.currentRoute())||"debt_form".equals(host.currentRoute())||"payment_form".equals(host.currentRoute()))?contactId:0;
+            if (cachedSnapshot == null || cachedDatabase != host.database || token != cachedSnapshotToken || overview != cachedOverview || person!=cachedPerson) {
+                cachedSnapshot = overview ? host.database.getOverview() : person>0?host.database.getPersonSnapshot(person):host.database.getSnapshot(); cachedPerson=person; cachedOverview = overview; cachedDatabase = host.database; cachedSnapshotToken = token;
             }
             return cachedSnapshot;
         } } catch (JSONException e) { return new JSONObject(); }

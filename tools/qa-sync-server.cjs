@@ -2,7 +2,7 @@ const fs=require('fs'),crypto=require('crypto'),{DatabaseSync}=require('node:sql
 const api=require('../server/server.js');const db=api.initializeDatabase(new DatabaseSync(':memory:'));
 const env={INITIAL_ADMIN_KEY:crypto.randomBytes(32).toString('hex'),TOKEN_ENCRYPTION_KEY:crypto.randomBytes(32).toString('hex')};api.configureDatabase(db,env);
 const server=api.createHttpServer();const handler=server.listeners('request')[0];server.removeAllListeners('request');let fail=true;
-server.on('request',(req,res)=>{if(req.url==='/api/mobile/sync'&&fail){fail=false;res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({ok:false,message:'QA retry'}));return;}handler(req,res);});
+server.on('request',(req,res)=>{if((req.url==='/api/mobile/sync'||req.url==='/api/mobile/sync-delta')&&fail){fail=false;res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({ok:false,message:'QA retry'}));return;}handler(req,res);});
 server.listen(18082,'0.0.0.0',async()=>{try{
 async function request(path,body,token){const r=await fetch('http://127.0.0.1:18082/api'+path,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body)});const data=await r.json();if(!r.ok)throw Error(data.message);return data;}
 const admin=await request('/setup/admin',{setupKey:env.INITIAL_ADMIN_KEY,username:'qa-admin',password:crypto.randomBytes(24).toString('hex')});const password=crypto.randomBytes(24).toString('hex');

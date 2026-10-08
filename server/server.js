@@ -144,6 +144,10 @@ function initializeDatabase(database, { durable = false } = {}) {
     if (typeof database.transactionSync === 'function') database.transactionSync(migrateMethods);
     else { database.exec('BEGIN IMMEDIATE'); try { migrateMethods(); database.exec('COMMIT'); } catch (error) { database.exec('ROLLBACK'); throw error; } }
   }
+  database.exec('CREATE TABLE IF NOT EXISTS sync_receipts (store_id INTEGER NOT NULL REFERENCES stores(id) ON DELETE CASCADE,device_id TEXT NOT NULL,batch_id TEXT NOT NULL,revision INTEGER NOT NULL,created_at INTEGER NOT NULL,PRIMARY KEY(store_id,device_id,batch_id))');
+  database.exec('CREATE INDEX IF NOT EXISTS idx_contacts_store_name ON contacts(store_id,name,phone)');
+  database.exec('CREATE INDEX IF NOT EXISTS idx_debts_store_time ON debts(store_id,created_at DESC,id DESC)');
+  database.exec('CREATE INDEX IF NOT EXISTS idx_payments_store_time ON payments(store_id,created_at DESC,id DESC)');
   database.exec('CREATE INDEX IF NOT EXISTS idx_payments_store_received ON payments(store_id,server_received_at)');
   return database;
 }
@@ -197,9 +201,10 @@ function send(res, status, body, type = 'application/json; charset=utf-8') {
 function ok(res, data = {}) { send(res, 200, { ok: true, ...data }); }
 function bodyJson(req) {
   return new Promise((resolve, reject) => {
-    let data = ''; let bytes = 0;
-    req.on('data', chunk => { bytes += chunk.length; if (bytes > 3_000_000) { reject(new HttpError(413, 'الطلب أكبر من الحد المسموح.')); req.destroy(); return; } data += chunk; });
+    let data = ''; let bytes = 0; let oversized = false;
+    req.on('data', chunk => { if(oversized)return; bytes += chunk.length; if(bytes>3_000_000){oversized=true;data='';reject(new HttpError(413,'الطلب أكبر من الحد المسموح.'));return;} data += chunk; });
     req.on('end', () => {
+      if (oversized) return;
       if (!data) return resolve({});
       try { resolve(JSON.parse(data)); } catch (_) { reject(new HttpError(400, 'صيغة البيانات غير صحيحة.')); }
     });
@@ -343,11 +348,14 @@ function requirePermission(store, permission) {
   if (permissions[permission] === false) throw new HttpError(403, 'هذه الميزة غير مفعّلة لحسابك من الإدارة.');
   return permissions;
 }
+let transactionDepth = 0;
 function tx(fn) {
-  if (typeof db.transactionSync === 'function') return db.transactionSync(fn);
-  db.exec('BEGIN IMMEDIATE');
-  try { const out = fn(); db.exec('COMMIT'); return out; }
-  catch (e) { db.exec('ROLLBACK'); throw e; }
+  if (transactionDepth) return fn();
+  transactionDepth++;
+  try {
+    if(typeof db.transactionSync==='function')return db.transactionSync(fn);
+    db.exec('BEGIN IMMEDIATE');try{const result=fn();db.exec('COMMIT');return result;}catch(e){db.exec('ROLLBACK');throw e;}
+  } finally { transactionDepth--; }
 }
 const cents = value => {
   const n = Number(value); if (!Number.isFinite(n) || n < 0 || n > 1_000_000_000) throw new HttpError(400, 'المبلغ المدخل غير صالح.');
@@ -366,15 +374,18 @@ function emptySnapshot(store) {
   return { contacts: [], debts: [], payments: [], transactions: [], totals: { receivable: 0, payable: 0, net: 0 }, revision: store.revision,
     account: accountForStore(store) };
 }
-function makeSnapshot(store) {
+function makeSnapshot(store, scope = null) {
+  const ids = scope && scope.length ? scope.map(Number).join(',') : '-1';
+  const contactScope = scope ? ` AND id IN (${ids})` : '';
+  const debtScope = scope ? ` AND d.contact_id IN (${ids})` : '';
   const result = emptySnapshot(store); const byId = new Map();
-  const contacts = db.prepare('SELECT * FROM contacts WHERE store_id=? ORDER BY name COLLATE NOCASE,id').all(store.id);
+  const contacts = db.prepare('SELECT * FROM contacts WHERE store_id=?'+contactScope+' ORDER BY name COLLATE NOCASE,id').all(store.id);
   for (const c of contacts) {
     const contact = { id: c.id, name: c.name, phone: c.phone, category: c.category, note: c.note, whatsappOptIn: !!c.whatsapp_opt_in, creditLimit: money(c.credit_limit_cents || 0),
       createdAt: c.created_at, createdBy: c.created_by || '', receivable: 0, payable: 0, net: 0, transactionCount: 0, lastActivity: 0, latestDebtId: 0 };
     result.contacts.push(contact); byId.set(c.id, contact);
   }
-  const debts = db.prepare('SELECT d.*,COALESCE(SUM(p.amount_cents),0) paid_cents FROM debts d LEFT JOIN payments p ON p.store_id=d.store_id AND p.debt_id=d.id WHERE d.store_id=? GROUP BY d.id ORDER BY d.created_at DESC,d.id DESC').all(store.id);
+  const debts = db.prepare('SELECT d.*,COALESCE(SUM(p.amount_cents),0) paid_cents FROM debts d LEFT JOIN payments p ON p.store_id=d.store_id AND p.debt_id=d.id WHERE d.store_id=?'+debtScope+' GROUP BY d.id ORDER BY d.created_at DESC,d.id DESC').all(store.id);
   for (const d of debts) {
     const paid = Number(d.paid_cents); const remaining = Math.max(0, Number(d.amount_cents) - paid);
     result.debts.push({ id: d.id, contactId: d.contact_id, direction: d.direction, amount: money(d.amount_cents), paid: money(paid), remaining: money(remaining), note: d.note, dueDate: d.due_date, createdAt: d.created_at, createdBy: d.created_by || '' });
@@ -382,7 +393,7 @@ function makeSnapshot(store) {
     if (c) { const key = d.direction === 'receivable' ? 'receivable' : 'payable'; c[key] += money(remaining); c.transactionCount++; if (d.created_at > c.lastActivity) { c.lastActivity = d.created_at; c.latestDebtId = d.id; } }
     result.transactions.push({ id: `d${d.id}`, debtId: d.id, contactId: d.contact_id, contactName: byId.get(d.contact_id)?.name || '', kind: 'debt', direction: d.direction, amount: money(d.amount_cents), note: d.note, method: '', createdAt: d.created_at, createdBy: d.created_by || '' });
   }
-  const payments = db.prepare('SELECT p.*,d.contact_id,d.direction,c.name contact_name FROM payments p JOIN debts d ON d.store_id=p.store_id AND d.id=p.debt_id JOIN contacts c ON c.store_id=d.store_id AND c.id=d.contact_id WHERE p.store_id=? ORDER BY p.created_at DESC,p.id DESC').all(store.id);
+  const payments = db.prepare('SELECT p.*,d.contact_id,d.direction,c.name contact_name FROM payments p JOIN debts d ON d.store_id=p.store_id AND d.id=p.debt_id JOIN contacts c ON c.store_id=d.store_id AND c.id=d.contact_id WHERE p.store_id=?'+debtScope+' ORDER BY p.created_at DESC,p.id DESC').all(store.id);
   for (const p of payments) {
     result.payments.push({ id: p.id, debtId: p.debt_id, contactId: p.contact_id, contactName: p.contact_name, direction: p.direction, amount: money(p.amount_cents), method: p.method, note: p.note, createdAt: p.created_at, createdBy: p.created_by || '' });
     const c = byId.get(p.contact_id); if (c && p.created_at > c.lastActivity) c.lastActivity = p.created_at;
@@ -396,11 +407,12 @@ function makeSnapshot(store) {
 
 function recordBackup(store, reason) {
   const snapshot = makeSnapshot(store);
+  delete snapshot.transactions; delete snapshot.totals;
   const contactCount = snapshot.contacts.length, debtCount = snapshot.debts.length, paymentCount = snapshot.payments.length;
   if (!contactCount && !debtCount && !paymentCount) return null;
   const result = db.prepare('INSERT INTO store_backups(store_id,created_at,reason,snapshot_json,contact_count,debt_count,payment_count) VALUES(?,?,?,?,?,?,?)')
     .run(store.id, Date.now(), text(reason, 80) || 'قبل التعديل', JSON.stringify(snapshot), contactCount, debtCount, paymentCount);
-  db.prepare('DELETE FROM store_backups WHERE store_id=? AND id NOT IN (SELECT id FROM store_backups WHERE store_id=? ORDER BY created_at DESC,id DESC LIMIT 100)').run(store.id, store.id);
+  db.prepare('DELETE FROM store_backups WHERE store_id=? AND id NOT IN (SELECT id FROM store_backups WHERE store_id=? ORDER BY created_at DESC,id DESC LIMIT 7)').run(store.id, store.id);
   return Number(result.lastInsertRowid);
 }
 
@@ -438,7 +450,7 @@ function enforceDeviceCap(storeId, limit) {
   for (const device of revoked) { mark.run(Date.now(), storeId, device.device_id); removeSessions.run(storeId, device.device_id); }
 }
 
-function syncSnapshot(store, input, baseRevision, device = null) {
+function syncSnapshot(store, input, baseRevision, device = null, scope = null) {
   if (!input || !Array.isArray(input.contacts) || !Array.isArray(input.debts) || !Array.isArray(input.payments)) {
     throw new HttpError(400, 'بيانات المزامنة غير مكتملة. لم يتم تغيير السجل.');
   }
@@ -446,7 +458,7 @@ function syncSnapshot(store, input, baseRevision, device = null) {
   const debts = input.debts;
   const payments = input.payments;
   if (contacts.length > 50_000 || debts.length > 100_000 || payments.length > 500_000) throw new HttpError(413, 'عدد السجلات أكبر من الحد.');
-  if (Number(baseRevision) !== Number(store.revision)) throw new HttpError(409, 'تغيّرت البيانات على جهاز آخر. حمّل النسخة الأحدث ثم أعد المحاولة.', { snapshot: makeSnapshot(store) });
+  if (Number(baseRevision) !== Number(store.revision)) throw new HttpError(409, 'تغيّرت البيانات على جهاز آخر. حمّل النسخة الأحدث ثم أعد المحاولة.', scope ? { revision:store.revision, reloadRequired:true } : { snapshot: makeSnapshot(store) });
   const timestamp = (value) => {
     if (value === undefined || value === null || value === '') return Date.now();
     const n = Number(value);
@@ -476,7 +488,7 @@ function syncSnapshot(store, input, baseRevision, device = null) {
     if (uniqueContacts.has(key)) throw new HttpError(400, 'يوجد اسم ورقم هاتف مكرران في سجل المتجر. راجع قائمة الأشخاص قبل المزامنة.');
     uniqueContacts.add(key);
   }
-  const previousSnapshot = makeSnapshot(store), previousContacts = new Map(previousSnapshot.contacts.map(item => [Number(item.id), item]));
+  const previousSnapshot = makeSnapshot(store, scope), previousContacts = new Map(previousSnapshot.contacts.map(item => [Number(item.id), item]));
   const previousDebts = new Map(previousSnapshot.debts.map(item => [Number(item.id), item]));
   const previousPayments = new Map(previousSnapshot.payments.map(item => [Number(item.id), item]));
   const nextContactIds = contactIds, nextDebtIds = debtIds, nextPaymentIds = new Set(payments.map(item => Number(item.id)));
@@ -540,7 +552,8 @@ function syncSnapshot(store, input, baseRevision, device = null) {
     if (remaining < 0) throw new HttpError(400, 'مجموع دفعات دين تجاوز أصل الدين.');
     if (d.direction === 'receivable' && remaining > 0) activeDebtors.add(Number(d.contactId));
   }
-  if (activeDebtors.size > Number(store.debtor_limit)) throw new HttpError(403, `تجاوزت حد ${store.debtor_limit} مدينًا الذي حدده الأدمن.`);
+  const otherDebtors = scope ? Number(db.prepare(`SELECT COUNT(*) n FROM contacts c WHERE c.store_id=? AND c.id NOT IN (${scope.length ? scope.join(',') : '-1'}) AND EXISTS (SELECT 1 FROM debts d WHERE d.store_id=c.store_id AND d.contact_id=c.id AND d.direction='receivable' AND d.amount_cents>COALESCE((SELECT SUM(p.amount_cents) FROM payments p WHERE p.store_id=d.store_id AND p.debt_id=d.id),0))`).get(store.id).n) : 0;
+  if (activeDebtors.size + otherDebtors > Number(store.debtor_limit)) throw new HttpError(403, `تجاوزت حد ${store.debtor_limit} مدينًا الذي حدده الأدمن.`);
   const contactByDebt = new Map(debts.map(debt => [Number(debt.id), Number(debt.contactId)]));
   const syncReceivedAt = Date.now();
   const newPaymentGroups = new Map();
@@ -582,7 +595,7 @@ function syncSnapshot(store, input, baseRevision, device = null) {
       || !!old.whatsappOptIn !== (item.whatsappOptIn === true) || cents(old.creditLimit || 0) !== cents(item.creditLimit || 0));
   });
   tx(() => {
-    recordBackup(store, removedContacts.length ? 'قبل حذف زبون من التطبيق' : 'قبل مزامنة التطبيق');
+    if (removedContacts.length || removedDebts.length || removedPayments.length) recordBackup(store, 'قبل حذف سجلات');
     if (removedContacts.length) archiveDeletedContacts(store, removedContacts, previousSnapshot);
     const deletePayment = db.prepare('DELETE FROM payments WHERE store_id=? AND id=?');
     for (const item of removedPayments) deletePayment.run(store.id, Number(item.id));
@@ -715,6 +728,43 @@ function restoreStoreBackup(store, backup, contactId = null) {
   return db.prepare('SELECT * FROM stores WHERE id=?').get(store.id);
 }
 
+/** A bounded patch reuses ledger validation on the affected people only. */
+function syncDelta(store, body, device) {
+  const delta=body.delta;
+  if(!delta || !Array.isArray(delta.contacts) || !Array.isArray(delta.debts) || !Array.isArray(delta.payments)) throw new HttpError(400,'دفعة مزامنة غير مكتملة.');
+  const deleted=delta.deleted || {};
+  let count=0;for(const table of ['contacts','debts','payments']) { if(!Array.isArray(deleted[table]||[])) throw new HttpError(400,'قائمة حذف غير صحيحة.');count+=delta[table].length+(deleted[table]||[]).length; }
+  if(count>500)throw new HttpError(413,'دفعة المزامنة تتجاوز 500 سجل.');
+  if(Number(body.baseRevision)!==Number(store.revision))throw new HttpError(409,'تغيّرت بيانات المتجر على جهاز آخر.',{revision:store.revision,reloadRequired:true});
+  const id=value=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1)throw new HttpError(400,'معرّف غير صالح.');return n;};
+  const scope=new Set();const debtContacts=new Map();
+  const changedContacts = new Set(delta.contacts.map(c=>id(c.id)));
+  const identities = new Set();
+  for (const contact of db.prepare('SELECT id,name,phone FROM contacts WHERE store_id=?').all(store.id)) {
+    if(!changedContacts.has(Number(contact.id)))identities.add(`${text(contact.name,120).normalize('NFKC').toLocaleLowerCase('ar')}|${normalizedContactPhone(contact.phone)}`);
+  }
+  for (const contact of delta.contacts) {
+    const key=`${text(contact.name,120).normalize('NFKC').toLocaleLowerCase('ar')}|${normalizedContactPhone(contact.phone)}`;
+    if(identities.has(key))throw new HttpError(400,'يوجد اسم ورقم هاتف مكرران في سجل المتجر.');identities.add(key);
+  }
+  for(const c of delta.contacts)scope.add(id(c.id));for(const value of deleted.contacts||[])scope.add(id(value));
+  for(const d of delta.debts){scope.add(id(d.contactId));debtContacts.set(id(d.id),id(d.contactId));}
+  const findDebt=db.prepare('SELECT contact_id FROM debts WHERE store_id=? AND id=?');
+  for(const value of deleted.debts||[]){const row=findDebt.get(store.id,id(value));if(row)scope.add(Number(row.contact_id));}
+  for(const p of delta.payments){const debt=id(p.debtId);const contact=debtContacts.get(debt)||findDebt.get(store.id,debt)?.contact_id;if(!contact)throw new HttpError(400,'الدين المرتبط بالدفعة غير موجود.');scope.add(Number(contact));}
+  const findPayment=db.prepare('SELECT d.contact_id FROM payments p JOIN debts d ON d.store_id=p.store_id AND d.id=p.debt_id WHERE p.store_id=? AND p.id=?');
+  for(const value of deleted.payments||[]){const row=findPayment.get(store.id,id(value));if(row)scope.add(Number(row.contact_id));}
+  if(!count)return store;
+  const ids=[...scope];const snapshot=makeSnapshot(store,ids);
+  for(const table of ['contacts','debts','payments']) {
+    const rows=new Map(snapshot[table].map(row=>[Number(row.id),row]));
+    for(const row of delta[table]) {const key=id(row.id);if(rows.has(key) && table!=='contacts') {const old=rows.get(key);const fields=table==='debts'?['contactId','direction','amount','createdAt']:['debtId','amount','method','createdAt'];if(fields.some(k=>String(old[k])!==String(row[k])))throw new HttpError(409,'معرّف سجل مستخدم على جهاز آخر. احتفظ بالسجل المحلي وراجع المزامنة.',{revision:store.revision,reloadRequired:true});}rows.set(key,row);}
+    for(const value of deleted[table]||[])rows.delete(id(value));
+    snapshot[table]=[...rows.values()];
+  }
+  return syncSnapshot(store,snapshot,body.baseRevision,device,ids);
+}
+
 function deriveEncryptionKey() {
   const raw = serverEnv.TOKEN_ENCRYPTION_KEY || '';
   if (/^[0-9a-f]{64}$/i.test(raw)) return Buffer.from(raw, 'hex');
@@ -789,10 +839,10 @@ async function route(req, res) {
         .run(store.id,deviceId,deviceLabel,staffName,JSON.stringify({registerPayments:true,deleteRecords:true,deleteContacts:true}),Date.now(),Date.now());
     });
     const session=makeSession('store',store.id,deviceId); const latest=db.prepare('SELECT * FROM stores WHERE id=?').get(store.id);
-    const snapshot=makeSnapshot(latest);
+    const snapshot=b.pagedSnapshot === true ? emptySnapshot(latest) : makeSnapshot(latest);
     const device=db.prepare('SELECT staff_name,permissions FROM store_devices WHERE store_id=? AND device_id=?').get(store.id,deviceId);
     const deviceInfo={staffName:device.staff_name||'صاحب المتجر',permissions:{registerPayments:true,deleteRecords:true,deleteContacts:true,...JSON.parse(device.permissions||'{}')}};
-    return ok(res,{...session,forcePasswordChange:!!latest.force_password_change,snapshot,account:snapshot.account,device:deviceInfo,deviceStaffName:deviceInfo.staffName});
+    return ok(res,{...session,snapshotDeferred:b.pagedSnapshot===true,forcePasswordChange:!!latest.force_password_change,snapshot,account:snapshot.account,device:deviceInfo,deviceStaffName:deviceInfo.staffName});
   }
   if (req.method === 'POST' && pathname === '/api/admin/logout') {
     const auth=requireSession(req,'admin'); db.prepare('DELETE FROM sessions WHERE token_hash=?').run(hashToken(auth.token)); return ok(res);
@@ -844,7 +894,7 @@ async function route(req, res) {
       const ph=await passwordHash(password);
       const defaults={contacts:true,debts:true,payments:true,reports:true,analytics:true,export:true,whatsapp:true,appLock:true};
       const permissions={...defaults,...(b.permissions||{})};
-      const debtorLimit=b.debtorLimit===undefined?100:Math.max(0,Math.min(1_000_000,Math.floor(Number(b.debtorLimit)||0)));
+      const debtorLimit=b.debtorLimit===undefined?5000:Math.max(0,Math.min(1_000_000,Math.floor(Number(b.debtorLimit)||0)));
       const insert=db.prepare('INSERT INTO stores(name,username,salt,password_hash,force_password_change,status,debtor_limit,subscription_mode,subscription_started_at,subscription_expires_at,allowed_devices,permissions,created_at) VALUES(?,?,?,?,1,?,?,?,?,?,?,?,?)');
       const row=insert.run(name,username,ph.salt,ph.hash,mode==='paused'?'suspended':'active',debtorLimit,mode,mode==='permanent'?null:now,mode==='timed'?now+days*86400000:null,maxDevices,JSON.stringify(permissions),now);
       return send(res,201,{ok:true,id:Number(row.lastInsertRowid),username,password,forcePasswordChange:true});
@@ -951,9 +1001,24 @@ async function route(req, res) {
         .map(item=>({actor:item.actor,action:item.action,description:item.description,createdAt:item.created_at}));
       return ok(res,{events});
     }
+    if(req.method==='GET' && pathname==='/api/mobile/snapshot-page') {
+      const table=url.searchParams.get('table');if(!['contacts','debts','payments'].includes(table))throw new HttpError(400,'جدول غير صالح.');
+      const revision=Number(url.searchParams.get('revision'));if(revision!==Number(store.revision))throw new HttpError(409,'تغيّر السجل أثناء التحميل. أعد المحاولة.',{revision:store.revision,reloadRequired:true});
+      const after=Number(url.searchParams.get('after')||0);if(!Number.isSafeInteger(after)||after<0)throw new HttpError(400,'مؤشر غير صالح.');
+      const limit=500;const rows=db.prepare(`SELECT * FROM ${table} WHERE store_id=? AND id>? ORDER BY id LIMIT ?`).all(store.id,after,limit);
+      const data=rows.map(record=>{const row={};for(const [key,value] of Object.entries(record)){if(key==='store_id'||key==='server_received_at')continue;if(key==='amount_cents'){row.amount=money(value);continue;}if(key==='credit_limit_cents'){row.creditLimit=money(value);continue;}if(key==='whatsapp_opt_in'){row.whatsappOptIn=!!value;continue;}row[key.replace(/_([a-z])/g,(_,letter)=>letter.toUpperCase())]=value;}return row;});
+      return ok(res,{rows:data,revision:store.revision,nextAfter:rows.length?Number(rows[rows.length-1].id):after,done:rows.length<limit,account:accountForStore(store)});
+    }
     if(req.method==='GET' && pathname==='/api/mobile/snapshot') return ok(res,{snapshot:makeSnapshot(store)});
+    if(req.method==='POST' && pathname==='/api/mobile/sync-delta'){
+      requirePermission(store,'contacts');requirePermission(store,'debts');const body=await bodyJson(req);const batchId=text(body.batchId,100);
+      const receipt=batchId?db.prepare('SELECT revision FROM sync_receipts WHERE store_id=? AND device_id=? AND batch_id=?').get(store.id,auth.device.device_id,batchId):null;
+      if(receipt)return ok(res,{revision:receipt.revision,acknowledged:true,replayed:true});
+      let changed;tx(()=>{const live=requireSession(req,'store');requirePermission(live.principal,'contacts');requirePermission(live.principal,'debts');changed=syncDelta(live.principal,body,live.device);if(batchId){db.prepare('INSERT INTO sync_receipts VALUES(?,?,?,?,?)').run(store.id,auth.device.device_id,batchId,changed.revision,Date.now());db.prepare('DELETE FROM sync_receipts WHERE store_id=? AND device_id=? AND batch_id NOT IN (SELECT batch_id FROM sync_receipts WHERE store_id=? AND device_id=? ORDER BY created_at DESC LIMIT 100)').run(store.id,auth.device.device_id,store.id,auth.device.device_id);}});
+      return ok(res,{revision:changed.revision,account:accountForStore(changed),acknowledged:true});
+    }
     if(req.method==='POST' && pathname==='/api/mobile/sync'){
-      requirePermission(store,'contacts'); requirePermission(store,'debts'); const b=await bodyJson(req); const changed=syncSnapshot(store,b.snapshot||{},b.baseRevision,auth.device); return ok(res,{revision:changed.revision,snapshot:makeSnapshot(changed)});
+      requirePermission(store,'contacts'); requirePermission(store,'debts'); const b=await bodyJson(req); const changed=syncSnapshot(db.prepare('SELECT * FROM stores WHERE id=?').get(store.id),b.snapshot||{},b.baseRevision,auth.device); return ok(res,{revision:changed.revision,snapshot:makeSnapshot(changed)});
     }
     if(req.method==='GET' && pathname==='/api/mobile/whatsapp'){
       const canUse=JSON.parse(store.permissions||'{}').whatsapp!==false;
@@ -999,15 +1064,40 @@ async function route(req, res) {
 }
 
 function createHttpServer() {
-  return http.createServer(async(req,res)=>{
+  const server = http.createServer(async(req,res)=>{
     try { await route(req,res); }
     catch(e) { const status=e instanceof HttpError?e.status:500; if(status===500) console.error(e); send(res,status,{ok:false,message:status===500?'حدث خطأ داخلي.':(e.message||'تعذر إكمال الطلب.'),...(e.extra||{})}); }
   });
+  server.requestTimeout=30_000;server.headersTimeout=15_000;server.keepAliveTimeout=5_000;server.maxRequestsPerSocket=1000;
+  return server;
 }
 
 function sweepStoreStatuses() {
   if (!db) return;
   for (const store of db.prepare("SELECT * FROM stores WHERE status!='deleted'").all()) refreshStoreStatus(store);
+}
+
+
+/** Consistent online copies include every store and every ledger record. */
+function scheduleDatabaseBackups() {
+  const directory=path.resolve(serverEnv.DATA_DIR || path.join(__dirname,'data'),'backups');
+  fs.mkdirSync(directory,{recursive:true,mode:0o700}); let busy=false;
+  const run=async()=>{
+    if(busy)return;busy=true;
+    const name='sadad-'+new Date().toISOString().replace(/[:.]/g,'-')+'.sqlite';
+    const destination=path.join(directory,name), temporary=destination+'.partial';
+    try {
+      await require('node:sqlite').backup(db,temporary,{rate:100});
+      fs.renameSync(temporary,destination);
+      const copies=fs.readdirSync(directory).filter(n=>/^sadad-[0-9TZ-]+\.sqlite$/.test(n)).sort().reverse();
+      for(const old of copies.slice(7))fs.unlinkSync(path.join(directory,old));
+      console.log('Complete database backup saved.');
+    } catch(error){console.error('Database backup failed:',error.message);}
+    finally{busy=false;}
+  };
+  const first=setTimeout(run,60_000);first.unref();
+  const timer=setInterval(run,24*60*60*1000);timer.unref();
+  return ()=>{clearTimeout(first);clearInterval(timer);};
 }
 
 function startNodeServer() {
@@ -1021,7 +1111,7 @@ function startNodeServer() {
   const host = process.env.HOST || '0.0.0.0';
   const server = createHttpServer();
   server.listen(port,host,()=>console.log(`Sadad server listening on http://${host}:${port}`));
-  process.on('SIGTERM',()=>{clearInterval(subscriptionTimer);server.close(()=>{db.close();process.exit(0);});});
+  process.on('SIGTERM',()=>{stopBackups();clearInterval(subscriptionTimer);server.close(()=>{db.close();process.exit(0);});});
   return server;
 }
 

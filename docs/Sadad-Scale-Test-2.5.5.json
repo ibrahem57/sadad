@@ -1,0 +1,18 @@
+{
+  "syntheticStores": 1000,
+  "contacts": 1500001,
+  "debts": 600001,
+  "seedMs": 26244,
+  "pagedContacts": 1501,
+  "pageRequests": 4,
+  "pageDownloadMs": 182,
+  "deltaMs": 41,
+  "concurrentRequests": 600,
+  "concurrency": 10,
+  "trafficMs": 15006,
+  "requestsPerSecond": 40,
+  "p95Ms": 296,
+  "rssMiB": 10,
+  "tests": "delta, idempotency, stale revision, paged full download, cross-store isolation, complete backup restore",
+  "limitation": "Synthetic data on local node; no certification of concurrent production traffic."
+}

@@ -73,8 +73,9 @@ final class DueReminderManager {
         String storeName = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("store_name", "").trim();
         HashMap<Long, String> names = new HashMap<>();
         try {
-            SadadDatabase database = new SadadDatabase(context);
-            JSONObject snapshot = database.getSnapshot();
+            SessionStore session = new SessionStore(context);
+            SadadDatabase database = new SadadDatabase(context, session.databaseNameForAccount(session.syncAccountId()));
+            JSONObject snapshot = database.dueReminderSnapshot(today, tomorrow);
             JSONArray contacts = snapshot.optJSONArray("contacts"), debts = snapshot.optJSONArray("debts");
             if (contacts != null) for (int i = 0; i < contacts.length(); i++) {
                 JSONObject person = contacts.optJSONObject(i);

@@ -22,7 +22,7 @@ import java.util.Map;
 /** Offline ledger. Contact balances are derived from debts minus recorded payments. */
 public final class SadadDatabase extends SQLiteOpenHelper {
     private static final String DB_NAME = "sadad.db";
-    private static final int DB_VERSION = 6;
+    private static final int DB_VERSION = 7;
 
     /** Includes changes from this connection and other connections, without rebuilding the ledger. */
     synchronized long changeToken() {
@@ -30,6 +30,100 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         try (Cursor c = getReadableDatabase().rawQuery("PRAGMA data_version", null)) { if (c.moveToFirst()) version = c.getLong(0); }
         try (Cursor c = getReadableDatabase().rawQuery("SELECT total_changes()", null)) { if (c.moveToFirst()) changes = c.getLong(0); }
         return (version << 32) ^ changes;
+    }
+
+    @Override public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_debts_recent ON debts(created_at DESC,id DESC)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_payments_recent ON payments(created_at DESC,id DESC)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_contacts_name ON contacts(name COLLATE NOCASE,id)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS sync_control (id INTEGER PRIMARY KEY, suppress INTEGER NOT NULL DEFAULT 0, ready INTEGER NOT NULL DEFAULT 0)");
+        db.execSQL("INSERT OR IGNORE INTO sync_control(id) VALUES(1)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS sync_outbox (seq INTEGER PRIMARY KEY AUTOINCREMENT, entity TEXT NOT NULL, row_id INTEGER NOT NULL)");
+        for (String table : new String[]{"contacts", "debts", "payments"}) for (String action : new String[]{"INSERT", "UPDATE", "DELETE"}) {
+            String record = action.equals("DELETE") ? "OLD" : "NEW";
+            db.execSQL("CREATE TRIGGER IF NOT EXISTS queue_" + table + "_" + action + " AFTER " + action + " ON " + table
+                    + " WHEN (SELECT suppress FROM sync_control WHERE id=1)=0 BEGIN INSERT INTO sync_outbox(entity,row_id) VALUES('" + table + "'," + record + ".id); END");
+        }
+        if (scalarLong(db,"SELECT ready FROM sync_control WHERE id=1",null)==0) {
+            db.beginTransaction();try {
+                db.execSQL("DELETE FROM sync_outbox");
+                for(String table:new String[]{"contacts","debts","payments"})db.execSQL("INSERT INTO sync_outbox(entity,row_id) SELECT '"+table+"',id FROM "+table+" ORDER BY id");
+                db.execSQL("UPDATE sync_control SET ready=1 WHERE id=1");db.setTransactionSuccessful();
+            }finally{db.endTransaction();}
+        }
+    }
+
+    synchronized boolean deltaReady() { return scalarLong(getReadableDatabase(), "SELECT ready FROM sync_control WHERE id=1", null) == 1; }
+    synchronized boolean hasPendingSync() { return scalarLong(getReadableDatabase(), "SELECT EXISTS(SELECT 1 FROM sync_outbox)", null) == 1; }
+    synchronized void acknowledgeDelta(long watermark) { getWritableDatabase().delete("sync_outbox", "seq<=?", new String[]{String.valueOf(watermark)}); }
+    /** Only queued rows are read, capped at 500 changes, including deletions and cascades. */
+    synchronized JSONObject pendingDelta() throws JSONException {
+        SQLiteDatabase db = getReadableDatabase();
+        java.util.LinkedHashMap<String, Long> changes = new java.util.LinkedHashMap<>(); long watermark = 0;
+        try (Cursor cursor = db.rawQuery("SELECT seq,entity,row_id FROM sync_outbox ORDER BY seq LIMIT 500", null)) {
+            while (cursor.moveToNext()) { watermark = cursor.getLong(0); changes.put(cursor.getString(1) + ":" + cursor.getLong(2), cursor.getLong(2)); }
+        }
+        JSONObject delta = new JSONObject(), deleted = new JSONObject();
+        for (String table : new String[]{"contacts", "debts", "payments"}) { delta.put(table, new JSONArray()); deleted.put(table, new JSONArray()); }
+        for (Map.Entry<String, Long> entry : changes.entrySet()) {
+            String table = entry.getKey().split(":")[0];
+            try (Cursor cursor = db.rawQuery("SELECT * FROM " + table + " WHERE id=?", new String[]{String.valueOf(entry.getValue())})) {
+                if (!cursor.moveToFirst()) { deleted.getJSONArray(table).put(entry.getValue()); continue; }
+                JSONObject row = new JSONObject();
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
+                    String column = cursor.getColumnName(i), key = column;
+                    if (column.equals("amount_cents")) { row.put("amount", fromCents(cursor.getLong(i))); continue; }
+                    if (column.equals("credit_limit_cents")) { row.put("creditLimit", fromCents(cursor.getLong(i))); continue; }
+                    if (column.equals("whatsapp_opt_in")) { row.put("whatsappOptIn", cursor.getInt(i) != 0); continue; }
+                    String[] parts = column.split("_"); for (int n=1;n<parts.length;n++) parts[n] = Character.toUpperCase(parts[n].charAt(0)) + parts[n].substring(1);
+                    key = String.join("", parts);
+                    row.put(key, cursor.getType(i)==Cursor.FIELD_TYPE_INTEGER ? cursor.getLong(i) : cursor.getString(i));
+                }
+                delta.getJSONArray(table).put(row);
+            }
+        }
+        delta.put("deleted", deleted); return new JSONObject().put("delta", delta).put("watermark", watermark);
+    }
+
+    synchronized long outboxWatermark() { return scalarLong(getReadableDatabase(), "SELECT COALESCE(MAX(seq),0) FROM sync_outbox", null); }
+    synchronized void beginSnapshotStage() {
+        for(String table : new String[]{"contacts","debts","payments"}) { getWritableDatabase().execSQL("DROP TABLE IF EXISTS stage_"+table); getWritableDatabase().execSQL("CREATE TABLE stage_"+table+" AS SELECT * FROM "+table+" WHERE 0"); }
+    }
+    synchronized void stageSnapshotPage(String table, JSONArray rows) throws JSONException {
+        if(!table.equals("contacts")&&!table.equals("debts")&&!table.equals("payments"))throw new IllegalArgumentException();
+        SQLiteDatabase db=getWritableDatabase(); java.util.LinkedHashMap<String,String> columns=new java.util.LinkedHashMap<>();
+        try(Cursor schema=db.rawQuery("PRAGMA table_info("+table+")",null)){while(schema.moveToNext())columns.put(schema.getString(1),schema.getString(2));}
+        db.beginTransaction();try {
+            for(int n=0;n<rows.length();n++) {
+                JSONObject row=rows.getJSONObject(n);ContentValues values=new ContentValues();
+                for(Map.Entry<String,String> schema:columns.entrySet()) {
+                    String column=schema.getKey();String key=column;String[] parts=column.split("_");for(int k=1;k<parts.length;k++)parts[k]=Character.toUpperCase(parts[k].charAt(0))+parts[k].substring(1);key=String.join("",parts);
+                    if(column.equals("amount_cents"))values.put(column,toCents(row.optString("amount","0")));
+                    else if(column.equals("credit_limit_cents"))values.put(column,toCents(row.optString("creditLimit","0")));
+                    else if(column.equals("whatsapp_opt_in"))values.put(column,row.optBoolean("whatsappOptIn")?1:0);
+                    else if(schema.getValue().equals("INTEGER"))values.put(column,row.optLong(key));
+                    else values.put(column,row.optString(key,""));
+                }
+                db.insertOrThrow("stage_"+table,null,values);
+            }db.setTransactionSuccessful();
+        } finally {db.endTransaction();}
+    }
+    synchronized void commitSnapshotStage(long expectedWatermark) {
+        if(outboxWatermark()!=expectedWatermark)throw new IllegalStateException("حُفظت تعديلات جديدة أثناء التحميل. بقيت سجلاتك المحلية محفوظة؛ أعد المزامنة.");
+        SQLiteDatabase db=getWritableDatabase();db.beginTransaction();try {
+            db.execSQL("UPDATE sync_control SET suppress=1 WHERE id=1");
+            for(String table:new String[]{"payments","debts","contacts"})db.execSQL("DELETE FROM "+table);
+            for(String table:new String[]{"contacts","debts","payments"})db.execSQL("INSERT INTO "+table+" SELECT * FROM stage_"+table);
+            db.execSQL("DELETE FROM sync_outbox");db.execSQL("UPDATE sync_control SET suppress=0,ready=1 WHERE id=1");db.setTransactionSuccessful();
+        }finally{db.endTransaction();dropSnapshotStage();}
+    }
+    synchronized void dropSnapshotStage() {for(String table:new String[]{"contacts","debts","payments"})getWritableDatabase().execSQL("DROP TABLE IF EXISTS stage_"+table);}
+
+    synchronized JSONObject dueReminderSnapshot(String today,String tomorrow) throws JSONException {
+        JSONArray people=new JSONArray(),debts=new JSONArray();SQLiteDatabase db=getReadableDatabase();
+        try(Cursor c=db.rawQuery("SELECT d.id,d.contact_id,c.name,d.due_date,d.amount_cents-COALESCE((SELECT SUM(amount_cents) FROM payments WHERE debt_id=d.id),0) remaining FROM debts d JOIN contacts c ON c.id=d.contact_id WHERE d.direction='receivable' AND d.due_date IN (?,?)",new String[]{today,tomorrow})) {while(c.moveToNext()){if(c.getLong(4)<=0)continue;people.put(new JSONObject().put("id",c.getLong(1)).put("name",c.getString(2)));debts.put(new JSONObject().put("id",c.getLong(0)).put("contactId",c.getLong(1)).put("dueDate",c.getString(3)).put("direction","receivable").put("remaining",fromCents(c.getLong(4))));}}
+        return new JSONObject().put("contacts",people).put("debts",debts);
     }
 
     public SadadDatabase(Context context) {
@@ -509,11 +603,22 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public synchronized JSONObject getSnapshot() throws JSONException {
+    synchronized JSONArray historyActivities(long from,long to) throws JSONException {
+        JSONArray rows=new JSONArray();
+        String sql="SELECT contact_id,MAX(created_at) FROM (SELECT contact_id,created_at FROM debts WHERE direction='receivable' UNION ALL SELECT d.contact_id,p.created_at FROM payments p JOIN debts d ON d.id=p.debt_id WHERE d.direction='receivable') WHERE created_at>=? AND created_at<=? GROUP BY contact_id ORDER BY MAX(created_at) DESC";
+        try(Cursor c=getReadableDatabase().rawQuery(sql,new String[]{String.valueOf(from),String.valueOf(to)})){while(c.moveToNext())rows.put(new JSONObject().put("contactId",c.getLong(0)).put("createdAt",c.getLong(1)).put("kind","debt").put("direction","receivable"));}return rows;
+    }
+    synchronized JSONObject latestPersonDebt(long id) throws JSONException {
+        try(Cursor c=getReadableDatabase().rawQuery("SELECT amount_cents FROM debts WHERE contact_id=? AND direction='receivable' ORDER BY created_at DESC,id DESC LIMIT 1",new String[]{String.valueOf(id)})){return c.moveToFirst()?new JSONObject().put("amount",fromCents(c.getLong(0))):null;}
+    }
+    public synchronized JSONObject getSnapshot() throws JSONException { return buildSnapshot(false,0); }
+    synchronized JSONObject getOverview() throws JSONException { return buildSnapshot(true,0); }
+    synchronized JSONObject getPersonSnapshot(long id) throws JSONException { return buildSnapshot(false,id); }
+    private JSONObject buildSnapshot(boolean overview, long onlyPerson) throws JSONException {
         SQLiteDatabase db = getReadableDatabase();
         Map<Long, JSONObject> contactById = new HashMap<>();
         JSONArray contacts = new JSONArray();
-        try (Cursor cursor = db.rawQuery("SELECT id,name,phone,category,note,whatsapp_opt_in,credit_limit_cents,created_at,created_by FROM contacts ORDER BY name COLLATE NOCASE,id", null)) {
+        try (Cursor cursor = db.rawQuery("SELECT id,name,phone,category,note,whatsapp_opt_in,credit_limit_cents,created_at,created_by FROM contacts"+(onlyPerson>0?" WHERE id="+onlyPerson:"")+" ORDER BY name COLLATE NOCASE,id", null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
                 JSONObject contact = new JSONObject();
@@ -541,7 +646,8 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         List<JSONObject> transactions = new ArrayList<>();
         String debtQuery = "SELECT d.id,d.contact_id,d.direction,d.amount_cents,d.note,d.due_date,d.created_at," +
                 "COALESCE(SUM(p.amount_cents),0),d.created_by FROM debts d LEFT JOIN payments p ON p.debt_id=d.id " +
-                "GROUP BY d.id ORDER BY d.created_at DESC,d.id DESC";
+                (onlyPerson>0?"WHERE d.contact_id="+onlyPerson+" ":"")+"GROUP BY d.id ORDER BY d.created_at DESC,d.id DESC";
+        if (overview) debtQuery += " LIMIT 1000";
         try (Cursor cursor = db.rawQuery(debtQuery, null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
@@ -592,7 +698,8 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         JSONArray payments = new JSONArray();
         String paymentQuery = "SELECT p.id,p.debt_id,p.amount_cents,p.method,p.note,p.created_at," +
                 "d.contact_id,d.direction,c.name,p.created_by FROM payments p JOIN debts d ON d.id=p.debt_id " +
-                "JOIN contacts c ON c.id=d.contact_id ORDER BY p.created_at DESC,p.id DESC";
+                "JOIN contacts c ON c.id=d.contact_id "+(onlyPerson>0?"WHERE d.contact_id="+onlyPerson+" ":"")+"ORDER BY p.created_at DESC,p.id DESC";
+        if (overview) paymentQuery += " LIMIT 1000";
         try (Cursor cursor = db.rawQuery(paymentQuery, null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0);
@@ -617,8 +724,9 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         String groupedPaymentQuery = "SELECT MIN(p.id),MIN(p.debt_id),d.contact_id,d.direction,SUM(p.amount_cents)," +
                 "p.note,p.method,p.created_at,c.name,p.created_by FROM payments p JOIN debts d ON d.id=p.debt_id " +
                 "JOIN contacts c ON c.id=d.contact_id " +
-                "GROUP BY p.created_at,d.contact_id,d.direction,p.note,p.method " +
+                (onlyPerson>0?"WHERE d.contact_id="+onlyPerson+" ":"")+"GROUP BY p.created_at,d.contact_id,d.direction,p.note,p.method " +
                 "ORDER BY p.created_at DESC,MIN(p.id) DESC";
+        if (overview) groupedPaymentQuery += " LIMIT 1000";
         try (Cursor cursor = db.rawQuery(groupedPaymentQuery, null)) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(0), debtId = cursor.getLong(1), contactId = cursor.getLong(2), createdAt = cursor.getLong(7);
@@ -652,6 +760,17 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         JSONArray transactionArray = new JSONArray();
         for (JSONObject transaction : transactions) transactionArray.put(transaction);
 
+        if (overview) {
+            for(JSONObject c : contactById.values()) { c.put("receivable",0d);c.put("payable",0d);c.put("transactionCount",0);c.put("lastActivity",0L); }
+            String sums="SELECT d.contact_id,d.direction,SUM(d.amount_cents-COALESCE(p.paid,0)),COUNT(*),MAX(d.created_at) FROM debts d LEFT JOIN (SELECT debt_id,SUM(amount_cents) paid FROM payments GROUP BY debt_id) p ON p.debt_id=d.id GROUP BY d.contact_id,d.direction";
+            try(Cursor c=db.rawQuery(sums,null)){while(c.moveToNext()){JSONObject person=contactById.get(c.getLong(0));if(person==null)continue;person.put(c.getString(1),fromCents(c.getLong(2)));person.put("transactionCount",person.optInt("transactionCount")+c.getInt(3));person.put("lastActivity",Math.max(person.optLong("lastActivity"),c.getLong(4)));}}
+            try(Cursor c=db.rawQuery("SELECT d.contact_id,COUNT(*),MAX(p.created_at) FROM payments p JOIN debts d ON d.id=p.debt_id GROUP BY d.contact_id",null)){while(c.moveToNext()){JSONObject person=contactById.get(c.getLong(0));if(person!=null){person.put("transactionCount",person.optInt("transactionCount")+c.getInt(1));person.put("lastActivity",Math.max(person.optLong("lastActivity"),c.getLong(2)));}}}
+            for(JSONObject person:contactById.values())person.put("net",person.optDouble("receivable")-person.optDouble("payable"));
+        }
+        java.util.Calendar month=java.util.Calendar.getInstance();month.set(java.util.Calendar.DAY_OF_MONTH,1);month.set(java.util.Calendar.HOUR_OF_DAY,0);month.set(java.util.Calendar.MINUTE,0);month.set(java.util.Calendar.SECOND,0);month.set(java.util.Calendar.MILLISECOND,0);
+        String[] monthArgs={String.valueOf(month.getTimeInMillis())};
+        long monthlyDebt=scalarLong(db,"SELECT COALESCE(SUM(amount_cents),0) FROM debts WHERE direction='receivable' AND created_at>=?",monthArgs);
+        long monthlyPaid=scalarLong(db,"SELECT COALESCE(SUM(p.amount_cents),0) FROM payments p JOIN debts d ON d.id=p.debt_id WHERE d.direction='receivable' AND p.created_at>=?",monthArgs);
         long receivable = scalarLong(db,
                 "SELECT COALESCE(SUM(d.amount_cents-COALESCE(x.paid,0)),0) FROM debts d " +
                         "LEFT JOIN (SELECT debt_id,SUM(amount_cents) paid FROM payments GROUP BY debt_id) x ON x.debt_id=d.id " +
@@ -665,6 +784,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
                 .put("debts", debts)
                 .put("payments", payments)
                 .put("transactions", transactionArray)
+                .put("monthly",new JSONObject().put("debt",fromCents(monthlyDebt)).put("paid",fromCents(monthlyPaid)))
                 .put("totals", new JSONObject()
                         .put("receivable", fromCents(receivable))
                         .put("payable", fromCents(payable))
@@ -679,6 +799,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
         JSONArray payments = snapshot.optJSONArray("payments");
         db.beginTransaction();
         try {
+            db.execSQL("UPDATE sync_control SET suppress=1 WHERE id=1");
             db.delete("payments", null, null);
             db.delete("debts", null, null);
             db.delete("contacts", null, null);
@@ -708,6 +829,7 @@ public final class SadadDatabase extends SQLiteOpenHelper {
                 v.put("created_by", clean(row.optString("createdBy"), 120));
                 v.put("created_at", row.optLong("createdAt", System.currentTimeMillis())); db.insertOrThrow("payments", null, v);
             }
+            db.execSQL("DELETE FROM sync_outbox"); db.execSQL("UPDATE sync_control SET suppress=0,ready=1 WHERE id=1");
             db.setTransactionSuccessful();
         } finally { db.endTransaction(); }
     }

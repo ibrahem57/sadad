@@ -179,7 +179,7 @@
   }
   function renderBackups(backups) {
     const select = $('#backupSelect'); select.innerHTML = backups.length ? backups.map(item => `<option value="${item.id}">${esc(dateFmt(item.createdAt))} · ${esc(item.reason)} · ${fmt(item.contactCount)} أشخاص / ${fmt(item.debtCount)} ديون / ${fmt(item.paymentCount)} دفعات</option>`).join('') : '<option value="">لا توجد نسخ محفوظة</option>';
-    $('#restoreContact').innerHTML = '<option value="">اختر النسخة أولًا</option>'; $('#restoreInfo').textContent = backups.length ? `عدد النسخ المحفوظة: ${backups.length} (آخر 100 نسخة).` : 'ستُنشأ النسخة الأولى بعد أول مزامنة بيانات.';
+    $('#restoreContact').innerHTML = '<option value="">اختر النسخة أولًا</option>'; $('#restoreInfo').textContent = backups.length ? `عدد النسخ المحفوظة: ${backups.length} (آخر 7 نسخ قبل الحذف).` : 'تُحفظ نسخة قبل حذف البيانات، ونسخة كاملة لقاعدة البيانات يوميًا على الخادم.';
   }
   $('#backupSelect').addEventListener('change', async () => {
     const backupId = $('#backupSelect').value; $('#restoreContact').innerHTML = '<option value="">جارٍ تحميل الأشخاص…</option>';

@@ -21,8 +21,17 @@ public final class LedgerSyncService extends JobService {
                     if(!session.isActive()||session.forcePasswordChange()||session.syncBlocked())return;
                     String account=session.syncAccountId(),token=session.token();if(token.isEmpty())return;
                     db=new SadadDatabase(this,session.databaseNameForAccount(account));
+                    if(db.hasPendingSync())session.setUnsyncedChanges(true);
                     long change=db.changeToken();JSONObject result;
                     if(session.hasUnsyncedChanges()){
+                        if (db.deltaReady()) {
+                            JSONObject packet=db.pendingDelta(); result=request(session,"POST","/mobile/sync-delta",new JSONObject().put("baseRevision",session.revision()).put("delta",packet.getJSONObject("delta")).put("batchId",session.deviceId()+":"+packet.optLong("watermark")),token);
+                            if(!account.equals(session.syncAccountId())||!token.equals(session.token()))return;
+                            db.acknowledgeDelta(packet.optLong("watermark")); session.setRevision(result.optLong("revision",session.revision()));
+                            session.setUnsyncedChanges(db.hasPendingSync());session.setSyncBlocked(false);
+                            if(session.hasUnsyncedChanges())retry=true;
+                            return;
+                        }
                         result=request(session,"POST","/mobile/sync",new JSONObject().put("baseRevision",session.revision()).put("snapshot",db.getSnapshot()),token);
                     }else{
                         JSONObject status=request(session,"GET","/mobile/session",null,token);
@@ -30,7 +39,8 @@ public final class LedgerSyncService extends JobService {
                         JSONObject info=status.optJSONObject("account");if(info!=null)session.setAccount(info);
                         session.setForcePasswordChange(status.optBoolean("forcePasswordChange",false));if(session.forcePasswordChange())return;
                         if(status.optLong("revision",session.revision())==session.revision())return;
-                        result=request(session,"GET","/mobile/snapshot",null,token);
+                        PagedSnapshotTransfer.download(session,db,status.optLong("revision",session.revision()));
+                        return;
                     }
                     if(!account.equals(session.syncAccountId())||!token.equals(session.token()))return;
                     // An activity may have opened while the request was in flight. Its edits stay local.
