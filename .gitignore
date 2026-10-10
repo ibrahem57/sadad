@@ -24,3 +24,19 @@ local.properties
 
 
 /tools/qa-scale-result.json
+
+# Local backend credentials, databases and generated dependencies
+**/node_modules/
+**/.wrangler/
+**/.dart_tool/
+**/.gradle/
+**/.idea/
+**/data/
+.env
+.env.*
+!.env.example
+.dev.vars
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log

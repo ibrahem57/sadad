@@ -1,0 +1,6 @@
+{$DOMAIN} {
+    encode zstd gzip
+    reverse_proxy api:8080 {
+        header_up X-Sadad-Client-IP {remote_host}
+    }
+}

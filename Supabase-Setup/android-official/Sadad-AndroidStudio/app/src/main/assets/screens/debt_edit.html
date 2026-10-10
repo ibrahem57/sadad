@@ -1,0 +1,238 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_stack" name="shell-type">
+</head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen" data-screen="debt_edit"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(13,71,64,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="رجوع" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:text-secondary transition-colors focus:outline-none" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_forward</span></button><h1 class="font-headline-sm text-headline-sm text-primary">تعديل بيانات الدين</h1></div><div class="flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"></div></div></header><main class="flex flex-col relative w-full pt-16 px-margin-mobile bg-surface min-h-screen"><div class="flex flex-col w-full pb-safe">
+<!-- Sub-Header Actions & Screen Title Breadcrumb -->
+<div class="flex items-center justify-between py-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-title-md text-title-md text-primary font-bold">تعديل بيانات الدين</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">#TX-8492</span>
+</div>
+<button class="font-label-lg text-label-lg text-secondary hover:text-primary transition-colors py-1 px-2.5 rounded-lg active:bg-surface-container" onclick="openExitDialog()" type="button">
+      إلغاء
+    </button>
+</div>
+<!-- Smart Financial Notice Banner -->
+<div class="flex items-start gap-space-sm p-space-md rounded-xl bg-surface-container-high shadow-sm mb-space-md relative overflow-hidden">
+<div class="absolute right-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<div class="flex flex-col min-w-0 pr-1">
+<h3 class="font-title-md text-title-md text-primary font-bold">تأثير مالي مباشر</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        تعديل بيانات هذا القيد سيؤثر تلقائياً على الرصيد الإجمالي المحسوب لكشف حساب <span class="font-bold text-primary">أحمد سالم</span> وجميع المطالبات المرتبطة.
+      </p>
+</div>
+</div>
+<!-- Main Form Content -->
+<form class="flex flex-col gap-space-md mb-space-lg" id="debtEditForm" onsubmit="event.preventDefault();">
+<!-- 1. Locked Counterparty Section -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-lg text-label-lg text-on-surface-variant">الطرف المعني (الحساب المالي)</label>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+          مقيد بالنظام
+        </span>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low mt-1">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-title-md">
+            أس
+          </div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-primary font-bold">أحمد سالم الشريف</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">عميل مسجل • +970 59-912-3456</span>
+</div>
+</div>
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+</div>
+</div>
+<!-- 2. Debt Direction Switcher -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<label class="font-label-lg text-label-lg text-on-surface-variant">اتجاه الذمة المالية</label>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Option: Receivable (Selected) -->
+<button class="relative flex items-center gap-space-xs p-space-sm rounded-xl transition-all duration-200 bg-secondary-container text-on-secondary-container ring-0 shadow-sm text-right" id="btnReceivable" onclick="selectDirection('receivable')" type="button">
+<div class="w-8 h-8 rounded-lg bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">arrow_outward</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md font-bold">مستحق لي</span>
+<span class="font-body-sm text-body-sm opacity-80">دين أطالب به</span>
+</div>
+<div class="absolute left-2.5 top-2.5 w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-on-secondary" id="badgeReceivable">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</div>
+</button>
+<!-- Option: Payable -->
+<button class="relative flex items-center gap-space-xs p-space-sm rounded-xl transition-all duration-200 bg-surface-container-low text-on-surface-variant hover:bg-surface-container text-right" id="btnPayable" onclick="selectDirection('payable')" type="button">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">call_received</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md font-bold">مستحق عليّ</span>
+<span class="font-body-sm text-body-sm opacity-80">دين يجب سداده</span>
+</div>
+<div class="hidden absolute left-2.5 top-2.5 w-4 h-4 rounded-full bg-secondary items-center justify-center text-on-secondary" id="badgePayable">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</div>
+</button>
+</div>
+</div>
+<!-- 3. Original Amount with Smart Live Validation & Calculation -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<label class="font-label-lg text-label-lg text-on-surface-variant" for="amountInput">مبلغ الدين الأصلي</label>
+<span class="font-label-md text-label-md text-on-surface-variant">القيمة المسجلة: <strong class="text-primary font-bold">500 ₪</strong></span>
+</div>
+<div class="relative flex items-center">
+<span class="absolute left-4 font-headline-sm text-headline-sm text-secondary font-bold select-none">₪</span>
+<input class="w-full h-14 pl-12 pr-4 rounded-xl bg-surface-container-low font-headline-md text-headline-md font-bold text-primary focus:bg-surface-container-lowest focus:outline-none transition-all shadow-inner" id="amountInput" min="150" oninput="handleAmountChange(this.value)" placeholder="0.00" step="10" type="number" value="600">
+</div>
+<!-- Real-time Rule Validation Badge -->
+<div class="flex items-start gap-space-xs p-space-sm rounded-lg bg-surface-container-low text-secondary transition-all" id="validationContainer">
+<span class="material-symbols-outlined text-[18px] shrink-0 pt-0.5" id="validationIcon" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="flex flex-col min-w-0">
+<p class="font-label-md text-label-md leading-normal font-bold" id="validationMsg">
+            المبلغ صالح للاعتماد. يتجاوز مجموع السدادات السابقة (150 ₪).
+          </p>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">القاعدة النظامية: لا يمكن أن يقل أصل الدين عن الدفعات المسجلة.</span>
+</div>
+</div>
+</div>
+<!-- 4. Operational Dates (Transaction Date & Due Date) -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<span class="font-label-lg text-label-lg text-on-surface-variant">التواريخ والاستحقاق</span>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Transaction Date Field -->
+<div class="flex flex-col gap-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant">تاريخ القيد</span>
+<div class="h-12 bg-surface-container-low rounded-xl px-3 flex items-center justify-between">
+<span class="font-title-md text-title-md text-primary font-bold">2024/04/10</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">calendar_today</span>
+</div>
+</div>
+<!-- Due Date Field (Editable simulated picker) -->
+<div class="flex flex-col gap-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant">موعد السداد</span>
+<button class="h-12 bg-surface-container-high rounded-xl px-3 flex items-center justify-between text-right active:bg-surface-container" type="button">
+<span class="font-title-md text-title-md text-primary font-bold">2024/05/25</span>
+<span class="material-symbols-outlined text-secondary text-[20px]">edit_calendar</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5 pt-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span class="font-body-sm text-body-sm">فترة الاستحقاق المتبقية: 45 يوماً</span>
+</div>
+</div>
+<!-- 5. Note and Statement Details -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<label class="font-label-lg text-label-lg text-on-surface-variant" for="debtNotes">البيان والملاحظات المرفقة</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">42 / 200 حرف</span>
+</div>
+<textarea class="w-full p-space-sm rounded-xl bg-surface-container-low font-body-md text-body-md text-primary focus:bg-surface-container-lowest focus:outline-none transition-all resize-none shadow-inner" id="debtNotes" rows="3">شراء بضاعة متفرقة لورشة النجارة المشتركة بحسب الفاتورة 401</textarea>
+</div>
+<!-- 6. Visual Preview of Financial Impact -->
+<div class="bg-primary-container text-on-primary p-space-md rounded-xl shadow-md relative overflow-hidden flex flex-col gap-space-md">
+<!-- Ambient Wave Graphic Layer -->
+<div class="absolute -left-6 -bottom-10 opacity-10 pointer-events-none text-on-primary">
+<svg fill="none" height="140" viewBox="0 0 200 120" width="220" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 60C50 20 80 100 130 50C180 0 200 70 250 40" stroke="currentColor" stroke-linecap="round" stroke-width="24"></path>
+</svg>
+</div>
+<div class="flex items-center justify-between relative z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed">insights</span>
+<span class="font-title-lg text-title-lg font-bold">معاينة الأثر على الرصيد</span>
+</div>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-primary font-bold text-on-primary-container">
+          قبل الحفظ
+        </span>
+</div>
+<!-- Comparative Stat Metric Strip -->
+<div class="grid grid-cols-2 gap-space-sm relative z-10">
+<!-- Original Debt Comparison -->
+<div class="bg-surface-container-lowest/10 p-space-sm rounded-lg flex flex-col gap-1 backdrop-blur-sm">
+<span class="font-label-sm text-label-sm opacity-80">أصل الدين الإجمالي</span>
+<div class="flex items-baseline gap-1.5 flex-wrap">
+<span class="font-body-sm text-body-sm line-through opacity-70">500 ₪</span>
+<span class="material-symbols-outlined text-[14px]">arrow_left</span>
+<span class="font-title-lg text-title-lg font-bold text-tertiary-fixed" id="previewNewTotal">600 ₪</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary-fixed font-bold" id="previewDiffBadge">
+            فارق التعديل: +100 ₪
+          </span>
+</div>
+<!-- Remaining Balance Comparison -->
+<div class="bg-surface-container-lowest/10 p-space-sm rounded-lg flex flex-col gap-1 backdrop-blur-sm">
+<span class="font-label-sm text-label-sm opacity-80">صافي المتبقي بذمته</span>
+<div class="flex items-baseline gap-1.5 flex-wrap">
+<span class="font-body-sm text-body-sm line-through opacity-70">350 ₪</span>
+<span class="material-symbols-outlined text-[14px]">arrow_left</span>
+<span class="font-title-lg text-title-lg font-bold text-secondary-fixed" id="previewNewRemaining">450 ₪</span>
+</div>
+<span class="font-label-sm text-label-sm opacity-75">
+            بعد خصم (150 ₪ مسدد)
+          </span>
+</div>
+</div>
+<!-- Settlement Progress Bar -->
+<div class="flex flex-col gap-1.5 relative z-10">
+<div class="flex justify-between font-label-sm text-label-sm opacity-85">
+<span>نسبة السداد المحققة</span>
+<span id="previewPctText">25% مسدد</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-lowest/20 overflow-hidden">
+<div class="h-full bg-tertiary-fixed rounded-full transition-all duration-300" id="previewProgressBar" style="width: 25%;"></div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-space-sm mt-space-sm">
+<button class="w-full h-12 rounded-xl bg-primary text-on-primary font-title-lg text-title-lg font-bold flex items-center justify-center gap-space-xs shadow-md hover:bg-secondary active:scale-[0.99] transition-all" id="submitBtn" onclick="saveChanges()" type="button">
+<span class="material-symbols-outlined text-[20px]">save_as</span>
+<span>حفظ التعديلات وتحديث الرصيد</span>
+</button>
+<button class="w-full h-12 rounded-xl bg-surface-container text-primary font-title-md text-title-md font-bold flex items-center justify-center gap-space-xs hover:bg-surface-container-high active:bg-surface-container-highest transition-colors" onclick="openExitDialog()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+<span>إلغاء والتراجع</span>
+</button>
+</div>
+</form>
+<!-- Unsaved Changes Prompt Dialog Modal (Layer 3 Depth) -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center px-margin-mobile bg-inverse-surface/60 backdrop-blur-sm transition-opacity" id="exitModal">
+<div class="bg-surface-container-lowest w-full max-w-sm rounded-xl p-space-lg shadow-xl flex flex-col items-center text-center gap-space-md transform transition-transform">
+<div class="w-14 h-14 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<h4 class="font-headline-sm text-headline-sm text-primary font-bold">تعديلات غير محفوظة</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          لديك تغييرات جديدة على مبلغ ومواصفات الدين. هل ترغب فعلاً في الخروج وتجاهل كافة التعديلات؟
+        </p>
+</div>
+<div class="flex flex-col w-full gap-space-sm pt-2">
+<button class="w-full h-12 rounded-xl bg-secondary text-on-secondary font-title-md text-title-md font-bold active:scale-[0.99] transition-all" onclick="closeExitDialog()" type="button">
+          متابعة التعديل
+        </button>
+<button class="w-full h-12 rounded-xl bg-surface-container text-error font-title-md text-title-md font-bold hover:bg-error-container/40 active:bg-error-container transition-colors" onclick="confirmExit()" type="button">
+          تجاهل التغييرات والعودة
+        </button>
+</div>
+</div>
+</div>
+<!-- Success Toast Overlay -->
+<div class="hidden fixed bottom-6 left-margin-mobile right-margin-mobile z-50 flex items-center gap-space-sm p-space-md rounded-xl bg-primary text-on-primary shadow-xl" id="successToast">
+<span class="material-symbols-outlined text-secondary-fixed text-[24px]">check_circle</span>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md font-bold">تم حفظ التعديل بنجاح</span>
+<span class="font-body-sm text-body-sm text-on-primary-container">تمت مزامنة الكشف المالي وتحديث رصيد أحمد سالم.</span>
+</div>
+</div>
+</div>
+</main><script src="../app.js"></script></body></html>

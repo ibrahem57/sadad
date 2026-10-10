@@ -1,0 +1,8 @@
+{
+  "name": "sadad-ledger-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sadad multi-store API and admin portal",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": { "start": "node server.js" }
+}

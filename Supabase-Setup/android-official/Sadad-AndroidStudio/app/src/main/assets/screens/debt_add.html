@@ -1,0 +1,175 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_stack" name="shell-type"><title>سدد</title>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased" data-screen="debt_add"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(13,71,64,0.06)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="رجوع" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_forward</span></button><h1 class="font-title-lg text-title-lg text-primary">إضافة دين جديد</h1></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface"><div class="flex flex-col w-full pb-10">
+<div class="w-full max-w-md mx-auto px-margin-mobile flex flex-col gap-space-md pt-space-xs">
+<!-- Wave Branding Ribbon Ambient Element -->
+<div class="w-full flex items-center justify-center py-space-xs opacity-90">
+<svg class="w-24 h-5 text-secondary" fill="none" viewBox="0 0 120 24" xmlns="http://www.w3.org/2000/svg">
+<path class="text-secondary-fixed" d="M4 18C16 18 24 6 36 6C48 6 56 18 68 18C80 18 88 6 100 6C108 6 114 12 116 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<path class="text-secondary opacity-60" d="M12 21C22 21 30 10 40 10C50 10 58 21 68 21C78 21 86 10 96 10C104 10 110 16 112 21" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+</div>
+<!-- Interactive Counterparty Selection -->
+<section class="flex flex-col gap-space-xs">
+<label class="font-label-lg text-label-lg text-on-surface-variant flex items-center justify-between">
+<span class="">الطرف المعني</span>
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified_user</span> سجل موثوق
+        </span>
+</label>
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 text-primary">
+<span class="material-symbols-outlined text-[24px]">person</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface truncate" id="personName">أحمد سالم</span>
+<span class="font-label-sm text-label-sm bg-surface-container text-secondary px-2 py-0.5 rounded-full">معتمد</span>
+</div>
+<span class="font-body-sm text-body-sm text-outline tracking-wider" dir="ltr" id="personPhone">059-1234567</span>
+</div>
+</div>
+<button class="flex items-center gap-1 bg-surface-container-low hover:bg-surface-container px-3 py-2 rounded-lg text-secondary transition-all" id="changePersonBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+<span class="font-label-md text-label-md">تغيير</span>
+</button>
+</div>
+</section>
+<!-- Debt Direction Selector: "لي" vs "عليّ" -->
+<section class="flex flex-col gap-space-xs">
+<label class="font-label-lg text-label-lg text-on-surface-variant">اتجاه المعاملة</label>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Receivable Option (Default: "لي") -->
+<button class="direction-btn relative flex flex-col items-center justify-center p-3 rounded-xl bg-secondary-fixed text-on-secondary-fixed transition-all shadow-sm" id="typeForMe" type="button">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest/80 flex items-center justify-center mb-1 text-secondary">
+<span class="material-symbols-outlined text-[20px]">north_east</span>
+</div>
+<span class="font-title-md text-title-md font-bold">مستحق لي</span>
+<span class="font-label-sm text-label-sm opacity-80">أنا الدائن (أطلبه)</span>
+<div class="absolute top-2 left-2 w-5 h-5 rounded-full bg-secondary text-on-secondary flex items-center justify-center" id="checkForMe">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+</button>
+<!-- Payable Option ("عليّ") -->
+<button class="direction-btn relative flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low transition-all shadow-sm" id="typeOnMe" type="button">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center mb-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">south_west</span>
+</div>
+<span class="font-title-md text-title-md font-bold">مستحق عليّ</span>
+<span class="font-label-sm text-label-sm opacity-80">أنا المدين (التزام)</span>
+<div class="hidden absolute top-2 left-2 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center" id="checkOnMe">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Amount Hero & Keypad Module -->
+<section class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col items-center">
+<span class="font-label-md text-label-md text-outline mb-1">المبلغ المطلوب تسجيله</span>
+<!-- Amount Display Area -->
+<div class="w-full flex items-center justify-center py-2 relative">
+<div class="flex items-baseline justify-center gap-2" dir="ltr">
+<span class="font-display-lg text-display-lg text-primary font-bold tracking-tight" id="amountDisplay">350</span>
+<span class="font-headline-sm text-headline-sm text-secondary font-bold">₪</span>
+</div>
+</div>
+<!-- Quick Preset Chips -->
+<div class="flex items-center gap-2 my-space-xs w-full justify-center">
+<button class="preset-chip bg-surface-container-low text-on-surface-variant hover:bg-secondary-fixed hover:text-on-secondary-fixed px-3 py-1 rounded-full font-label-md text-label-md transition-all" data-value="50" type="button">+٥٠ ₪</button>
+<button class="preset-chip bg-surface-container-low text-on-surface-variant hover:bg-secondary-fixed hover:text-on-secondary-fixed px-3 py-1 rounded-full font-label-md text-label-md transition-all" data-value="100" type="button">+١٠٠ ₪</button>
+<button class="preset-chip bg-surface-container-low text-on-surface-variant hover:bg-secondary-fixed hover:text-on-secondary-fixed px-3 py-1 rounded-full font-label-md text-label-md transition-all" data-value="200" type="button">+٢٠٠ ₪</button>
+<button class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md hover:bg-error-container hover:text-on-error-container transition-all" id="clearBtn" type="button">تصفير</button>
+</div>
+<!-- Tactile Custom Numeric Pad -->
+<div class="w-full grid grid-cols-3 gap-2 mt-2 pt-2 border-t-0">
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">1</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">2</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">3</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">4</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">5</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">6</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">7</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">8</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">9</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">.</button>
+<button class="keypad-btn h-12 rounded-xl bg-surface hover:bg-surface-container-high active:scale-95 font-headline-sm text-headline-sm text-on-surface flex items-center justify-center transition-all" type="button">0</button>
+<button class="h-12 rounded-xl bg-surface-container hover:bg-surface-container-high active:scale-95 text-on-surface flex items-center justify-center transition-all" id="backspaceBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">backspace</span>
+</button>
+</div>
+</section>
+<!-- Context Details (Dates & Statement) -->
+<section class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm">
+<!-- Transaction Date -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">calendar_today</span>
+<span class="font-title-md text-title-md">تاريخ العملية</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-low px-3 py-1.5 rounded-lg text-primary font-label-md text-label-md">
+<span class="">اليوم، ١٥ مايو ٢٠٢٤</span>
+</div>
+</div>
+<!-- Due Date Optional Toggle -->
+<div class="pt-space-xs flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[20px]">event_upcoming</span>
+<span class="font-title-md text-title-md">تحديد موعد استحقاق</span>
+</div>
+<button class="w-12 h-6 rounded-full bg-surface-container-high relative transition-colors focus:outline-none" id="dueDateToggle" type="button">
+<div class="w-5 h-5 rounded-full bg-surface-container-lowest absolute top-0.5 right-0.5 transition-transform shadow-sm" id="toggleDot"></div>
+</button>
+</div>
+<div class="hidden flex items-center justify-between bg-surface-container-low p-2.5 rounded-lg transition-all" id="dueDateContainer">
+<span class="font-body-sm text-body-sm text-on-surface-variant">تاريخ السداد المقترح:</span>
+<span class="font-label-md text-label-md text-primary font-bold">٣٠ مايو ٢٠٢٤ (بعد أسبوعين)</span>
+</div>
+</div>
+<!-- Note / Purpose Input -->
+<div class="pt-space-xs flex flex-col gap-1">
+<label class="font-label-md text-label-md text-outline" for="noteInput">بيان أو ملاحظة (اختياري)</label>
+<div class="flex items-center gap-2 bg-surface-container-low rounded-xl px-3 py-2.5">
+<span class="material-symbols-outlined text-outline text-[20px]">edit_note</span>
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none" id="noteInput" placeholder="مثال: قسط سلفة، مشتريات مشتركة..." type="text" value="مشتريات مشتركة ومصاريف الجمعية">
+</div>
+</div>
+</section>
+<!-- Visual Assurance Card: Real-time Reassurance -->
+<section class="rounded-xl p-space-md bg-secondary-fixed/40 text-on-secondary-fixed flex items-start gap-space-sm shadow-sm transition-colors" id="summaryCard">
+<span class="material-symbols-outlined text-secondary text-[24px] shrink-0 mt-0.5">verified</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">ملخص المعاملة</span>
+<p class="font-body-md text-body-md mt-0.5 text-on-secondary-fixed" id="summaryText">أنت تسجل ديناً بقيمة <span class="font-bold font-title-md">350 ₪</span> مستحق <span class="font-bold text-secondary">لك (لي)</span> عند <span class="font-bold">أحمد سالم</span>.</p>
+</div>
+</section>
+<!-- Action Confirmation Button -->
+<section class="flex flex-col gap-space-xs pt-space-xs">
+<button class="w-full h-12 rounded-xl bg-primary-container hover:bg-secondary text-on-primary font-title-lg text-title-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg active:scale-[0.98] transition-all" id="saveDebtBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">check_circle</span>
+<span class="">حفظ الدين وتحديث الرصيد</span>
+</button>
+<button class="w-full py-2.5 text-center text-outline hover:text-on-surface font-label-lg text-label-lg transition-colors" onclick="history.back()" type="button">
+        إلغاء والعودة
+      </button>
+</section>
+</div>
+<!-- Success Toast Modal Mockup (Hidden by default) -->
+<div class="fixed bottom-6 left-4 right-4 max-w-md mx-auto z-50 transform translate-y-32 opacity-0 pointer-events-none transition-all duration-300" id="toastNotification">
+<div class="bg-primary text-on-primary p-4 rounded-xl shadow-2xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">done_all</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md">تم الحفظ بنجاح!</span>
+<span class="font-body-sm text-body-sm text-on-primary-container">تم تسجيل الدين وتحديث رصيد أحمد سالم.</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]">check</span>
+</div>
+</div>
+</div>
+</main>
+
+<script src="../app.js"></script></body></html>

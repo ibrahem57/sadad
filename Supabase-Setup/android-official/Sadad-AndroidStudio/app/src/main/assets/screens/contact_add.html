@@ -1,0 +1,99 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_stack" name="shell-type"><title>إضافة شخص جديد</title>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased" data-screen="contact_add"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(13,71,64,0.06)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="رجوع" class="w-11 h-11 flex items-center justify-center rounded-full text-primary hover:bg-surface-container transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_forward</span></button><h1 class="font-title-lg text-title-lg text-primary">إضافة شخص جديد</h1></div><div class="flex items-center gap-space-xs"><button aria-label="إغلاق" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container transition-colors hidden" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">close</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface"><div class="flex flex-col w-full">
+<div class="px-margin-mobile pt-space-md pb-space-xl flex flex-col gap-space-lg max-w-lg mx-auto w-full">
+<div class="relative overflow-hidden bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center gap-space-md">
+<div class="absolute -left-6 -bottom-6 w-24 h-24 bg-primary-fixed/10 rounded-full blur-xl pointer-events-none"></div>
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest/15 flex items-center justify-center shrink-0 text-primary-fixed">
+<span class="material-symbols-outlined text-[26px]">person_add</span>
+</div>
+<div class="flex flex-col min-w-0">
+<p class="font-title-md text-title-md text-primary-fixed font-bold">جهة اتصال مالية جديدة</p>
+<p class="font-body-sm text-body-sm text-on-primary-container leading-relaxed">أضف شخصاً جديداً لبدء توثيق المعاملات المالية المشتركة بكل ثقة وسهولة وهدوء.</p>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center gap-space-xs py-space-xs">
+<div class="relative" id="avatarSelector">
+<div class="w-20 h-20 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[36px]" id="avatarIcon">person</span>
+</div>
+
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">جهة اتصال جديدة</span>
+</div>
+<form class="flex flex-col gap-space-md" onsubmit="event.preventDefault();">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-title-md text-title-md text-on-surface flex items-center gap-1" for="contactName">
+<span>الاسم الكامل</span>
+<span class="text-error font-bold text-base">*</span>
+</label>
+<span class="font-label-sm text-label-sm text-secondary font-medium">مطلوب</span>
+</div>
+<div class="relative flex items-center">
+<input class="w-full h-12 pr-11 pl-4 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline shadow-sm focus:outline-none focus:bg-surface-bright transition-all" id="contactName" placeholder="مثال: عمر الحلبي" required="" type="text">
+<span class="material-symbols-outlined absolute right-3 text-on-surface-variant text-[22px] pointer-events-none">badge</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-title-md text-title-md text-on-surface" for="contactPhone">رقم الهاتف</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">اختياري</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<div class="relative flex-1 flex items-center">
+<input class="w-full h-12 pr-4 pl-11 rounded-xl bg-surface-container-lowest text-on-surface text-left font-body-md text-body-md placeholder:text-outline shadow-sm focus:outline-none focus:bg-surface-bright transition-all" dir="ltr" id="contactPhone" placeholder="+97059xxxxxxx" type="tel">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[22px] pointer-events-none">phone</span>
+</div>
+<div class="h-12 px-3 rounded-xl bg-surface-container text-on-surface flex items-center gap-1 shrink-0 select-none shadow-sm">
+<span class="font-label-md text-label-md font-bold text-primary" dir="ltr">+970</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-title-md text-title-md text-on-surface">طبيعة العلاقة</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">اختياري</span>
+</div>
+<div class="grid grid-cols-4 gap-space-xs" id="categoryChips">
+<button class="category-chip h-11 rounded-xl bg-surface-container-lowest text-on-surface flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-all" data-cat="صديق" type="button">
+<span class="font-label-md text-label-md font-bold">صديق</span>
+</button>
+<button class="category-chip h-11 rounded-xl bg-surface-container-lowest text-on-surface flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-all" data-cat="عمل" type="button">
+<span class="font-label-md text-label-md font-bold">عمل</span>
+</button>
+<button class="category-chip h-11 rounded-xl bg-surface-container-lowest text-on-surface flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-all" data-cat="عائلة" type="button">
+<span class="font-label-md text-label-md font-bold">عائلة</span>
+</button>
+<button class="category-chip h-11 rounded-xl bg-surface-container-lowest text-on-surface flex flex-col items-center justify-center gap-0.5 shadow-sm active:scale-95 transition-all" data-cat="متجر" type="button">
+<span class="font-label-md text-label-md font-bold">متجر</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-title-md text-title-md text-on-surface" for="contactNote">ملاحظة عامة</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">اختياري</span>
+</div>
+<div class="relative">
+<textarea class="w-full p-3 pr-10 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline shadow-sm focus:outline-none focus:bg-surface-bright transition-all resize-none" id="contactNote" placeholder="مثال: شريك مشروع التصميم، حساب الورشة..." rows="3"></textarea>
+<span class="material-symbols-outlined absolute top-3.5 right-3 text-on-surface-variant text-[20px] pointer-events-none">description</span>
+</div>
+</div>
+<label class="rounded-xl bg-surface-container-low p-space-md flex items-start gap-space-sm mt-space-xs">
+<input id="whatsappConsent" type="checkbox" class="mt-1 w-5 h-5 accent-secondary">
+<span class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">أقرّ بموافقة هذا الشخص على استلام كشوف الحساب عبر WhatsApp عند طلبي ذلك. لن تُرسل رسائل تلقائية.</span>
+</label>
+<div class="flex flex-col gap-space-sm pt-space-sm">
+<button class="w-full h-12 rounded-xl bg-primary-container text-on-primary font-title-lg text-title-lg shadow-md flex items-center justify-center gap-space-xs active:scale-[0.99] transition-transform hover:bg-tertiary-container" id="submitBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span>حفظ الشخص والمتابعة</span>
+</button>
+<button class="w-full h-11 rounded-xl bg-transparent text-secondary hover:bg-surface-container font-title-md text-title-md transition-colors flex items-center justify-center" onclick="history.back()" type="button">
+          إلغاء
+        </button>
+</div>
+</form>
+</div>
+</div>
+</main><script src="../app.js"></script></body></html>

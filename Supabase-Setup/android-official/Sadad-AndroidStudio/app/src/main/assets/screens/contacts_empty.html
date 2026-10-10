@@ -1,0 +1,136 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_tab" name="shell-type"><title>سدد</title>
+
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased" data-screen="contacts_empty"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(13,71,64,0.06)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"><div class="flex flex-col"><span class="font-title-lg text-title-lg text-primary leading-none">&nbsp; &nbsp;سدد</span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Contacts</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="الإشعارات" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">notifications</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full px-margin-mobile gap-space-md">
+<!-- Mini Header & Balance Summary -->
+<section class="flex flex-col bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[20px]">contacts</span>
+</div>
+<div>
+<h1 class="font-title-lg text-title-lg text-primary">سجل الأشخاص والشركاء</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">إدارة المعاملات المالية المتبادلة</p>
+</div>
+</div>
+<span class="bg-surface-container px-2.5 py-1 rounded-full font-label-sm text-label-sm text-on-surface-variant">
+        0 جهة اتصال
+      </span>
+</div>
+<!-- Twin Balance Summary Cards -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+            مستحق لي
+          </span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">0 ₪</span>
+</div>
+<div class="w-7 h-7 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">south_west</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">call_received</span>
+            مستحق عليّ
+          </span>
+<span class="font-headline-sm text-headline-sm text-on-surface-variant font-bold">0 ₪</span>
+</div>
+<div class="w-7 h-7 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">north_east</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Search Bar (Disabled / Empty State) -->
+<div class="relative w-full">
+<div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full h-12 pr-10 pl-4 bg-surface-container-lowest text-on-surface-variant placeholder:text-outline/70 font-body-md text-body-md rounded-xl shadow-sm cursor-not-allowed opacity-80 select-none" disabled="" placeholder="ابحث بالاسم أو رقم الهاتف..." type="text">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 text-outline/50 pointer-events-none">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</div>
+</div>
+<!-- Filter Pills (Disabled Count) -->
+<div id="emptyContactFilters" class="flex items-center gap-space-xs overflow-x-auto pb-0.5 select-none">
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm whitespace-nowrap">
+<span>الكل</span>
+<span class="bg-on-primary/20 px-1.5 py-0.2 rounded-full font-label-sm text-label-sm">0</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm whitespace-nowrap opacity-60">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>لي</span>
+<span class="bg-surface-container px-1.5 py-0.2 rounded-full font-label-sm text-label-sm">0</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm whitespace-nowrap opacity-60">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>عليّ</span>
+<span class="bg-surface-container px-1.5 py-0.2 rounded-full font-label-sm text-label-sm">0</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm whitespace-nowrap opacity-60">
+<span class="material-symbols-outlined text-[14px]">done_all</span>
+<span>مسدد</span>
+<span class="bg-surface-container px-1.5 py-0.2 rounded-full font-label-sm text-label-sm">0</span>
+</button>
+</div>
+<!-- Empty State Delight Card -->
+<section class="flex flex-col items-center justify-center text-center bg-surface-container-lowest rounded-xl p-space-lg shadow-sm mt-space-sm relative overflow-hidden">
+<!-- Subtle Ambient Decorative Glow -->
+<div class="absolute -top-16 -left-16 w-36 h-36 rounded-full bg-secondary-container/40 blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-16 -right-16 w-40 h-40 rounded-full bg-primary-fixed/30 blur-2xl pointer-events-none"></div>
+<!-- Expressive Illustrated Icon Container -->
+<div class="relative mb-space-md">
+<div class="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center text-secondary shadow-inner">
+<span class="material-symbols-outlined text-[44px]" style="font-variation-settings: 'FILL' 1;">person_add</span>
+</div>
+<!-- Small Floating Badge Indicators -->
+<div class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[16px]">account_balance_wallet</span>
+</div>
+<div class="absolute top-0 -left-1 w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shadow-sm">
+<span class="material-symbols-outlined text-[13px]">handshake</span>
+</div>
+</div>
+<!-- Text Grouping -->
+<h2 class="font-headline-sm text-headline-sm text-primary mb-space-xs font-bold">
+      لم تضف أي شخص بعد
+    </h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[270px] leading-relaxed mb-space-lg">
+      ابدأ بإضافة أصدقائك أو شركائك لتوثيق المبالغ ومتابعة الديون والدفعات بكل وضوح وراحة بال.
+    </p>
+<!-- Highlighted Benefits Micro-cards -->
+<div class="grid grid-cols-2 gap-space-xs w-full max-w-[320px] mb-space-lg text-right">
+<div class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-[18px] text-secondary">verified_user</span>
+<span class="font-label-sm text-label-sm text-on-surface">توثيق دقيق</span>
+</div>
+<div class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-[18px] text-secondary">notifications_active</span>
+<span class="font-label-sm text-label-sm text-on-surface">تذكير ودي</span>
+</div>
+</div>
+<!-- Primary Action Trigger -->
+<button class="w-full max-w-[280px] h-12 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-title-md text-title-md flex items-center justify-center gap-space-xs shadow-md transition-all active:scale-[0.98]" id="add-first-contact-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>إضافة أول شخص</span>
+</button>
+</section>
+<!-- Helpful Hint Callout -->
+<div class="flex items-start gap-space-sm p-space-md rounded-xl bg-surface-container-low">
+<div class="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center text-secondary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">lightbulb</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-primary font-bold">نصيحة مالية ذكية</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-normal">
+        تسجيل المعاملات فور حدوثها يحفظ الحقوق ويضمن علاقات هادئة ومريحة بين الأهل والأصدقاء.
+      </p>
+</div>
+</div>
+</div>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(13,71,64,0.05)]" data-active-classes="text-secondary font-bold scale-105"><div class="flex items-center justify-around h-16 px-space-sm"><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-sm text-label-sm">الرئيسية</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="contacts" href="#"><span class="material-symbols-outlined text-[24px]">group</span><span class="font-label-sm text-label-sm">الأشخاص</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="history" href="#"><span class="material-symbols-outlined text-[24px]">history</span><span class="font-label-sm text-label-sm">السجل</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="settings" href="#"><span class="material-symbols-outlined text-[24px]">settings</span><span class="font-label-sm text-label-sm">الإعدادات</span></a></div></nav>
+<script src="../app.js"></script></body></html>

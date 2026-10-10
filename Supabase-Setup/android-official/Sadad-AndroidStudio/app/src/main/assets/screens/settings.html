@@ -1,0 +1,284 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_tab" name="shell-type">
+</head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen" data-screen="settings"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(13,71,64,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"><div class="flex flex-col"><span class="font-title-lg text-title-lg text-primary leading-tight">سدد</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-none">Settings</span></div></div><div class="flex items-center"><button aria-label="الإشعارات" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors focus:outline-none" type="button"><span class="material-symbols-outlined text-[24px]">notifications</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 px-margin-mobile bg-surface min-h-screen"><div class="flex flex-col w-full space-y-space-lg pb-6">
+<!-- بطاقة الملف الشخصي المميزة مع لمسة فنية دافئة -->
+<section class="relative w-full rounded-xl bg-surface-container p-space-md shadow-sm overflow-hidden">
+<!-- خلفية زخرفية ناعمة تحاكي تموجات الهوية -->
+<div class="absolute -top-10 -left-10 w-36 h-36 rounded-full bg-secondary-container/30 blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-8 -right-8 w-28 h-28 rounded-full bg-tertiary-fixed/20 blur-xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md w-full sm:w-auto">
+<div class="relative flex-shrink-0">
+<img class="w-16 h-16 rounded-full object-cover shadow-md" data-alt="Portrait photo of Omar Al-Halabi, a friendly 30-year-old Middle Eastern man with a warm and trustworthy smile, natural warm daylight, high resolution modern fintech app profile avatar, emerald and deep teal ambient palette" src="../logo-light.jpeg">
+<div class="absolute -bottom-1 -left-1 bg-surface-container-lowest rounded-full p-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary flex items-center justify-center" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h1 class="font-title-lg text-title-lg text-primary truncate">عمر الحلبي</h1>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-container text-on-secondary-container">
+              حساب موثّق
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-mono text-right" dir="ltr">+970 59 123 4567</span>
+<span class="font-label-sm text-label-sm text-secondary mt-0.5">عضو منذ يناير ٢٠٢٤</span>
+</div>
+</div>
+<button class="w-full sm:w-auto px-space-md h-10 rounded-lg bg-surface-container-lowest text-primary font-label-lg text-label-lg flex items-center justify-center gap-1.5 shadow-sm hover:bg-surface-bright active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">edit</span>
+<span>تعديل الملف</span>
+</button>
+</div>
+</section>
+<!-- القسم الأول: الحساب والمالية -->
+<section class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<span class="font-title-md text-title-md text-primary font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">manage_accounts</span>
+        الحساب والأمان
+      </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">البيانات والخصوصية</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- العملة الافتراضية -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">العملة الافتراضية</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">تُطبق على جميع الحسابات والمعاملات الجديدة</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-full">
+<span class="font-title-md text-title-md text-secondary font-bold">₪</span>
+<span class="font-label-md text-label-md text-on-surface">شيكل (ILS)</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_left</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- قفل التطبيق والأمان -->
+<div id="legacyBiometricRow" class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">fingerprint</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">بصمة الوجه / الرمز السري</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">حماية إضافية وفورية عند فتح التطبيق</span>
+</div>
+</div>
+<!-- مفتاح تبديل مفعّل -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- النسخ الاحتياطي والمزامنة السحابية -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">cloud_sync</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-on-surface">النسخ الاحتياطي والمزامنة</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">آخر مزامنة سحابية: اليوم، 11:30 ص</span>
+</div>
+</div>
+<button class="text-secondary font-label-md text-label-md px-2.5 py-1 rounded-md bg-surface-container hover:bg-secondary-container transition-colors" type="button">
+          تحديث الآن
+        </button>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- كشف الحساب وتصدير التقرير الشامل -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">كشف حساب وتصدير التقرير</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">ملف مفصل بصيغة PDF أو جدول Excel</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span>تصدير</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_left</span>
+</div>
+</div>
+</div>
+</section>
+<!-- القسم الثاني: التذكيرات والتنبيهات -->
+<section class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<span class="font-title-md text-title-md text-primary font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">notifications_active</span>
+        التذكيرات والرسائل
+      </span>
+<span class="font-label-sm text-label-sm text-secondary">إدارة اللباقة والود</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- تذكيرات الاستحقاقات التلقائية -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">alarm</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">التذكيرات التلقائية</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">إظهار الديون المستحقة في مركز التنبيهات عند فتح التطبيق</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input id="automaticReminderToggle" checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- موعد إرسال التنبيهات -->
+<div id="reminderLeadTime" class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">event_upcoming</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">موعد إرسال التنبيه</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">المهلة المسبقة قبل موعد السداد</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-container-low px-3 py-1 rounded-lg">
+<span class="reminder-lead-value font-label-md text-label-md text-secondary font-bold">قبل يومين</span>
+<span class="material-symbols-outlined text-[16px] text-outline">expand_more</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- قوالب رسائل تذكير واتساب الودية -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">chat</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-on-surface">قوالب رسائل واتساب الودية</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-secondary-container text-on-secondary-container font-label-sm">مخصّصة</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">صيغ راقية ومحترمة لتذكير الأصدقاء والأقارب</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_left</span>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- نغمة التنبيه الهادئة -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">volume_up</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">نغمة التنبيهات</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">نغمة رقيقة تمنح الطمأنينة والهدوء</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">هدوء النسيم</span>
+</div>
+</div>
+</section>
+<!-- القسم الثالث: المساعدة والدعم والتطبيق -->
+<section class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<span class="font-title-md text-title-md text-primary font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">help_outline</span>
+        المساعدة والمعلومات
+      </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">سدد معك دائماً</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- الأسئلة الشائعة FAQ -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">quiz</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">الأسئلة الشائعة (FAQ)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">طريقة تتبع الديون، الخصوصية، وتوثيق المخالصة</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_left</span>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- تواصل عبر واتساب -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">support_agent</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">فريق الدعم المباشر</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">محادثة فورية وسريعة عبر واتساب</span>
+</div>
+</div>
+<div class="flex items-center gap-1 text-secondary font-label-md text-label-md">
+<span>متصل</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-surface-container-highest/60"></div>
+<!-- عن تطبيق سدد وشروط الاستخدام -->
+<div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">info</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-on-surface">عن سدد وسياسة الخصوصية</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">الإصدار 2.0.0 • الشروط والأحكام المالية</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_left</span>
+</div>
+</div>
+</section>
+<!-- زر تسجيل الخروج الرئيسي -->
+<div class="pt-2">
+<button class="w-full h-12 rounded-xl bg-error-container/40 text-on-error-container font-title-md text-title-md flex items-center justify-center gap-2 hover:bg-error-container/70 active:scale-98 transition-all" id="trigger-logout-btn" type="button">
+<span class="material-symbols-outlined text-[20px] text-error">logout</span>
+<span class="text-error font-bold">تسجيل الخروج</span>
+</button>
+</div>
+<!-- تذييل معنوي أنيق -->
+<div class="text-center py-2 flex flex-col items-center gap-1">
+<p class="font-body-sm text-body-sm text-on-surface-variant">سدد • لراحة البال وصفاء العلاقات المالية</p>
+<span class="font-label-sm text-label-sm text-outline">جميع الحقوق محفوظة © ٢٠٢٤</span>
+</div>
+<!-- نافذة حوارية منبثقة لتأكيد تسجيل الخروج (Modal Dialog الظاهرة بوضوح) -->
+<div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-space-md bg-inverse-surface/40 backdrop-blur-sm transition-opacity" id="logout-modal">
+<div class="bg-surface-container-lowest w-full max-w-sm rounded-2xl p-space-lg shadow-2xl flex flex-col items-center text-center relative overflow-hidden transform transition-transform">
+<!-- أيقونة تنبيهية لطيفة ومحترمة -->
+<div class="w-14 h-14 rounded-full bg-error-container/50 flex items-center justify-center mb-space-md">
+<span class="material-symbols-outlined text-error text-[30px]">power_settings_new</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold mb-space-xs">
+        تأكيد تسجيل الخروج
+      </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-lg leading-relaxed">
+        هل أنت متأكد من رغبتك في تسجيل الخروج؟ بياناتك المالية والتزاماتك محفوظة ومحمية بأمان على سحابة سدد المشفرة.
+      </p>
+<div class="flex flex-col sm:flex-row w-full gap-space-sm">
+<button class="w-full h-12 rounded-xl bg-error text-on-error font-title-md text-title-md font-bold flex items-center justify-center shadow-md hover:opacity-95 active:scale-95 transition-all order-1 sm:order-2" id="confirm-logout-btn" type="button">
+          تسجيل الخروج
+        </button>
+<button class="w-full h-12 rounded-xl bg-surface-container text-on-surface font-title-md text-title-md flex items-center justify-center hover:bg-surface-container-high active:scale-95 transition-all order-2 sm:order-1" id="cancel-logout-btn" type="button">
+          إلغاء
+        </button>
+</div>
+</div>
+</div>
+</div>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(13,71,64,0.06)]" data-active-classes="text-secondary font-bold"><div class="flex justify-around items-center h-20 px-space-xs"><a class="flex flex-col items-center justify-center gap-1 w-16 h-14 text-on-surface-variant hover:text-secondary transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">account_balance_wallet</span><span class="font-label-sm text-label-sm">الرئيسية</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-14 text-on-surface-variant hover:text-secondary transition-colors" data-path="people" href="#"><span class="material-symbols-outlined text-[24px]">group</span><span class="font-label-sm text-label-sm">الأشخاص</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-14 text-on-surface-variant hover:text-secondary transition-colors" data-path="ledger" href="#"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-sm text-label-sm">السجل</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-1 w-16 h-14 transition-colors text-secondary font-bold" data-path="settings" href="#"><span class="material-symbols-outlined text-[24px]">settings</span><span class="font-label-sm text-label-sm">الإعدادات</span></a></div></nav><script src="../app.js"></script></body></html>

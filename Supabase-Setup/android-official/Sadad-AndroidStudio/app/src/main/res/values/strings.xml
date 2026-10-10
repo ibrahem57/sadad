@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">سدد</string>
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_contacts">الأشخاص</string>
+    <string name="nav_history">السجل</string>
+    <string name="nav_settings">الإعدادات</string>
+</resources>

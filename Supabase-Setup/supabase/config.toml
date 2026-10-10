@@ -1,0 +1,9 @@
+project_id = "vhftjmiltqfwmrszdtgf"
+
+[functions.sadad-api]
+# The app uses Sadad's own short-lived bearer sessions, not Supabase Auth JWTs.
+verify_jwt = false
+
+[functions.sadad-auth]
+# Login/refresh are public; handler validates Supabase JWT plus bound device session on private routes.
+verify_jwt = false

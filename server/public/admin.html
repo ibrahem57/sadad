@@ -3,8 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="sadad-api-base-url" content="https://vhftjmiltqfwmrszdtgf.supabase.co/functions/v1/sadad-api">
+  <meta name="sadad-publishable-key" content="sb_publishable_dK7HuYY8TbO8ZiBPbOZ2cw_1ZRL_chh">
   <title>إدارة سدد</title>
   <link rel="stylesheet" href="admin.css">
+  <script>
+    window.SADAD_API_BASE_URL = document.querySelector('meta[name="sadad-api-base-url"]')?.content || '';
+    window.SADAD_SUPABASE_PUBLISHABLE_KEY = document.querySelector('meta[name="sadad-publishable-key"]')?.content || '';
+  </script>
   <script defer src="admin.js"></script>
 </head>
 <body>
@@ -153,4 +159,3 @@
   </main>
 </body>
 </html>
-

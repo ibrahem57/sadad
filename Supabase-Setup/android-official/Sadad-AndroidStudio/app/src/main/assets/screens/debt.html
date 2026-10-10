@@ -1,0 +1,198 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_stack" name="shell-type">
+</head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen" data-screen="debt"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(13,71,64,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="رجوع" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:text-secondary transition-colors focus:outline-none" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_forward</span></button><h1 class="font-headline-sm text-headline-sm text-primary">تفاصيل الدين</h1></div><div class="flex items-center"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"></div></div></header><main class="flex flex-col relative w-full pt-16 px-margin-mobile bg-surface min-h-screen"><div class="flex flex-col w-full pb-safe space-y-space-md">
+<!-- Action Sub-header / Fast Actions Bar -->
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center px-space-sm py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md gap-1">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+        معاملة نشطة
+      </span>
+<span class="text-on-surface-variant font-label-md text-label-md">#DEBT-2024-089</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button aria-label="مشاركة تفاصيل الدين" class="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-container text-secondary hover:bg-surface-container-high transition-colors focus:outline-none" id="shareBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+<button aria-label="خيارات إضافية" class="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Counterparty Identity Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-space-md">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover" data-alt="Close-up portrait of Ahmad Salem, a handsome young Arab professional man with a warm smile, neatly groomed short dark beard, wearing a crisp modern sage green linen shirt in natural soft morning light." src="../logo-light.jpeg">
+<div class="absolute -bottom-1 -left-1 w-5 h-5 rounded-full bg-secondary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[13px]">check</span>
+</div>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-title-lg text-title-lg text-on-surface">أحمد سالم</h2>
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-surface-container text-secondary font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[12px]">verified_user</span>
+            شخص معتمد
+          </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5" dir="ltr">+970 59 912 3456</p>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<a aria-label="اتصال" class="w-10 h-10 rounded-full bg-surface-container-low text-secondary flex items-center justify-center hover:bg-surface-container transition-colors" href="tel:+970599123456">
+<span class="material-symbols-outlined text-[20px]">call</span>
+</a>
+<button aria-label="محادثة" class="w-10 h-10 rounded-full bg-surface-container-low text-secondary flex items-center justify-center hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+</button>
+</div>
+</div>
+<!-- Primary Financial Deep Teal Hero Card -->
+<div class="relative overflow-hidden bg-primary-container text-on-primary rounded-xl p-space-md shadow-lg">
+<!-- Ambient Wave Background Graphic -->
+<svg class="absolute -left-12 -top-12 w-64 h-64 opacity-10 pointer-events-none text-secondary-container" fill="currentColor" viewBox="0 0 200 200">
+<path d="M43.3,-65.4C55.4,-57.1,64.2,-44.6,70.1,-30.9C76,-17.1,79.1,-2.2,76.4,12.3C73.7,26.7,65.3,40.7,53.8,50.7C42.3,60.8,27.7,66.8,12.7,69.5C-2.3,72.1,-17.6,71.4,-31.6,65.5C-45.6,59.6,-58.3,48.5,-66.2,34.5C-74.1,20.4,-77.3,3.4,-74.6,-12.3C-71.9,-27.9,-63.4,-42.2,-51.2,-50.8C-39.1,-59.4,-23.3,-62.3,-7.8,-63.2C7.7,-64.1,31.2,-73.7,43.3,-65.4Z" transform="translate(100 100)"></path>
+</svg>
+<div class="relative z-10 flex flex-col space-y-space-md">
+<!-- Debt Direction Tag & Status Badge -->
+<div class="flex items-center justify-between">
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">north_east</span>
+<span>مستحق لي (أنت الدائن)</span>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container bg-surface/10 px-2.5 py-1 rounded-lg backdrop-blur-sm">
+          متبقي 15 يوم
+        </span>
+</div>
+<!-- Outstanding Amount Metric -->
+<div class="flex flex-col pt-1">
+<span class="font-body-sm text-body-sm text-on-primary-container">المبلغ المستحق المتبقي</span>
+<div class="flex items-baseline gap-1.5 mt-0.5">
+<span class="font-display-lg text-display-lg tracking-tight font-bold">350</span>
+<span class="font-headline-sm text-headline-sm text-secondary-container">₪</span>
+</div>
+</div>
+<!-- Settlement Progress Bar -->
+<div class="flex flex-col space-y-1.5">
+<div class="flex justify-between items-center font-label-md text-label-md text-on-primary-container">
+<span>نسبة السداد المكتملة</span>
+<span class="font-bold text-secondary-container">30% (تم سداد 150 ₪)</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface/20 overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full transition-all duration-700" style="width: 30%"></div>
+</div>
+</div>
+<!-- Financial Micro Breakdown Grid -->
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<div class="bg-surface/10 backdrop-blur-sm rounded-lg p-space-sm flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container">المبلغ الأصلي</span>
+<span class="font-title-md text-title-md font-bold mt-0.5">500 ₪</span>
+</div>
+<div class="bg-surface/10 backdrop-blur-sm rounded-lg p-space-sm flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container">مجموع المسدد</span>
+<span class="font-title-md text-title-md font-bold text-secondary-container mt-0.5">150 ₪</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Metadata & Notes Bento Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col space-y-space-md">
+<div class="flex flex-col space-y-space-xs">
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">description</span>
+        البيان والملاحظة
+      </span>
+<p class="font-body-md text-body-md text-on-surface font-medium pr-6 leading-relaxed">
+        مساهمة شراء حاسوب محمول للعمل المشترك
+      </p>
+</div>
+<!-- Timeline / Dates Strip -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="bg-surface-container-low rounded-lg p-space-sm flex items-center gap- space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">event</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">تاريخ التسجيل</span>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">1 مايو 2024</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-space-sm flex items-center gap- space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">event_upcoming</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">موعد الاستحقاق</span>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">30 مايو 2024</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col space-y-space-xs">
+<button class="w-full h-12 bg-primary-container text-on-primary rounded-xl font-title-md text-title-md flex items-center justify-center gap-2 shadow-md hover:bg-secondary active:scale-[0.99] transition-all" type="button">
+<span class="material-symbols-outlined text-[22px]">add_circle</span>
+<span>تسجيل دفعة جديدة لهذا الدين</span>
+</button>
+<button class="w-full h-12 bg-surface-container text-primary font-title-md text-title-md rounded-xl flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span>تعديل بيانات الدين</span>
+</button>
+</div>
+<!-- Linked Settlements & Payments Section -->
+<div class="flex flex-col space-y-space-sm pt-space-xs">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[20px] text-secondary">history</span>
+<h3 class="font-title-lg text-title-lg text-on-surface">الدفعات المرتبطة بهذا الدين</h3>
+</div>
+<span class="font-label-md text-label-md text-secondary bg-surface-container px-2.5 py-0.5 rounded-full font-bold">1 دفعة مسجلة</span>
+</div>
+<!-- Payment Item Row -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col space-y-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">payments</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-md text-title-md text-on-surface font-bold">دفعة رقم 1</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container text-secondary font-label-sm text-label-sm">
+                نقداً
+              </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">15 مايو 2024</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<div class="font-title-lg text-title-lg font-bold text-secondary">
+            + 150 ₪
+          </div>
+<span class="inline-flex items-center gap-0.5 text-secondary font-label-sm text-label-sm mt-0.5">
+<span class="material-symbols-outlined text-[13px]">check_circle</span>
+            موثقة ومعتمدة
+          </span>
+</div>
+</div>
+<!-- Payment Note -->
+<div class="bg-surface-container-low rounded-lg px-space-sm py-1.5 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">info</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">تحويل كاش في المكتب</span>
+</div>
+</div>
+</div>
+<!-- Trust & Verification Notice -->
+<div class="bg-surface-container rounded-xl p-space-md flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-secondary flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md text-primary font-bold">حفظ الحقوق والشفافية</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+        هذا السجل موثق برضا الطرفين لحفظ الحقوق وتسهيل التسوية المالية بود.
+      </p>
+</div>
+</div>
+</div>
+</main><script src="../app.js"></script></body></html>

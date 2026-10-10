@@ -1,0 +1,213 @@
+<!DOCTYPE html><html dir="rtl" lang="ar" style=""><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_tab" name="shell-type"><title>سدد</title>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased" data-screen="contacts"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(13,71,64,0.06)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"><div class="flex flex-col"><span class="font-title-lg text-title-lg text-primary leading-none">&nbsp; &nbsp;سدد</span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Contacts</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="الإشعارات" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">notifications</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full pb-6">
+<!-- Dynamic Waves Ambient Accent (Logo Ingestion) -->
+<div class="px-margin-mobile pt-4 pb-2">
+<div class="relative overflow-hidden rounded-xl bg-primary-container text-on-primary p-space-md shadow-sm">
+<!-- Background Abstract Curved Ribbon SVGs echoing the logo -->
+<svg class="absolute -left-6 -bottom-8 w-44 h-44 text-on-primary-container opacity-20 pointer-events-none" fill="currentColor" viewBox="0 0 100 100">
+<path d="M10 80 Q 30 20, 60 40 T 100 20 L 100 100 L 10 100 Z"></path>
+</svg>
+<svg class="absolute -left-2 -bottom-4 w-36 h-36 text-secondary-fixed opacity-15 pointer-events-none" fill="currentColor" viewBox="0 0 100 100">
+<path d="M20 90 Q 40 35, 70 50 T 100 30 L 100 100 L 20 100 Z"></path>
+</svg>
+<div class="relative z-10 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary-fixed-dim">دفتر المعاملات والأصدقاء</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary mt-0.5">سجل الأشخاص والشركاء</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest/15 flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-[24px]">group</span>
+</div>
+</div>
+<!-- Quick Micro-Summary Ticker inside Hero Card -->
+<div class="relative z-10 grid grid-cols-2 gap-space-sm mt-space-md pt-space-sm border-t border-white/10">
+<div class="flex items-center gap-2 bg-surface-container-lowest/10 px-2.5 py-1.5 rounded-lg">
+<div class="w-2 h-2 rounded-full bg-secondary-fixed"></div>
+<span class="font-label-sm text-label-sm text-primary-fixed">مجموع المستحق لي:</span>
+<span class="font-label-sm text-label-sm font-bold text-on-primary mr-auto">١,١٠٠ ₪</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest/10 px-2.5 py-1.5 rounded-lg">
+<div class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></div>
+<span class="font-label-sm text-label-sm text-primary-fixed">مجموع المستحق عليّ:</span>
+<span class="font-label-sm text-label-sm font-bold text-on-primary mr-auto">١,٢٠٠ ₪</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Search & Primary Filter Section -->
+<div class="px-margin-mobile mt-2 flex flex-col gap-space-sm">
+<!-- Search Input Field -->
+<div class="relative w-full">
+<input class="w-full h-12 pr-11 pl-4 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md focus:outline-none shadow-sm transition-all focus:bg-surface-container-lowest focus:shadow-md" dir="rtl" id="searchContactsInput" placeholder="ابحث بالاسم أو رقم الهاتف..." type="text">
+<div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[22px]">search</span>
+</div>
+</div>
+<!-- Filter Chips Horizontal Flow -->
+<div class="flex items-center gap-space-xs overflow-x-auto py-1 scrollbar-none" id="filterBar" role="tablist">
+<button aria-selected="true" class="filter-chip flex items-center justify-center h-10 px-4 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap shadow-sm transition-all active:scale-95" data-filter="all" role="tab" type="button">
+<span class="">الكل (٨)</span>
+</button>
+<button aria-selected="false" class="filter-chip flex items-center gap-1.5 justify-center h-10 px-4 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md whitespace-nowrap shadow-sm transition-all hover:bg-surface-container-low active:scale-95" data-filter="mine" role="tab" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">north_east</span>
+<span class="">لي (٥)</span>
+</button>
+<button aria-selected="false" class="filter-chip flex items-center gap-1.5 justify-center h-10 px-4 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md whitespace-nowrap shadow-sm transition-all hover:bg-surface-container-low active:scale-95" data-filter="theirs" role="tab" type="button">
+<span class="material-symbols-outlined text-[16px] text-error">south_west</span>
+<span class="">عليّ (٣)</span>
+</button>
+<button aria-selected="false" class="filter-chip flex items-center gap-1 justify-center h-10 px-3.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md whitespace-nowrap shadow-sm transition-all hover:bg-surface-container-low active:scale-95" data-filter="settled" role="tab" type="button">
+<span class="material-symbols-outlined text-[16px] text-outline">done_all</span>
+<span class="">مسدد (١)</span>
+</button>
+</div>
+</div>
+<!-- Contacts List -->
+<div class="px-margin-mobile mt-3 flex flex-col gap-space-sm" id="contactsContainer">
+<!-- Contact 1: أحمد سالم (لي) -->
+<article class="contact-item group relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer active:scale-[0.99]" data-name="أحمد سالم" data-type="mine">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-title-lg text-title-lg font-bold flex-shrink-0">
+            أ س
+          </div>
+<div class="flex flex-col min-w-0">
+<h2 class="font-title-lg text-title-lg text-on-surface truncate font-bold">أحمد سالم</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span class="">اليوم • دفعة ١٥٠ ₪</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-headline-sm text-headline-sm font-bold text-secondary">٣٥٠ ₪</span>
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 mt-0.5 rounded-full bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[12px]">north_east</span>
+            مستحق لي
+          </span>
+</div>
+</div>
+<!-- Subtle Visual Progress Track -->
+<div class="w-full h-1 bg-surface-container-high rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 70%;"></div>
+</div>
+</article>
+<!-- Contact 2: محمود الخالد (لي) -->
+<article class="contact-item group relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer active:scale-[0.99]" data-name="محمود الخالد" data-type="mine">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-full bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center font-title-lg text-title-lg font-bold flex-shrink-0">
+            م خ
+          </div>
+<div class="flex flex-col min-w-0">
+<h2 class="font-title-lg text-title-lg text-on-surface truncate font-bold">محمود الخالد</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span class="">قبل يومين • دين ٥٠٠ ₪</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-headline-sm text-headline-sm font-bold text-secondary">٧٥٠ ₪</span>
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 mt-0.5 rounded-full bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[12px]">north_east</span>
+            مستحق لي
+          </span>
+</div>
+</div>
+<div class="w-full h-1 bg-surface-container-high rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 45%;"></div>
+</div>
+</article>
+<!-- Contact 3: شركة النور للأجهزة (عليّ) -->
+<article class="contact-item group relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer active:scale-[0.99]" data-name="شركة النور للأجهزة" data-type="theirs">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center font-title-lg text-title-lg font-bold flex-shrink-0">
+            ش ن
+          </div>
+<div class="flex flex-col min-w-0">
+<h2 class="font-title-lg text-title-lg text-on-surface truncate font-bold">شركة النور للأجهزة</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">storefront</span>
+<span class="">قبل أسبوع • فاتورة شراء</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-headline-sm text-headline-sm font-bold text-error">٨٠٠ ₪</span>
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 mt-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[12px]">south_west</span>
+            مستحق عليّ
+          </span>
+</div>
+</div>
+<div class="w-full h-1 bg-surface-container-high rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-error rounded-full" style="width: 60%;"></div>
+</div>
+</article>
+<!-- Contact 4: طارق العلي (مسدد بالكامل) -->
+<article class="contact-item group relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer active:scale-[0.99]" data-name="طارق العلي" data-type="settled">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-title-lg text-title-lg font-bold flex-shrink-0">
+            ط ع
+          </div>
+<div class="flex flex-col min-w-0">
+<h2 class="font-title-lg text-title-lg text-on-surface truncate font-bold">طارق العلي</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-secondary font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[14px]">task_alt</span>
+<span class="">تمت التسوية بنجاح</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-headline-sm text-headline-sm font-bold text-outline">٠ ₪</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 mt-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold">
+            مسدد بالكامل
+          </span>
+</div>
+</div>
+<div class="w-full h-1 bg-secondary rounded-full mt-3"></div>
+</article>
+<!-- Contact 5: هبة عبدالله (عليّ) -->
+<article class="contact-item group relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer active:scale-[0.99]" data-name="هبة عبدالله" data-type="theirs">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center font-title-lg text-title-lg font-bold flex-shrink-0">
+            هـ ع
+          </div>
+<div class="flex flex-col min-w-0">
+<h2 class="font-title-lg text-title-lg text-on-surface truncate font-bold">هبة عبدالله</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span class="">قبل شهر • سلفة مؤقتة</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-headline-sm text-headline-sm font-bold text-error">٤٠٠ ₪</span>
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 mt-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[12px]">south_west</span>
+            مستحق عليّ
+          </span>
+</div>
+</div>
+<div class="w-full h-1 bg-surface-container-high rounded-full mt-3 overflow-hidden">
+<div class="h-full bg-error rounded-full" style="width: 100%;"></div>
+</div>
+</article>
+</div>
+<!-- Empty State Demonstration & Delight Box -->
+
+<!-- Sticky Floating Action Button (FAB) positioned right above shell bottom navigation -->
+<aside class="sticky bottom-4 z-40 px-margin-mobile mt-auto pointer-events-none flex justify-center">
+<button aria-label="إضافة شخص جديد" class="pointer-events-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-lg text-label-lg font-bold flex items-center gap-2 shadow-[0_8px_24px_rgba(13,71,64,0.3)] hover:bg-primary-container active:scale-95 transition-all" id="addNewContactBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">person_add</span>
+<span class="">إضافة شخص جديد</span>
+</button>
+</aside>
+</div>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(13,71,64,0.05)]" data-active-classes="text-secondary font-bold scale-105"><div class="flex items-center justify-around h-16 px-space-sm"><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-sm text-label-sm">الرئيسية</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 transition-all gap-0.5 text-secondary font-bold scale-105" data-path="contacts" href="#"><span class="material-symbols-outlined text-[24px]">group</span><span class="font-label-sm text-label-sm">الأشخاص</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="history" href="#"><span class="material-symbols-outlined text-[24px]">history</span><span class="font-label-sm text-label-sm">السجل</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="settings" href="#"><span class="material-symbols-outlined text-[24px]">settings</span><span class="font-label-sm text-label-sm">الإعدادات</span></a></div></nav>
+
+<script src="../app.js"></script></body></html>

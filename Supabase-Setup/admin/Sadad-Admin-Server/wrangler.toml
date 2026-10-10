@@ -1,0 +1,25 @@
+name = "sadad-ledger"
+main = "worker.mjs"
+compatibility_date = "2026-09-30"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[limits]
+cpu_ms = 50
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[durable_objects]
+bindings = [{ name = "SADAD_BACKEND", class_name = "SadadBackend" }]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SadadBackend"]
+
+[vars]
+NODE_ENV = "production"
+INITIAL_ADMIN_USERNAME = "sadiddid"
+PASSWORD_SCRYPT_N = "8192"
+TRUST_PROXY_HEADERS = "true"

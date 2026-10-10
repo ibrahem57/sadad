@@ -1,5 +1,7 @@
 # سدد 2.5.10 — مشروع Android Studio
 
+For the Supabase backend work, admin dashboard connection, verification status and remaining tasks, start with [the continuation handoff](docs/CONTINUE_HERE.md).
+
 هذا المشروع يبني التطبيق المستقل والمتصل من نفس واجهات Android الأصلية. التحديث مؤرخ في 10 أكتوبر 2026.
 
 ## البناء

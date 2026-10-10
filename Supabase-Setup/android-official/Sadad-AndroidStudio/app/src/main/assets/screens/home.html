@@ -1,0 +1,264 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_tab" name="shell-type"><title>سدد</title>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased" data-screen="home"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(13,71,64,0.06)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"><div class="flex flex-col"><span class="font-title-lg text-title-lg text-primary leading-none">سدد</span><span class="font-label-sm text-label-sm text-on-surface-variant font-medium">الرئيسية</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="الإشعارات" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">notifications</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full px-margin-mobile gap-space-md">
+<!-- Ambient Wave Graphic Inspired by Sadded Identity -->
+<div class="relative w-full rounded-2xl bg-primary-container text-on-primary overflow-hidden shadow-xl p-space-md flex flex-col justify-between">
+<!-- Atmospheric SVG Ribbons mimicking brand logo curves -->
+<div class="absolute inset-0 pointer-events-none opacity-15">
+<svg class="w-full h-full object-cover" fill="none" preserveAspectRatio="none" viewBox="0 0 360 220">
+<path d="M-20 220C40 200 90 90 140 10C170 -40 240 -40 290 10C340 70 380 200 420 220" fill="#72D8BE" fill-opacity="0.35"></path>
+<path d="M40 220C100 180 150 70 200 10C240 -40 300 30 350 110C380 160 410 200 440 220" fill="#99F3E2" fill-opacity="0.45"></path>
+<path d="M120 220C170 160 210 80 260 20C300 -30 350 10 390 80C420 130 440 180 460 220" fill="#B7EDE3" fill-opacity="0.55"></path>
+</svg>
+</div>
+<!-- Card Top: Net Balance Focus -->
+<div class="relative z-10 flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-secondary-fixed-dim">صافي الرصيد الحالي</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-primary tracking-tight">+٣,٦٥٠</span>
+<span class="font-title-md text-title-md text-secondary-fixed">₪</span>
+</div>
+</div>
+<!-- Brand Badge Status -->
+<div class="flex items-center gap-1 bg-surface-container-lowest/15 backdrop-blur-md px-2.5 py-1 rounded-full">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-secondary-fixed">الوضع المالي متوازن</span>
+</div>
+</div>
+<!-- Card Split: Sub-Summaries (لي / عليّ) -->
+<div class="relative z-10 grid grid-cols-2 gap-2 mt-4 pt-3.5 border-t border-white/10">
+<!-- Total For Me (لي) -->
+<div class="bg-surface-container-lowest/10 backdrop-blur-sm rounded-xl p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim">مستحق لي</span>
+<span class="material-symbols-outlined text-[16px] text-secondary-fixed">north_east</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-sm text-headline-sm text-on-primary font-bold">٤,٨٥٠</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-secondary-fixed/80 mt-0.5">مطلوب من ٤ أشخاص</span>
+</div>
+<!-- Total Owed By Me (عليّ) -->
+<div class="bg-surface-container-lowest/10 backdrop-blur-sm rounded-xl p-2.5 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-amber-200">مستحق عليّ</span>
+<span class="material-symbols-outlined text-[16px] text-amber-300">south_west</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-sm text-headline-sm text-on-primary font-bold">١,٢٠٠</span>
+<span class="font-label-sm text-label-sm text-amber-200/80">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-amber-200/80 mt-0.5">واجب لـ شخصين</span>
+</div>
+</div>
+</div>
+<!-- Primary Quick Actions -->
+<div class="grid grid-cols-2 gap-2.5">
+<button class="flex items-center justify-center gap-2 h-12 bg-primary text-on-primary rounded-xl shadow-md hover:bg-primary-container active:scale-[0.98] transition-all" id="add-debt-btn">
+<span class="material-symbols-outlined text-[20px] text-secondary-fixed">add_circle</span>
+<span class="font-label-lg text-label-lg font-bold">إضافة دين جديد</span>
+</button>
+<button class="flex items-center justify-center gap-2 h-12 bg-secondary-container text-on-secondary-container rounded-xl hover:bg-secondary-fixed-dim active:scale-[0.98] transition-all" id="record-pay-btn">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="font-label-lg text-label-lg font-bold">تسجيل سداد</span>
+</button>
+</div>
+<!-- Upcoming Settlement Due Reminder -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between px-0.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">notifications_active</span>
+<span class="font-title-md text-title-md text-on-surface font-bold">استحقاقات قريبة</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">خلال هذا الأسبوع</span>
+</div>
+<!-- Respectful Smart Nudge Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-sm shadow-sm flex flex-col gap-2.5">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="Portrait photo of a young Arabian professional man wearing a light olive shirt, gentle smile, natural soft lighting, high-end photography" src="../logo-light.jpeg">
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-on-surface font-bold">أحمد سالم</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">مستحق لي</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">موعد مقترح بعد يومين (الخميس)</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-baseline gap-0.5 text-secondary font-bold">
+<span class="font-headline-sm text-headline-sm">٣٥٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant">من أصل ٥٠٠ ₪</span>
+</div>
+</div>
+<!-- Subtle Progress Bar of Settlement -->
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full rounded-full w-[70%]"></div>
+</div>
+<!-- Gentle Reminder Action Row -->
+<div class="flex items-center justify-between pt-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-secondary">sentiment_satisfied</span>
+          تذكير ودي عبر وتساب
+        </span>
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-variant active:scale-95 text-secondary font-label-sm text-label-sm transition-all" onclick="triggerFriendlyReminder(this)">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span class="">إرسال رسالة تذكير</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recent Ledger Transactions -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-0.5">
+<span class="font-title-md text-title-md text-on-surface font-bold">آخر الحركات</span>
+<button class="font-label-md text-label-md text-secondary hover:underline">عرض السجل الكامل</button>
+</div>
+<!-- Transaction Stream Stack -->
+<div class="flex flex-col gap-2">
+<!-- Item 1: Payment Received (أحمد سالم) -->
+<div class="bg-surface-container-lowest p-3 rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-secondary-container text-on-secondary-container flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-title-md text-title-md text-on-surface truncate font-bold">أحمد سالم</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-secondary-container text-on-secondary-container font-medium">دفعة مستلمة</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">اليوم، ١٠:٣٠ ص</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<div class="flex items-baseline gap-0.5 text-secondary font-bold">
+<span class="font-headline-sm text-headline-sm">+١٥٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant">سداد جزئي</span>
+</div>
+</div>
+<!-- Item 2: New Debt For Me (محمود الخالد) -->
+<div class="bg-surface-container-lowest p-3 rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a thoughtful Middle Eastern gentleman with dark neatly trimmed beard and stylish casual navy shirt, softly lit neutral studio background" src="../logo-light.jpeg">
+</div>
+<div class="flex flex-col truncate">
+<span class="font-title-md text-title-md text-on-surface truncate font-bold">محمود الخالد</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-surface-container text-secondary font-medium">دين جديد (لي)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">أمس</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<div class="flex items-baseline gap-0.5 text-secondary font-bold">
+<span class="font-headline-sm text-headline-sm">٥٠٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant">سلفة مشروع</span>
+</div>
+</div>
+<!-- Item 3: Debt Owed by Me (صيدلية الأمل) -->
+<div class="bg-surface-container-lowest p-3 rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-amber-100 text-amber-800 flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">storefront</span>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-title-md text-title-md text-on-surface truncate font-bold">صيدلية الأمل</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-medium">مستحق عليّ</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">قبل ٣ أيام</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<div class="flex items-baseline gap-0.5 text-amber-800 font-bold">
+<span class="font-headline-sm text-headline-sm">-٢٠٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-amber-700">أدوية ومستلزمات</span>
+</div>
+</div>
+<!-- Item 4: Payment Settled (طارق العلي) -->
+<div class="bg-surface-container-lowest p-3 rounded-xl shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Portrait of an energetic young Arab professional smiling warmly outdoors in warm golden hour sunlight, clean cinematic profile shot" src="../logo-light.jpeg">
+</div>
+<div class="flex flex-col truncate">
+<span class="font-title-md text-title-md text-on-surface truncate font-bold">طارق العلي</span>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-secondary-container text-on-secondary-container font-medium">دفعة مسددة</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">الأحد الماضي</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<div class="flex items-baseline gap-0.5 text-secondary font-bold">
+<span class="font-headline-sm text-headline-sm">+٣٠٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant">تحويل بنكي</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro Modal for Quick Addition (Interactive Playground) -->
+<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden items-end justify-center p-0 transition-opacity" id="quick-action-sheet">
+<div class="bg-surface-container-lowest w-full max-w-md rounded-t-3xl p-space-md shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-200">
+<div class="w-10 h-1.5 bg-surface-variant rounded-full mx-auto"></div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-title-lg text-title-lg text-primary">تسجيل حركة جديدة</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">اختر نوع المعاملة المالية لإضافتها فوراً</span>
+</div>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" id="close-sheet-btn">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Quick Direction Switch -->
+<div class="grid grid-cols-2 gap-2 bg-surface-container p-1 rounded-xl">
+<button class="py-2 rounded-lg bg-surface-container-lowest text-secondary font-title-md text-title-md font-bold shadow-sm flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">north_east</span>
+<span class="">مستحق لي</span>
+</button>
+<button class="py-2 rounded-lg text-on-surface-variant font-title-md text-title-md font-medium flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">south_west</span>
+<span class="">مستحق عليّ</span>
+</button>
+</div>
+<!-- Person Selector -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-medium">الشخص أو الجهة</label>
+<div class="flex items-center h-12 px-3 bg-surface rounded-xl text-on-surface gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">person_search</span>
+<input class="bg-transparent w-full text-on-surface outline-none font-body-md text-body-md placeholder:text-on-surface-variant" placeholder="اكتب اسم الصديق أو المتجر..." type="text">
+</div>
+</div>
+<!-- Amount Input -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface font-medium">المبلغ</label>
+<div class="flex items-center justify-between h-12 px-3 bg-surface rounded-xl text-on-surface">
+<input class="bg-transparent w-full text-on-surface outline-none font-headline-sm text-headline-sm font-bold placeholder:text-outline-variant" placeholder="0.00" type="number">
+<span class="font-headline-sm text-headline-sm text-secondary font-bold">₪</span>
+</div>
+</div>
+<!-- Submit Action -->
+<button class="w-full h-12 bg-primary text-on-primary rounded-xl font-title-lg text-title-lg font-bold shadow-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]">check</span>
+<span class="">حفظ المعاملة</span>
+</button>
+</div>
+</div>
+</div>
+</main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(13,71,64,0.05)]" data-active-classes="text-secondary font-bold scale-105"><div class="flex items-center justify-around h-16 px-space-sm"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 transition-all gap-0.5 text-secondary font-bold scale-105" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-sm text-label-sm">الرئيسية</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="contacts" href="#"><span class="material-symbols-outlined text-[24px]">group</span><span class="font-label-sm text-label-sm">الأشخاص</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="history" href="#"><span class="material-symbols-outlined text-[24px]">history</span><span class="font-label-sm text-label-sm">السجل</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 text-on-surface-variant hover:text-secondary transition-all gap-0.5" data-path="settings" href="#"><span class="material-symbols-outlined text-[24px]">settings</span><span class="font-label-sm text-label-sm">الإعدادات</span></a></div></nav>
+
+<script src="../app.js"></script></body></html>

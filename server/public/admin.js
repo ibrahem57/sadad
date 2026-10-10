@@ -2,6 +2,8 @@
   'use strict';
   const $ = selector => document.querySelector(selector);
   const tokenKey = 'sadad-admin-session';
+  const apiBase = String(window.SADAD_API_BASE_URL || '').replace(/\/+$/, '');
+  const publishableKey = String(window.SADAD_SUPABASE_PUBLISHABLE_KEY || '').trim();
   let token = sessionStorage.getItem(tokenKey) || '';
   let stores = [];
   let current = null;
@@ -38,8 +40,9 @@
   }
   async function api(path, options = {}) {
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (publishableKey) headers.apikey = publishableKey;
     if (token) headers.Authorization = `Bearer ${token}`;
-    const response = await fetch(path, { ...options, headers });
+    const response = await fetch(`${apiBase}${path}`, { ...options, headers });
     const data = await response.json().catch(() => ({ ok: false, message: 'استجابة الخادم غير مفهومة.' }));
     if (!response.ok || data.ok === false) {
       if (response.status === 401 && token) { sessionStorage.removeItem(tokenKey); token = ''; showAuth(false); }

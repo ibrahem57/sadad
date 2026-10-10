@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8080
+      DATA_DIR: /app/data
+      TRUST_PROXY_HEADERS: "true"
+    volumes:
+      - sadad-data:/app/data
+    expose:
+      - "8080"
+
+  https:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in server/.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+
+volumes:
+  sadad-data:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,251 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head><link rel="stylesheet" href="../app.css"><link rel="stylesheet" href="../fonts.css"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta content="mobile_stack" name="shell-type"><title>سدد</title>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased" data-screen="contact"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(13,71,64,0.06)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="رجوع" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_forward</span></button><h1 class="font-title-lg text-title-lg text-primary">تفاصيل الحساب</h1></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="../logo-light.jpeg"></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface"><div class="flex flex-col w-full pb-10">
+<!-- Profile & Meta Strip -->
+<div class="px-margin-mobile pt-space-md pb-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="relative w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-title-lg text-title-lg shadow-sm">
+<span class="">أ س</span>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<h2 class="font-headline-sm text-headline-sm text-primary">أحمد سالم</h2>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">نشط</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">call</span>
+<span dir="ltr" class="">059-1234567</span>
+<span class="mx-1 text-outline-variant">•</span>
+<span class="">منذ مارس ٢٠٢٤</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="اتصال" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary active:scale-95 transition-transform" id="callBtn">
+<span class="material-symbols-outlined text-[20px]">phone_enabled</span>
+</button>
+<button aria-label="مشاركة الحساب" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary active:scale-95 transition-transform" id="shareTopBtn">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+</div>
+</div>
+<!-- Hero Financial Summary Card (Deep Teal with Brand Wave Motif) -->
+<div class="px-margin-mobile my-space-sm">
+<div class="relative overflow-hidden rounded-xl bg-primary-container text-on-primary p-space-md shadow-xl">
+<!-- Decorative Organic Wave SVG (echoing the brand mark rhythm) -->
+<svg class="absolute -left-6 -bottom-8 w-44 h-44 text-on-primary opacity-5 pointer-events-none" fill="currentColor" viewBox="0 0 100 100">
+<path d="M0,50 Q25,20 50,50 T100,50 L100,100 L0,100 Z"></path>
+</svg>
+<svg class="absolute -right-8 -top-8 w-40 h-40 text-secondary-fixed opacity-10 pointer-events-none" fill="currentColor" viewBox="0 0 100 100">
+<circle cx="50" cy="50" r="50"></circle>
+</svg>
+<!-- Badge & Status Indicator -->
+<div class="flex items-center justify-between mb-space-sm relative z-10">
+<span class="font-label-md text-label-md text-primary-fixed flex items-center gap-1.5 bg-primary/40 backdrop-blur-sm px-2.5 py-1 rounded-full">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+          المبلغ المتبقي المستحق لك
+        </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+<span class="">مستحق لي</span>
+<span class="material-symbols-outlined text-[12px]">north_east</span>
+</span>
+</div>
+<!-- Outstanding Amount Display -->
+<div class="relative z-10 flex items-baseline gap-2 mb-space-md">
+<span class="font-display-lg text-display-lg font-bold tracking-tight text-surface-bright">٣٥٠</span>
+<span class="font-title-lg text-title-lg text-primary-fixed">₪</span>
+<span class="font-body-sm text-body-sm text-primary-fixed-dim mr-auto">بانتظار السداد</span>
+</div>
+<!-- Sub-card Progress & Metric Split -->
+<div class="relative z-10 bg-primary/60 backdrop-blur-md rounded-lg p-space-sm">
+<div class="flex items-center justify-between text-surface-bright font-label-md text-label-md mb-2">
+<span class="">نسبة الإنجاز في السداد</span>
+<span class="text-secondary-fixed font-bold">٣٠٪</span>
+</div>
+<!-- Custom Dual-tone Settlement Progress Bar -->
+<div class="w-full h-2 rounded-full bg-surface-container-lowest/20 overflow-hidden mb-3">
+<div class="h-full rounded-full bg-gradient-to-l from-secondary-fixed to-secondary-container transition-all duration-700 ease-out" style="width: 30%"></div>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1 border-t border-on-primary/10">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-primary-container">إجمالي الدين الأصلي</span>
+<span class="font-title-md text-title-md text-surface-bright font-semibold">٥٠٠ <span class="text-xs">₪</span></span>
+</div>
+<div class="flex flex-col pr-2 border-r border-on-primary/10">
+<span class="font-label-sm text-label-sm text-on-primary-container">المدفوع حتى الآن</span>
+<span class="font-title-md text-title-md text-secondary-fixed font-semibold">١٥٠ <span class="text-xs">₪</span></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Interactive Action Triggers -->
+<div class="px-margin-mobile grid grid-cols-2 gap-space-sm mt-space-xs mb-space-sm">
+<!-- Main Payment Button -->
+<button class="h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center gap-2 font-label-lg text-label-lg shadow-md active:scale-[0.98] transition-all" id="openRecordPayment">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span class="">تسجيل دفعة</span>
+</button>
+<!-- Add New Debt Button -->
+<button class="h-12 rounded-xl bg-surface-container-high text-primary flex items-center justify-center gap-2 font-label-lg text-label-lg active:scale-[0.98] transition-all" id="openAddDebt">
+<span class="material-symbols-outlined text-[20px]">playlist_add</span>
+<span class="">دين جديد</span>
+</button>
+</div>
+<!-- Friendly Settlement Reminder Banner -->
+<div class="px-margin-mobile mb-space-md">
+<div class="flex items-center justify-between p-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">forum</span>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-title-md text-title-md text-on-surface truncate">مشاركة كشف الحساب</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">إرسال ملخص ودي عبر واتساب</span>
+</div>
+</div>
+<button class="px-3 py-2 rounded-lg bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center gap-1 shrink-0 active:scale-95 transition-transform shadow-sm" id="whatsappShareBtn">
+<span class="">إرسال</span>
+<span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</div>
+</div>
+<!-- Chronological Ledger Header & Filter Chips -->
+<div class="px-margin-mobile flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">history</span>
+<h3 class="font-title-lg text-title-lg text-primary">سجل المعاملات</h3>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">٢ حركات</span>
+</div>
+<!-- Interactive Filter Tabs -->
+<div class="px-margin-mobile flex gap-2 mb-space-sm overflow-x-auto py-1">
+<button class="ledger-filter active px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm whitespace-nowrap shadow-sm" data-filter="all">الكل (٢)</button>
+<button class="ledger-filter px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap" data-filter="payment">دفعات مسددة (١)</button>
+<button class="ledger-filter px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap" data-filter="debt">ديون مسجلة (١)</button>
+</div>
+<!-- Chronological Ledger Timeline Feed -->
+<div class="px-margin-mobile flex flex-col gap-space-sm">
+<!-- Item 1: Payment Recorded -->
+<div class="ledger-item group relative flex items-start gap-3 p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-shadow" data-type="payment">
+<!-- Icon Indicator Badge -->
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">payments</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline justify-between mb-1">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-on-surface">استلام دفعة نقدية</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-surface-container text-secondary">سداد</span>
+</div>
+<!-- Shekel Sum Receivable Styled with Directional Green -->
+<div class="flex items-baseline gap-0.5 font-title-lg text-title-lg text-secondary">
+<span class="font-bold">-١٥٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm mb-1.5">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+            اليوم، ١٥ مايو
+          </span>
+<span class="">•</span>
+<span class="">١٠:٣٠ ص</span>
+</div>
+<!-- Note Pill -->
+<div class="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1.5 rounded-lg text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary">sticky_note_2</span>
+<span class="truncate">تحويل كاش في المكتب</span>
+</div>
+</div>
+</div>
+<!-- Item 2: Initial Debt Entry -->
+<div class="ledger-item group relative flex items-start gap-3 p-space-md rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-shadow" data-type="debt">
+<!-- Icon Indicator Badge -->
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-primary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-baseline justify-between mb-1">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-on-surface">دين أولي مسجل</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-primary-fixed text-on-primary-fixed-variant">لك</span>
+</div>
+<!-- Original Debt Amount in Primary Dark -->
+<div class="flex items-baseline gap-0.5 font-title-lg text-title-lg text-primary">
+<span class="font-bold">+٥٠٠</span>
+<span class="font-label-sm text-label-sm">₪</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm mb-1.5">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">event</span>
+            ١ مايو ٢٠٢٤
+          </span>
+<span class="">•</span>
+<span class="">٠٤:١٥ م</span>
+</div>
+<!-- Note Pill -->
+<div class="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1.5 rounded-lg text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-primary">laptop_mac</span>
+<span class="truncate">مساهمة شراء حاسوب محمول</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tactful Disclaimer / Financial Safety Note -->
+<div class="px-margin-mobile mt-space-lg mb-space-sm">
+<div class="flex items-start gap-2.5 p-space-sm rounded-xl bg-surface-container/60">
+<span class="material-symbols-outlined text-outline text-[18px] mt-0.5">shield_with_heart</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        تطبيق <span class="font-semibold text-primary">سدد</span> مصمم لتوثيق وتتبع الحسابات والديون الشخصية برضا الطرفين، ولا يقوم بأي عمليات سداد أو تحويل مالي بنكي فعلية.
+      </p>
+</div>
+</div>
+<!-- Bottom Sheet / Modal Mock for Payment Recording (Interactive Micro-delight) -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/40 backdrop-blur-sm hidden flex items-end justify-center" id="paymentModal">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-t-2xl p-space-md shadow-2xl transition-transform duration-300">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full mx-auto mb-space-md"></div>
+<div class="flex items-center justify-between mb-space-md">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary">تسجيل دفعة مستلمة</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">من السيد: أحمد سالم</p>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface" id="closePaymentModal">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Quick Preset Amounts -->
+<div class="flex gap-2 mb-space-md">
+<button class="preset-amt flex-1 py-1.5 rounded-lg bg-surface-container-low font-label-md text-label-md text-primary hover:bg-secondary-container transition-colors" data-val="100">١٠٠ ₪</button>
+<button class="preset-amt flex-1 py-1.5 rounded-lg bg-surface-container-low font-label-md text-label-md text-primary hover:bg-secondary-container transition-colors" data-val="200">٢٠٠ ₪</button>
+<button class="preset-amt flex-1 py-1.5 rounded-lg bg-secondary-fixed-dim text-on-secondary-fixed font-label-md text-label-md font-bold" data-val="350">كامل المبلغ (٣٥٠ ₪)</button>
+</div>
+<!-- Sum Input Field -->
+<div class="relative mb-space-sm">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">المبلغ المسدد</label>
+<div class="relative flex items-center">
+<input class="w-full h-12 pr-4 pl-12 rounded-xl bg-surface-container-low font-headline-sm text-headline-sm text-primary focus:outline-none focus:ring-2 focus:ring-secondary" id="paymentInput" placeholder="0" type="number" value="350">
+<span class="absolute left-4 font-title-md text-title-md text-outline">₪</span>
+</div>
+</div>
+<!-- Note Input -->
+<div class="mb-space-md">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">ملاحظة (اختياري)</label>
+<input class="w-full h-11 px-4 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary" placeholder="مثال: حوالة بنكية، نقداً باليد..." type="text">
+</div>
+<button class="w-full h-12 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-all" id="confirmPaymentBtn">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span class="">تأكيد تسجيل السداد</span>
+</button>
+</div>
+</div>
+<!-- Toast Notification -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-4 py-2.5 rounded-full shadow-lg font-label-md text-label-md flex items-center gap-2 opacity-0 pointer-events-none transition-opacity duration-200 z-50" id="toast">
+<span class="material-symbols-outlined text-secondary-fixed text-[18px]">verified</span>
+<span id="toastMsg" class="">تم الإجراء بنجاح</span>
+</div>
+</div>
+</main>
+
+<script src="../app.js"></script></body></html>
