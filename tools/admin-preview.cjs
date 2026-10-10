@@ -6,7 +6,10 @@ const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charse
 const port = Number(process.env.SADAD_ADMIN_PREVIEW_PORT || 8081);
 http.createServer((req,res)=>{
   const pathname = new URL(req.url,'http://localhost').pathname;
+  if (['/v3-admin', '/v3-admin/', '/v3-admin/index.html'].includes(pathname)) { res.writeHead(302, { Location: '/' }); res.end(); return; }
   const file = path.resolve(root, '.' + (pathname === '/' ? '/admin.html' : pathname));
   if (!file.startsWith(root + path.sep)) {res.writeHead(403);res.end();return;}
   fs.readFile(file,(err,data)=>{res.writeHead(err?404:200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});res.end(err?'Not found':data);});
-}).listen(port,'127.0.0.1',()=>console.log(`Admin dashboard: http://localhost:${port}`));
+}).listen(port,'127.0.0.1',()=>{
+  console.log(`Admin dashboard: http://localhost:${port}`);
+});

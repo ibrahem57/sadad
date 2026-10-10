@@ -3,11 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "description": "Sadad multi-store API and admin portal",
-  "engines": { "node": ">=24.0.0" },
-  "scripts": {
-    "start": "node server.js",
-    "dev:cloudflare": "wrangler dev",
-    "deploy:cloudflare": "wrangler deploy"
+  "engines": {
+    "node": ">=24.0.0"
   },
-  "devDependencies": { "wrangler": "4.145.0" }
+  "scripts": {
+    "start": "node ../../../tools/admin-preview.cjs",
+    "dev:cloudflare": "wrangler dev",
+    "deploy:cloudflare": "wrangler deploy",
+    "start:legacy": "node server.js"
+  },
+  "devDependencies": {
+    "wrangler": "4.145.0"
+  }
 }

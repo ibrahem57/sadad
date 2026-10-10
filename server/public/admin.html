@@ -17,7 +17,7 @@
   <main class="shell">
     <section id="authView" class="auth-wrap hidden">
       <div class="auth-card">
-        <img src="/logo-light.jpeg" alt="سدد" class="brand">
+        <img src="logo-light.jpeg" alt="سدد" class="brand">
         <p class="eyebrow">لوحة التحكم المركزية</p>
         <h1 id="authTitle">دخول الأدمن</h1>
         <p id="authHint" class="muted">هذه اللوحة خاصة بمدير النظام.</p>
@@ -41,8 +41,8 @@
 
     <section id="appView" class="hidden">
       <header class="topbar">
-        <div class="brand-line"><img src="/logo-light.jpeg" alt="" class="brand-small"><div><strong>سدد</strong><span>إدارة المتاجر والصلاحيات</span></div></div>
-        <div class="top-actions"><span id="adminName" class="pill">أدمن</span><button class="button secondary" id="changeAdminPasswordBtn" type="button">تغيير كلمة المرور</button><button class="button quiet" id="logoutBtn">خروج</button></div>
+        <div class="brand-line"><img src="logo-light.jpeg" alt="" class="brand-small"><div><strong>سدد</strong><span>إدارة المتاجر والصلاحيات</span></div></div>
+        <div class="top-actions"><button class="button quiet" id="refreshDashboard" type="button">تحديث</button><span id="adminName" class="pill">أدمن</span><button class="button secondary" id="changeAdminPasswordBtn" type="button">تغيير كلمة المرور</button><button class="button quiet" id="logoutBtn">خروج</button></div>
       </header>
       <div id="notice" class="notice hidden" role="status"></div>
 
@@ -51,26 +51,26 @@
         <button class="button primary" id="newStoreBtn">＋ إنشاء حساب متجر</button>
       </section>
 
-      <section class="metrics" id="metrics"></section>
+      <p class="small muted" id="connectionState" role="status">جارٍ الاتصال بقاعدة البيانات…</p><section class="metrics" id="metrics" aria-live="polite"></section>
       <section class="panel">
-        <div class="panel-head"><div><h2>حسابات المتاجر</h2><p class="muted">الحسابات التي أنشأها الأدمن فقط</p></div><input id="searchStores" class="search" placeholder="بحث بالمتجر أو اسم المستخدم"></div>
-        <div class="table-wrap"><table><thead><tr><th>المتجر</th><th>اسم الدخول</th><th>الحالة</th><th>الاشتراك</th><th>الأجهزة</th><th>التوثيق</th><th>الأشخاص</th><th>الديون</th><th></th></tr></thead><tbody id="storesBody"></tbody></table></div>
+        <div class="panel-head"><div><h2>حسابات المتاجر</h2><p class="muted">الحسابات التي أنشأها الأدمن فقط</p></div><div class="store-filters"><label class="inline-check"><input id="showArchived" type="checkbox">إظهار المؤرشفة</label><input id="searchStores" class="search" aria-label="بحث بالمتجر أو اسم المستخدم" placeholder="بحث بالمتجر أو اسم المستخدم"></div></div>
+        <div class="table-wrap"><table><thead><tr><th>المتجر</th><th>اسم الدخول</th><th>الحالة</th><th>الاشتراك</th><th>الهاتف المعتمد</th><th>التوثيق</th><th>الأشخاص</th><th>الديون</th><th></th></tr></thead><tbody id="storesBody"></tbody></table></div>
         <div id="emptyStores" class="empty hidden">لا توجد حسابات متاجر. أنشئ أول حساب من زر الأعلى.</div>
       </section>
 
       <section id="storePanel" class="panel hidden">
         <div class="panel-head"><div><p class="eyebrow">إدارة حساب</p><h2 id="storeHeading"></h2><p id="storeMeta" class="muted"></p></div><button class="button quiet" id="closeStore">إغلاق</button></div>
         <div class="admin-grid">
-          <form id="storeSettings" class="stack panel-inset">
+          <form id="storeSettings" class="stack panel-inset"><fieldset id="storeSettingsFields" class="stack">
             <h3>بيانات وصلاحيات الحساب</h3>
             <label>اسم المتجر<input id="storeName" required></label>
             <label>اسم المستخدم<input id="storeUsername" required></label>
-            <label>حد الأشخاص ذوي الديون المفتوحة<input id="debtorLimit" type="number" min="0" max="1000000"></label>
-            <label>عدد الأجهزة المسموح دخولها لهذا المتجر<input id="maxDevices" type="number" min="1" max="50" step="1" value="1"></label>
+            <label>حد جهات الاتصال النشطة<input id="debtorLimit" type="number" min="0" max="1000000"></label>
+            <label>عدد أجهزة تسجيل الدخول المسموحة<input id="maxDevices" type="number" min="1" max="50" step="1" value="1"></label><p class="small muted">يمكن تسجيل الدخول من عدة أجهزة. يُعتمد هاتف واحد للدفتر في كل مرة؛ اعتماد هاتف جديد ينقل صلاحية المزامنة إليه.</p>
             <label class="switch-row"><span><b>توثيق الحساب</b><small>شارة الموثوقية تظهر لهذا المتجر فقط</small></span><input id="verified" type="checkbox"></label>
             <label class="switch-row"><span><b>تفعيل ربط WhatsApp</b><small>يسمح لهذا المتجر بإعداد ربط WhatsApp Cloud API</small></span><input id="whatsappEnabled" type="checkbox"></label>
             <fieldset><legend>الميزات المسموحة</legend><div id="permissions" class="checks"></div></fieldset>
-            <button class="button primary">حفظ إعدادات المتجر</button>
+            <button class="button primary">حفظ إعدادات المتجر</button></fieldset>
           </form>
           <div class="stack">
             <section class="panel-inset stack">
@@ -80,10 +80,10 @@
               <hr>
               <h3>إعادة تعيين كلمة المرور</h3>
               <p class="muted">يُنشأ رمز مؤقت، ويطلب التطبيق تغييره عند أول دخول.</p>
-              <div class="button-row"><input id="newTempPassword" autocomplete="new-password" placeholder="كلمة مؤقتة (4 خانات على الأقل)"><button class="button secondary" id="resetPassword">إنشاء كلمة مؤقتة</button></div>
+              <div class="button-row"><input id="newTempPassword" autocomplete="new-password" minlength="12" maxlength="128" placeholder="كلمة مؤقتة (12 خانة على الأقل)"><button class="button secondary" id="resetPassword">إنشاء كلمة مؤقتة</button></div>
               <p id="tempPasswordResult" class="result hidden"></p>
               <hr>
-              <button class="button danger" id="deleteStore">حذف الحساب والبيانات نهائياً</button>
+              <div class="button-row"><button class="button danger" id="archiveStore">أرشفة الحساب</button><button class="button secondary hidden" id="unarchiveStore">إعادة الحساب من الأرشيف</button><button class="button danger" id="deleteStore">حذف حساب غير مستخدم</button></div><p class="small muted" id="archiveHint">الأرشفة توقف الحساب وأجهزته وتحفظ دفتره وسجل نشاطه.</p>
             </section>
             <section class="panel-inset stack">
               <h3>الاشتراك والمدة</h3>
@@ -96,17 +96,27 @@
               <button class="button success" id="extendSubscription">تمديد الاشتراك</button>
             </section>
             <section class="panel-inset stack">
-              <h3>الأجهزة المسجلة</h3>
-              <p class="muted">اسم الموظف يثبت على الجهاز بعد أول دخول. غيّره بإزالة ربط الجهاز ثم تسجيله من جديد.</p>
-              <div id="deviceList" class="record-list"></div>
-              <button class="button danger" id="revokeAllDevices">إلغاء كل الأجهزة المسجلة</button>
+              <h3>اعتماد هواتف المتجر</h3><p class="muted small">اختر طلب الهاتف ثم اعتمده. اعتماد هاتف جديد يلغي صلاحية الهاتف السابق للمزامنة. احتفظ بنسخة استرداد على الهاتف قبل نقله.</p>
+              <div id="installationList" class="record-list"></div>
+              <div class="button-row"><button class="button secondary" id="endStoreSessions">إنهاء جلسات الدخول</button><button class="button danger" id="revokeAllDevices">إلغاء اعتماد جميع الأجهزة</button></div>
+              <details><summary>أجهزة تسجيل الدخول</summary><p class="small muted">هذه قائمة الدخول إلى الحساب. الاعتماد للمزامنة يظهر في القائمة أعلاه.</p><div id="deviceList" class="record-list"></div></details>
+            </section>
+            <section id="ledgerRecovery" class="panel-inset stack">
+              <h3>استرداد إدخالات الهاتف السابق</h3><p class="muted small">استورد نسخة الاسترداد المشفرة داخل الهاتف الجديد، ثم اعتمده من القائمة أعلاه. الصق قائمة الأوامر الأصلية من شاشة الاسترداد. التصريح صالح 24 ساعة ويُستخدم داخل الهاتف الجديد.</p>
+              <form id="recoveryForm" class="stack"><fieldset id="recoveryFields" class="stack">
+                <label>الهاتف السابق<select id="recoveryOld" required></select></label><label>الهاتف المعتمد حاليًا<select id="recoveryNew" required></select></label>
+                <label>قائمة الأوامر الأصلية<textarea id="recoveryManifest" dir="ltr" rows="6" required placeholder="الصق قائمة الأوامر من الهاتف"></textarea></label>
+                <label>أو اختر ملف قائمة الأوامر<input id="recoveryFile" type="file" accept="application/json,.json"></label>
+                <label>سبب الاسترداد<textarea id="recoveryReason" rows="2" maxlength="2000" required></textarea></label>
+                <button class="button primary">اعتماد الاسترداد</button></fieldset><p id="recoveryError" class="form-error" role="alert"></p>
+              </form><div id="recoveryResult" class="result hidden" role="status"></div><div id="recoveryHistory" class="record-list"></div>
             </section>
             <section class="panel-inset stack">
               <h3>سجل نشاط المتجر</h3>
-              <p class="muted">يعرض اسم المستخدم الذي أضاف الأشخاص والديون والدفعات أو حذف السجلات.</p>
+              <p class="muted">يعرض عمليات الدفتر والجهاز الذي أرسلها، وقرارات الإدارة وأسبابها.</p>
               <div id="deviceAuditList" class="record-list"></div>
             </section>
-            <section class="panel-inset stack">
+            <section id="legacyBackups" class="panel-inset stack">
               <h3>استعادة سجل محفوظ</h3>
               <p class="muted">يحفظ الخادم نسخة قبل كل مزامنة. يمكنك استعادة المتجر كاملًا أو شخصًا واحدًا.</p>
               <label>نسخة الاستعادة<select id="backupSelect"><option value="">لا توجد نسخ محفوظة</option></select></label>
@@ -114,33 +124,44 @@
               <div class="button-row"><button class="button secondary" id="restoreStore">إرجاع بيانات التاجر كاملة</button><button class="button secondary" id="restorePerson">استعادة هذا الشخص</button></div>
               <p id="restoreInfo" class="small muted"></p>
             </section>
-            <section class="panel-inset stack">
+            <section id="legacyArchives" class="panel-inset stack">
               <h3>أرشيف الزبائن المحذوفين</h3>
               <p class="muted">تُحفظ نسخة مستقلة لكل زبون يحذفه التاجر، بما فيها بياناته والديون والدفعات. استخدم الاستعادة لإرجاع سجله إلى حساب المتجر.</p>
               <div id="deletedContactArchives" class="record-list"></div>
             </section>
             <section class="panel-inset stack">
               <div class="panel-head"><h3>ملخص السجل</h3><button class="button quiet" id="downloadReport">تنزيل CSV</button></div>
-              <div id="storeStats" class="mini-metrics"></div>
+              <div id="storeStats" class="mini-metrics"></div><p id="ledgerReadInfo" class="small muted"></p>
             </section>
           </div>
         </div>
       </section>
-      <footer>سدد · لوحة الإدارة · الإصدار 1.0</footer>
+      <section id="ledgerPanel" class="panel hidden">
+        <div class="panel-head"><div><h2>دفتر المتجر</h2><p class="muted small">قراءة مباشرة مسجّلة من قاعدة البيانات. التصحيحات المالية يجريها صاحب المتجر من الهاتف وتبقى في سجل الحركات.</p></div><input id="ledgerSearch" class="search" aria-label="بحث في جهات اتصال الدفتر" placeholder="بحث باسم الشخص أو الهاتف"></div>
+        <h3>جهات الاتصال والأرصدة</h3><div class="table-wrap"><table><thead><tr><th>الشخص</th><th>الهاتف</th><th>الحالة</th><th>مستحق للمتجر</th><th>مستحق على المتجر</th></tr></thead><tbody id="ledgerContacts"></tbody></table></div>
+        <h3 class="ledger-heading">الديون والدفعات</h3><div class="table-wrap"><table><thead><tr><th>الشخص</th><th>الاتجاه</th><th>المبلغ الحالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead><tbody id="ledgerDebts"></tbody></table></div>
+        <h3 class="ledger-heading">سجل الحركات</h3><p class="small muted">تظهر أحدث 100 حركة هنا. تنزيل CSV يشمل جميع الحركات، بما فيها التصحيحات والدفعات المعكوسة.</p><div class="table-wrap"><table><thead><tr><th>النوع</th><th>الشخص</th><th>المبلغ</th><th>التاريخ</th><th>البيان</th></tr></thead><tbody id="ledgerTransactions"></tbody></table></div>
+      </section>
+      <footer>سدد · لوحة إدارة المتاجر · قاعدة البيانات المباشرة</footer>
     </section>
 
+    <dialog id="actionDialog" class="dialog"><form id="actionForm" class="stack">
+      <div class="panel-head"><h2 id="actionTitle"></h2><button class="icon-button" type="button" id="cancelAction" aria-label="إغلاق">×</button></div>
+      <p id="actionDescription" class="muted"></p><label>سبب الإجراء<textarea id="actionReason" rows="3" maxlength="2000" required></textarea></label>
+      <p id="actionError" class="form-error" role="alert"></p><button id="confirmAction" class="button primary">تأكيد الإجراء</button>
+    </form></dialog>
     <dialog id="createDialog" class="dialog">
       <form id="createStoreForm" class="stack">
         <div class="panel-head"><div><p class="eyebrow">حساب جديد</p><h2>إنشاء متجر</h2></div><button type="button" class="icon-button" id="cancelCreate" aria-label="إغلاق">×</button></div>
         <label>اسم المتجر<input id="newName" required maxlength="120"></label>
         <label>اسم المستخدم<input id="newUsername" required minlength="3" maxlength="80" autocomplete="off"></label>
-        <label>كلمة مرور مؤقتة<input id="newPassword" required minlength="4" autocomplete="new-password"></label>
-        <label>حد الأشخاص ذوي الديون المفتوحة<input id="newLimit" type="number" min="0" value="5000"></label>
-        <label>عدد الأجهزة المسموحة<input id="newMaxDevices" type="number" min="1" max="50" value="1"></label>
+        <label>كلمة مرور مؤقتة<input id="newPassword" required minlength="12" maxlength="128" autocomplete="new-password"></label>
+        <label>حد جهات الاتصال النشطة<input id="newLimit" type="number" min="0" value="5000"></label>
+        <label>عدد أجهزة تسجيل الدخول المسموحة<input id="newMaxDevices" type="number" min="1" max="50" value="1"></label>
         <label>نوع الاشتراك<select id="newSubscriptionMode"><option value="timed">مدة محددة</option><option value="permanent">فعال دائمًا</option><option value="paused">إنشاء موقوف</option></select></label>
         <label id="newSubscriptionDaysWrap">مدة الاشتراك بالأيام<input id="newSubscriptionDays" type="number" min="1" max="36500" value="30"></label>
         <button type="button" class="button quiet" id="generatePassword">إنشاء كلمة مرور قوية</button>
-        <button class="button primary">إنشاء الحساب</button>
+        <button class="button primary">إنشاء الحساب</button><p id="createError" class="form-error" role="alert"></p>
         <p class="muted small">كلمة المرور المؤقتة ستظهر بعد الإنشاء. انسخها وأرسلها لصاحب المتجر بطريقة آمنة.</p>
       </form>
     </dialog>

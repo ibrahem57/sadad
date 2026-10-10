@@ -58,3 +58,6 @@ SADID_ACCESS.txt
 credentials.json
 *session*.json
 work/
+
+# Generated GitHub Pages dashboard
+/_site/
