@@ -70,8 +70,9 @@ final class NativeScreens {
     private int personHistoryPage; private long personHistoryOwner;
     private android.database.Cursor homeCursor;
     private ScrollView pageScroll;
-    int scrollPosition() { return pageScroll == null ? 0 : pageScroll.getScrollY(); }
-    void restoreScroll(int y) { if(pageScroll != null) pageScroll.post(() -> pageScroll.scrollTo(0,y)); }
+    private android.widget.ListView homeList;
+    int scrollPosition() { return homeList != null ? homeList.getFirstVisiblePosition() : pageScroll == null ? 0 : pageScroll.getScrollY(); }
+    void restoreScroll(int y) { if(homeList != null) homeList.post(() -> homeList.setSelection(y)); else if(pageScroll != null) pageScroll.post(() -> pageScroll.scrollTo(0,y)); }
     void closeHistory() { if(homeCursor != null) { homeCursor.close(); homeCursor=null; } }
     private int reportContactLimit = 60;
     private String reportSearchText = "";
@@ -90,7 +91,7 @@ final class NativeScreens {
     NativeScreens(MainActivity host) { this.host = host; }
 
     void show(String page) {
-        closeHistory(); pageScroll=null;
+        closeHistory(); pageScroll=null; homeList=null;
         route = page;
         palette();
         if ("welcome".equals(page)) { buildWelcome(); return; }
@@ -398,15 +399,23 @@ final class NativeScreens {
         View headerDivider = new View(host);
         headerDivider.setBackgroundColor(Color.argb(72, Color.red(line), Color.green(line), Color.blue(line)));
         root.addView(headerDivider, new LinearLayout.LayoutParams(-1, dp(1)));
-        ScrollView scroller = scroll(); pageScroll=scroller; content = new LinearLayout(host); content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(18), dp(6), dp(18), dp(22)); content.setClipToPadding(false); scroller.addView(content);
-        root.addView(scroller, new LinearLayout.LayoutParams(-1, 0, 1));
+        content = new LinearLayout(host); content.setOrientation(LinearLayout.VERTICAL);content.setClipToPadding(false);
+        ScrollView scroller=null;
+        if("home".equals(page)) {
+            homeList=new android.widget.ListView(host);homeList.setPadding(dp(18),0,dp(18),dp(22));homeList.setClipToPadding(false);
+            homeList.setDivider(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));homeList.setDividerHeight(dp(10));
+            homeList.setContentDescription("سجل الحركات الكامل");content.setPadding(0,dp(6),0,0);homeList.addHeaderView(content,null,false);
+            root.addView(homeList,new LinearLayout.LayoutParams(-1,0,1));
+        } else {
+            scroller=scroll();pageScroll=scroller;content.setPadding(dp(18),dp(6),dp(18),dp(22));scroller.addView(content);
+            root.addView(scroller,new LinearLayout.LayoutParams(-1,0,1));
+        }
         addPage(page);
         if (showBottomNav(page)) root.addView(bottomNav(page), new LinearLayout.LayoutParams(-1, -2));
         host.setContentView(root);
         if (scrollContactsToBottom && "contacts".equals(page)) {
             scrollContactsToBottom = false;
-            scroller.post(() -> scroller.fullScroll(View.FOCUS_DOWN));
+            ScrollView contactScroll=pageScroll;contactScroll.post(() -> contactScroll.fullScroll(View.FOCUS_DOWN));
         }
     }
 
@@ -453,14 +462,13 @@ final class NativeScreens {
         LinearLayout metrics = new LinearLayout(host); metrics.setOrientation(LinearLayout.HORIZONTAL);
         metrics.addView(monthMetric("ديون مسجلة", debt, debt + paid == 0 ? 0 : debt / (debt + paid), host.isDarkTheme() ? Color.rgb(245, 154, 159) : Color.rgb(171, 50, 58)), new LinearLayout.LayoutParams(0, -2, 1)); metrics.addView(spaceWidth(10));
         metrics.addView(monthMetric("دفعات مستلمة", paid, debt + paid == 0 ? 0 : paid / (debt + paid), accent), new LinearLayout.LayoutParams(0, -2, 1)); content.addView(metrics, bottomMargin(20));
-        content.addView(button(homeHistoryOpen ? "⌃  إغلاق سجل الحركات" : "⌄  عرض سجل الحركات",soft,softForeground(),()->{homeHistoryOpen=!homeHistoryOpen;host.refreshCurrentScreen();}),bottomMargin(10));
+        TextView toggle=button(homeHistoryOpen ? "إغلاق سجل الحركات" : "عرض سجل الحركات",soft,softForeground(),()->{homeHistoryOpen=!homeHistoryOpen;host.refreshCurrentScreen();});
+        Drawable chevron=host.getDrawable(homeHistoryOpen?R.drawable.ic_chevron_up_wide:R.drawable.ic_chevron_down_wide).mutate();chevron.setTint(softForeground());chevron.setBounds(0,0,dp(28),dp(28));toggle.setCompoundDrawables(null,null,chevron,null);toggle.setCompoundDrawablePadding(dp(10));content.addView(toggle,bottomMargin(10));
         if(homeHistoryOpen) {
             homeCursor=host.database.openHomeHistory();
             if(homeCursor.getCount()==0) emptyCard("لا توجد حركات بعد","تظهر هنا جميع الديون والدفعات من الأحدث.");
             else {
-                android.widget.ListView list=new android.widget.ListView(host);
-                list.setDivider(null); list.setContentDescription("سجل الحركات الكامل");
-                list.setOnTouchListener((v,event)->{v.getParent().requestDisallowInterceptTouchEvent(event.getAction()!=android.view.MotionEvent.ACTION_UP && event.getAction()!=android.view.MotionEvent.ACTION_CANCEL);return false;});
+                android.widget.ListView list=homeList;
                 list.setAdapter(new android.widget.CursorAdapter(host,homeCursor,0) {
                     public View newView(android.content.Context context,android.database.Cursor c,ViewGroup parent) { return new LinearLayout(host); }
                     public void bindView(View view,android.content.Context context,android.database.Cursor c) {
@@ -469,10 +477,10 @@ final class NativeScreens {
                         holder.addView(dashboardTransaction(tx));
                     }
                 });
-                content.addView(list,new LinearLayout.LayoutParams(-1,dp(420)));
-                content.addView(button("⌃  إغلاق سجل الحركات",soft,softForeground(),()->{homeHistoryOpen=false;host.refreshCurrentScreen();}),topMargin(10));
+
             }
         }
+        if(homeList.getAdapter()==null) homeList.setAdapter(new android.widget.ArrayAdapter<String>(host,android.R.layout.simple_list_item_1,new String[0]));
 
     }
 

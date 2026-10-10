@@ -22,7 +22,7 @@ final class ProfilePhotoEditor {
         action(host, actions, "تدوير ٩٠°", () -> { crop.rotate(); zoom.setProgress(0); });
         action(host, actions, "توسيط", () -> { crop.center(); zoom.setProgress(0); });
         action(host, actions, "صورة جديدة", () -> { dialog[0].dismiss(); host.pickProfilePhoto(false); });
-        dialog[0] = new SadadDialog.Builder(host).setTitle("معاينة وتعديل الصورة").setView(body).setNegativeButton("إلغاء", null).setPositiveButton("حفظ الصورة", (d, w) -> { Bitmap result = crop.export(); host.saveProfilePhoto(result, account); result.recycle(); }).create();
+        dialog[0] = new SadadDialog.Builder(host).setTitle("معاينة وتعديل الصورة").setView(body).setNegativeButton("إلغاء", null).setNeutralButton("حذف الصورة", (d,w)->host.deleteProfilePhoto(account)).setPositiveButton("حفظ الصورة", (d, w) -> { Bitmap result = crop.export(); host.saveProfilePhoto(result, account); result.recycle(); }).create();
         dialog[0].setOnDismissListener(d -> crop.release()); dialog[0].show(); return dialog[0];
     }
     private static void action(MainActivity host, LinearLayout row, String title, Runnable task) {

@@ -946,6 +946,14 @@ public final class MainActivity extends Activity {
         if (!(image instanceof android.graphics.drawable.BitmapDrawable)) { pickProfilePhoto(false); return; }
         ProfilePhotoEditor.show(this, ((android.graphics.drawable.BitmapDrawable) image).getBitmap(), sessions.syncAccountId());
     }
+    void deleteProfilePhoto(String account) {
+        if(!account.equals(sessions.syncAccountId())) { showBrandedMessage("تغيّر الحساب؛ افتح الصورة مجددًا."); return; }
+        for(String key:new String[]{"account_photo","store_photo"}) {
+            java.io.File file=new java.io.File(getFilesDir(),profileKey(key,account)+".jpg");
+            if(file.exists() && !file.delete()) { showBrandedMessage("تعذر حذف الصورة. حاول مجددًا.");screens.show(currentRoute);return; }
+        }
+        screens.show(currentRoute);showBrandedMessage("تم حذف الصورة.");
+    }
     void saveProfilePhoto(android.graphics.Bitmap image, String account) {
         if (!account.equals(sessions.syncAccountId())) { showBrandedMessage("تغيّر الحساب؛ افتح الصورة مجددًا."); return; }
         try (OutputStream out = new FileOutputStream(new java.io.File(getFilesDir(), profileKey("account_photo", account) + ".jpg"))) {
