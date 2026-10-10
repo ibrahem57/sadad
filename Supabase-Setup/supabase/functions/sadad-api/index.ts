@@ -1,6 +1,7 @@
 import { createClient } from "supabase";
 import { randomBytes, scrypt, timingSafeEqual, createHash, createCipheriv, createDecipheriv } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { adminLedgerSnapshot, ledgerAuditEvents } from "./admin-ledger.ts";
 
 type Json = Record<string, any>;
 type Principal = { kind: "admin" | "store"; token: string; session: Json; user: Json; device: Json | null };
@@ -407,6 +408,28 @@ async function syncSnapshot(store: Json, input: Json, baseRevision: unknown, dev
   return { revision: Number(commit.data), snapshot: await makeSnapshot(latest) };
 }
 
+async function adminStoreList(auth: Principal, includeArchived = false): Promise<Json[]> {
+  const rows: Json[] = dataOrThrow(await db.from("stores").select("*").order("created_at", { ascending: false }));
+  const visible = rows.filter(row => includeArchived || row.status !== "deleted");
+  for (let index=0;index<visible.length;index++) if (visible[index].status !== "deleted") visible[index]=await refreshStoreStatus(visible[index]);
+  const legacy: Json[] = dataOrThrow(await db.rpc("sadad_admin_store_list"));
+  const summaries: Json[] = dataOrThrow(await db.rpc("sadid_admin_summaries", { p_admin_hash: hashToken(auth.token), p_stores: visible.map(row => Number(row.id)) }));
+  const installations: Json[] = dataOrThrow(await db.rpc("sadid_pending_installations", { p_admin_hash: hashToken(auth.token) }));
+  return visible.map(row => {
+    const old = legacy.find(item => Number(item.id) === Number(row.id)) || {};
+    const summary = summaries.find(item => Number(item.storeId) === Number(row.id)) || {};
+    const phones = installations.filter(item => Number(item.storeId) === Number(row.id));
+    return { ...publicStore(row), contacts: Number(old.contacts || 0), debts: Number(old.debts || 0), debtTotal: Number(old.debt_total || 0),
+      ...summary, ledgerMode: summary.initialized ? "current" : "legacy", archived: row.status === "deleted",
+      loginDevices: Number(old.device_count || 0), boundDevices: phones.filter(item => item.status === "active").length,
+      pendingDevices: phones.filter(item => item.status === "pending").length };
+  });
+}
+
+async function adminAccountAction(auth: Principal, storeId: number, action: string, reason: string): Promise<Json> {
+  return dataOrThrow(await db.rpc("sadid_admin_account_action", { p_admin_hash: hashToken(auth.token), p_store: storeId, p_action: action, p_reason: reason }));
+}
+
 function publicStore(store: Json): Json {
   const state = subscriptionState(store);
   return { id: Number(store.id), name: store.name, username: store.username, status: store.status, suspendUntil: store.suspend_until,
@@ -586,31 +609,20 @@ async function route(request: Request): Promise<Response> {
       return ok({ forcePasswordChange: false });
     }
     if (auth.user.force_password_change) throw new HttpError(403, "غيّر كلمة مرور الأدمن للمتابعة.", { forcePasswordChange: true });
+    if (request.method === "GET" && pathname === "/admin/dashboard") {
+      const stores = await adminStoreList(auth, url.searchParams.get("includeArchived") === "true");
+      const available = stores.filter(store => !store.archived);
+      const overview = { stores: available.length, active: available.filter(store => store.status === "active").length,
+        trusted: available.filter(store => store.verified).length, debts: available.reduce((sum,store) => sum + Number(store.debtTotal), 0),
+        pendingDevices: available.reduce((sum,store) => sum + Number(store.pendingDevices), 0) };
+      return ok({ overview, stores, meta: { username: auth.user.username, backend: "supabase" } });
+    }
     if (request.method === "GET" && pathname === "/admin/overview") {
-      const stores = dataOrThrow(await db.from("stores").select("*").neq("status", "deleted"));
-      for (const store of stores) await refreshStoreStatus(store);
-      const overview = dataOrThrow(await db.rpc("sadad_admin_overview"));
-      return ok({ overview, meta: { username: auth.user.username } });
+      const stores = await adminStoreList(auth);
+      return ok({ overview: { stores: stores.length, active: stores.filter(store => store.status === "active").length,
+        trusted: stores.filter(store => store.verified).length, debts: stores.reduce((sum,store) => sum + Number(store.debtTotal),0) }, meta: { username: auth.user.username } });
     }
-    if (request.method === "GET" && pathname === "/admin/stores") {
-      const stores = dataOrThrow(await db.from("stores").select("*").neq("status", "deleted"));
-      for (const store of stores) await refreshStoreStatus(store);
-      const rows = dataOrThrow(await db.rpc("sadad_admin_store_list"));
-      return ok({ stores: rows.map((row: Json) => ({
-        ...row,
-        verified: !!row.verified,
-        whatsappEnabled: !!row.whatsapp_enabled,
-        debtorLimit: Number(row.debtor_limit),
-        subscriptionMode: row.subscription_mode,
-        subscriptionStartedAt: row.subscription_started_at,
-        subscriptionExpiresAt: row.subscription_expires_at,
-        subscriptionRemainingMs: row.subscription_remaining_ms,
-        debtTotal: Number(row.debt_total || 0),
-        maxDevices: Number(row.allowed_devices || 1),
-        boundDevices: Number(row.device_count || 0),
-        permissions: parseJsonObject(row.permissions),
-      })) });
-    }
+    if (request.method === "GET" && pathname === "/admin/stores") return ok({ stores: await adminStoreList(auth, url.searchParams.get("includeArchived") === "true") });
     if (request.method === "POST" && pathname === "/admin/stores") {
       const body = await bodyJson(request), name = text(body.name, 120), username = text(body.username, 80), password = String(body.password || "");
       if (!name || !safeUsername(username) || password.length < ADMIN_PASSWORD_MIN || password.length > PASSWORD_MAX) throw new HttpError(400, "أدخل اسم المتجر واسم مستخدم وكلمة مؤقتة بين 12 و128 محرفًا.");
@@ -637,16 +649,30 @@ async function route(request: Request): Promise<Response> {
     if (storeMatch) {
       const storeId = Number(storeMatch[1]), action = storeMatch[2] || "";
       let store = dataOrThrow(await db.from("stores").select("*").eq("id", storeId).maybeSingle());
-      if (!store || store.status === "deleted") throw new HttpError(404, "المتجر غير موجود.");
+      if (!store) throw new HttpError(404, "المتجر غير موجود.");
+      if (store.status === "deleted" && !(request.method === "GET" && action === "") && action !== "unarchive") throw new HttpError(409, "الحساب مؤرشف. أعده من الأرشيف أولًا.");
       store = await refreshStoreStatus(store);
+      const ledgerCurrent = !!dataOrThrow(await db.rpc("sadid_is_v3_store", { p_store: storeId }));
+      if (ledgerCurrent && request.method === "POST" && (/^(backups|archives)\/\d+\/restore$/.test(action) || /^devices\/[^/]+\/permissions$/.test(action))) throw new HttpError(409, "استخدم استرداد الأوامر المعتمد وصلاحيات الحساب لهذا المتجر.");
+      if (request.method === "POST" && ["archive", "unarchive", "end-sessions", "revoke-all"].includes(action)) {
+        const body = await bodyJson(request), reason = text(body.reason, 2000);
+        if (!reason) throw new HttpError(400, "اكتب سبب الإجراء.");
+        return ok({ result: await adminAccountAction(auth, storeId, action, reason) });
+      }
 
       if (request.method === "GET" && action === "") {
-        const [snapshot, devices, backups, contactArchives, auditEvents] = await Promise.all([
-          makeSnapshot(store), listDevices(storeId), listBackups(storeId), listContactArchives(storeId),
+        const reason = text(url.searchParams.get("reason") || "Store management in admin dashboard", 2000);
+        const raw = ledgerCurrent ? dataOrThrow(await db.rpc("sadid_support_snapshot", { p_admin_hash: hashToken(auth.token), p_store: storeId, p_reason: reason })) : null;
+        const [devices, backups, contactArchives, auditEvents, controls] = await Promise.all([
+          listDevices(storeId), ledgerCurrent ? [] : listBackups(storeId), ledgerCurrent ? [] : listContactArchives(storeId),
           db.from("audit_events").select("actor,action,description,created_at,device_id").eq("store_id", storeId).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(200),
+          db.rpc("sadid_admin_controls", { p_admin_hash: hashToken(auth.token), p_store: storeId }),
         ]);
-        const events = dataOrThrow(auditEvents).map((row: Json) => ({ actor: row.actor, action: row.action, description: row.description, createdAt: row.created_at, deviceId: row.device_id }));
-        return ok({ store: publicStore(store), snapshot, devices, backups, contactArchives, auditEvents: events });
+        const control = dataOrThrow(controls);
+        const account = { ...publicStore(store), archived: store.status === "deleted", ledgerMode: ledgerCurrent ? "current" : "legacy", canDelete: !ledgerCurrent && !control.hasDeviceHistory };
+        const snapshot = raw ? adminLedgerSnapshot(raw, account) : await makeSnapshot(store);
+        const events = raw ? ledgerAuditEvents(raw) : dataOrThrow(auditEvents).map((row: Json) => ({ actor: row.actor, action: row.action, description: row.description, createdAt: row.created_at, deviceId: row.device_id }));
+        return ok({ store: account, snapshot, devices, backups, contactArchives, auditEvents: events, ...control });
       }
       if (request.method === "GET" && action === "archives") return ok({ archives: await listContactArchives(storeId) });
       const restoreArchive = action.match(/^archives\/(\d+)\/restore$/);
@@ -794,9 +820,12 @@ async function route(request: Request): Promise<Response> {
         const hashed = await passwordHash(password);
         dataOrThrow(await db.from("stores").update({ salt: hashed.salt, password_hash: hashed.hash, force_password_change: true }).eq("id", storeId));
         dataOrThrow(await db.from("sessions").delete().eq("kind", "store").eq("principal_id", storeId));
+        await adminAccountAction(auth, storeId, "end-sessions", "Store password reset by admin");
         return ok({ username: store.username, password, forcePasswordChange: true });
       }
       if (request.method === "DELETE" && action === "permanent") {
+        const control = dataOrThrow(await db.rpc("sadid_admin_controls", { p_admin_hash: hashToken(auth.token), p_store: storeId }));
+        if (ledgerCurrent || control.hasDeviceHistory) throw new HttpError(409, "هذا الحساب له سجل محفوظ. استخدم أرشفة الحساب بدل الحذف النهائي.");
         if (url.searchParams.get("confirm") !== store.username) throw new HttpError(400, "أرسل اسم المستخدم لتأكيد الحذف النهائي.");
         dataOrThrow(await db.from("sessions").delete().eq("kind", "store").eq("principal_id", storeId));
         dataOrThrow(await db.from("stores").delete().eq("id", storeId));

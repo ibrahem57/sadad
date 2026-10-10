@@ -10,6 +10,21 @@
 
 البيانات المرفقة اصطناعية. هذه نسخة للتجربة؛ توقيع التطبيق تطويري، واختبار هاتف فعلي واستعادة قاعدة الخادم الكاملة ما زالا مطلوبين قبل الإنتاج.
 
+## Team admin dashboard — live Supabase
+
+GitHub Pages deployment is prepared in `.github/workflows/admin-pages.yml` for the repository owner to enable on `ibrahem57/sadad`. It has not been published. The hosted dashboard uses the same live Supabase admin account.
+
+From the repository root, use Node.js 24 or newer:
+
+```sh
+git pull --ff-only
+node tools/admin-preview.cjs
+```
+
+Open <http://localhost:8081/> and sign in with the shared `admin_sadid` account. Get the password from the team lead. Store management, current financial balances, phone approval and recovery are now integrated in this screen. Old `/v3-admin` links redirect here.
+
+The browser authenticates against the live `sadid` Supabase project (`vhftjmiltqfwmrszdtgf`) on every machine. No local admin account, SQLite database, `.env`, dependency installation or Supabase CLI login is needed. See [team setup and verification](docs/ADMIN_TEAM_SETUP.md).
+
 ## البناء والاختبارات
 
 افتح مشروع Android في Android Studio، أو شغّل داخل مجلده:

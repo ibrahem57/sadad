@@ -1,5 +1,15 @@
 # خادم سدد ولوحة الأدمن
 
+## Current team dashboard
+
+Run `npm start` in this directory, or `node tools/admin-preview.cjs` from the repository root, with Node.js 24 or newer. Open <http://localhost:8081/>. This serves the dashboard locally; authentication and account data come from the live Sadid Supabase backend. The shared admin username is `admin_sadid`; get its password from the team lead.
+
+The same screen includes phone approvals, recovery permits, audited ledger reads and account archiving. Old `/v3-admin` links redirect to the main dashboard. See [team setup](../docs/ADMIN_TEAM_SETUP.md). There is no local account setup, `.env` or SQLite database for this workflow.
+
+The Node/SQLite API below is retained for legacy development. Start it explicitly with `npm run start:legacy`; it is separate from the hosted Supabase project.
+
+---
+
 يقدّم هذا المجلد واجهة الإدارة وREST API للتطبيق من الخادم نفسه. بيانات كل متجر مرتبطة بمعرّف مستقل في SQLite، وكلمات المرور لا تُخزّن كنص صريح.
 
 ## تشغيل محلي للتجربة
