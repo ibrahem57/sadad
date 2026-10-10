@@ -1,0 +1,10 @@
+{
+  "auditedAdminRead": true,
+  "requestId": "9dc6bad3-86ae-4681-a9da-9a7a6e0cab2a",
+  "counts": {
+    "contacts": 15,
+    "debts": 30,
+    "payments": 20
+  },
+  "adminFinancialWriteDenied": true
+}

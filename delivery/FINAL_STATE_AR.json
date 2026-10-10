@@ -1,0 +1,14 @@
+{
+  "debts": 30,
+  "storeId": 2,
+  "balances": {
+    "payableCents": 109000,
+    "receivableCents": 356000
+  },
+  "contacts": 15,
+  "payments": 20,
+  "forcePasswordChange": true,
+  "verificationStoreStatus": "suspended",
+  "adminForcePasswordChange": true,
+  "verificationActiveInstallations": 0
+}

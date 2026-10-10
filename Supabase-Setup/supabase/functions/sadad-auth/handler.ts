@@ -115,10 +115,11 @@ export function makeHandler(
         const identity = createHmac("sha256", serverKey).update(
           `sadad-store:${login.account.id}`,
         ).digest("hex");
+        const stableEmail = requireData(await db.rpc("sadid_store_auth_identity", { p_store: login.account.id }));
         const link = requireData(
           await db.auth.admin.generateLink({
             type: "magiclink",
-            email: `${identity}@stores.sadad.invalid`,
+            email: stableEmail || `${identity}@stores.sadad.invalid`,
           }),
         );
         const authClient = newAuthClient(); // Never mutate the shared service-role client's auth session.

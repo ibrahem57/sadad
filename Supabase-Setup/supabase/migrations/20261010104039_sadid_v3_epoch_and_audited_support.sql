@@ -106,7 +106,7 @@ begin
  if jsonb_typeof(p_command)<>'object' or p_command->>'schemaVersion'<>'1' or octet_length(p_command::text)>65536 then raise exception 'unsupported_schema'; end if;
  op:=(p_command->>'operationId')::uuid; entity:=(p_command->>'entityId')::uuid; kind:=p_command->>'type'; payload:=p_command->'payload';
  if op is null or entity is null or kind is null or jsonb_typeof(payload)<>'object' then raise exception 'invalid_input'; end if;
-
+ 
  if not coalesce(sadid_private.origin_allowed(p_command),false) then raise exception 'installation_revoked'; end if;
  select * into st from public.sadid_ledger_state where store_id=c.store_id for update;
  if not found then raise exception 'ledger_not_initialized'; end if;

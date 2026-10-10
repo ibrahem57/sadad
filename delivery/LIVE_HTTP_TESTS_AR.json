@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "رفض طلب بلا JWT",
+      "status": "passed"
+    },
+    {
+      "name": "قراءة عادية موقعة",
+      "status": "passed"
+    },
+    {
+      "name": "رفض توقيع مزور",
+      "status": "passed"
+    },
+    {
+      "name": "رفض JWT غير صالح",
+      "status": "passed"
+    },
+    {
+      "name": "قراءة REST بلا إثبات تركيب لا تكشف صفوفًا",
+      "status": "passed"
+    },
+    {
+      "name": "رفض DML مباشر عبر REST",
+      "status": "passed"
+    }
+  ],
+  "storeId": 2,
+  "installationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2"
+}

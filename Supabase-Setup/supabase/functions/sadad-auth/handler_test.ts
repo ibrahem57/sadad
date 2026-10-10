@@ -11,10 +11,12 @@ function fixture(
     bound?: boolean;
     revoked?: boolean;
     expired?: boolean;
+    identity?: string;
   } = {},
 ) {
   const calls: { url: string; init: any }[] = [],
     filters: Record<string, any> = {};
+  let generatedEmail = "";
   let inserted: any, deleted = false, signedOut = false;
   const session = {
     access_token: jwt(),
@@ -51,6 +53,7 @@ function fixture(
     then: (resolve: any) => resolve({ data: null, error: null }),
   };
   const db: any = {
+    rpc: () => Promise.resolve({ data: options.identity ?? null, error: null }),
     from: () => query,
     auth: {
       getUser: () =>
@@ -59,11 +62,10 @@ function fixture(
           error: options.valid === false ? { status: 401 } : null,
         }),
       admin: {
-        generateLink: () =>
-          Promise.resolve({
+        generateLink: (args: any) => { generatedEmail=args.email; return Promise.resolve({
             data: { properties: { hashed_token: "otp" } },
             error: null,
-          }),
+          });},
         signOut: () => {
           signedOut = true;
           return Promise.resolve({ error: null });
@@ -128,6 +130,7 @@ function fixture(
     request,
     calls,
     filters,
+    get generatedEmail(){return generatedEmail;},
     get inserted() {
       return inserted;
     },
@@ -139,18 +142,18 @@ function fixture(
     },
   };
 }
-Deno.test("missing credentials reject before upstream", async () => {
+Deno.test("رفض غياب بيانات التحقق قبل الاتصال بالخادم", async () => {
   const f = fixture();
   const result = await f.handler(
     new Request("https://project.test/api/mobile/snapshot"),
   );
   assert(result.status === 401 && f.calls.length === 0);
 });
-Deno.test("invalid JWT rejects before upstream", async () => {
+Deno.test("رفض رمز دخول غير صالح قبل الاتصال بالخادم", async () => {
   const f = fixture({ valid: false });
   assert((await f.handler(f.request())).status === 401 && f.calls.length === 0);
 });
-Deno.test("unbound or expired sessions reject", async () => {
+Deno.test("رفض جلسة غير مرتبطة أو منتهية", async () => {
   for (const options of [{ bound: false }, { expired: true }]) {
     const f = fixture(options);
     assert(
@@ -158,7 +161,7 @@ Deno.test("unbound or expired sessions reject", async () => {
     );
   }
 });
-Deno.test("JWT from another Auth session cannot use the device token", async () => {
+Deno.test("رمز جلسة أخرى لا يستخدم رمز الجهاز", async () => {
   const f = fixture();
   assert(
     (await f.handler(
@@ -168,17 +171,17 @@ Deno.test("JWT from another Auth session cannot use the device token", async () 
     )).status === 401,
   );
 });
-Deno.test("valid private request forwards only device credential and checks user", async () => {
+Deno.test("الطلب الخاص الصحيح يتحقق من المستخدم ويحول اعتماد الجهاز فقط", async () => {
   const f = fixture();
   assert((await f.handler(f.request())).status === 200);
   assert(f.filters.user_id === "user" && f.filters.expires_at > 0);
   assert(f.calls[0].init.headers.Authorization === "Bearer device");
 });
-Deno.test("revoked store session remains rejected", async () => {
+Deno.test("رفض جلسة متجر ملغاة", async () => {
   const f = fixture({ revoked: true });
   assert((await f.handler(f.request())).status === 401);
 });
-Deno.test("refresh checks device status and Auth session binding", async () => {
+Deno.test("تجديد الرمز يتحقق من الجهاز وربط جلسة Auth", async () => {
   const f = fixture({ revoked: true });
   assert(
     (await f.handler(
@@ -186,7 +189,7 @@ Deno.test("refresh checks device status and Auth session binding", async () => {
     )).status === 401,
   );
 });
-Deno.test("login binds verified store and returns Auth tokens without OTP", async () => {
+Deno.test("الدخول يربط المتجر الموثوق ويعيد الرموز دون كشف OTP", async () => {
   const f = fixture();
   const result = await f.handler(
     f.request("login", {}, { username: "store", password: "password" }),
@@ -202,17 +205,19 @@ Deno.test("login binds verified store and returns Auth tokens without OTP", asyn
       !JSON.stringify(body).includes("server-secret"),
   );
 });
-Deno.test("logout removes binding and revokes local Auth session", async () => {
+Deno.test("الخروج يلغي الربط والجلسة", async () => {
   const f = fixture();
   assert(
     (await f.handler(f.request("logout", {}, {}))).status === 200 &&
       f.deleted && f.signedOut,
   );
 });
-Deno.test("admin and arbitrary routes are unavailable", async () => {
+Deno.test("رفض مسارات الإدارة والمسارات العشوائية", async () => {
   const f = fixture();
   assert(
     (await f.handler(new Request("https://project.test/api/admin/session")))
           .status === 404 && f.calls.length === 0,
   );
 });
+
+Deno.test("هوية المتجر الموثوقة لا تتغير عند تدوير مفتاح الخدمة", async()=>{const f=fixture({identity:"durable-store@auth.sadad.invalid"});const response=await f.handler(f.request("login",{}, {username:"store",password:"password"}));assert(response.status===200&&f.generatedEmail==="durable-store@auth.sadad.invalid");});

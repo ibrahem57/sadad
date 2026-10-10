@@ -1,0 +1,1451 @@
+{
+  "version": 1,
+  "projectRef": "vhftjmiltqfwmrszdtgf",
+  "storeId": 2,
+  "anchor": "2026-10-10",
+  "timezone": "Asia/Hebron",
+  "provenance": "بيانات اصطناعية عبر الأوامر العادية؛ تركيب تحقق برمجي يحتاج نقلًا معتمدًا إلى الهاتف.",
+  "counts": {
+    "contacts": 15,
+    "debts": 30,
+    "payments": 20
+  },
+  "expectedTotals": {
+    "remainingReceivableCents": "356000",
+    "remainingPayableCents": "109000",
+    "netCents": "247000"
+  },
+  "expectedDebts": [
+    {
+      "debtId": "0422e272-3dcc-8eba-8467-080e5a6f27d5",
+      "contactId": "6b7dbe22-93fe-83d8-81ea-eaa7671715ad",
+      "direction": "payable",
+      "principalCents": "10000",
+      "paidCents": "10000",
+      "remainingCents": "0"
+    },
+    {
+      "debtId": "14dce212-4d8b-8057-8b5f-efb1a3e41a95",
+      "contactId": "6b7dbe22-93fe-83d8-81ea-eaa7671715ad",
+      "direction": "payable",
+      "principalCents": "20000",
+      "paidCents": "7500",
+      "remainingCents": "12500"
+    },
+    {
+      "debtId": "fc5fdd9c-b25f-8322-88aa-a22f44c1828a",
+      "contactId": "4092fd3b-1b0d-8318-8729-fabdc04ae9ba",
+      "direction": "receivable",
+      "principalCents": "10500",
+      "paidCents": "10500",
+      "remainingCents": "0"
+    },
+    {
+      "debtId": "bcc59e8e-39bb-879c-8864-25678551a58c",
+      "contactId": "4092fd3b-1b0d-8318-8729-fabdc04ae9ba",
+      "direction": "receivable",
+      "principalCents": "21000",
+      "paidCents": "7500",
+      "remainingCents": "13500"
+    },
+    {
+      "debtId": "541cdf14-cacd-806a-83e2-ac13c09cd342",
+      "contactId": "290bf4b1-9f71-85dd-8563-24419d04b2c1",
+      "direction": "receivable",
+      "principalCents": "11000",
+      "paidCents": "11000",
+      "remainingCents": "0"
+    },
+    {
+      "debtId": "ef6a5623-d47a-8aa4-8112-96ca66e8a204",
+      "contactId": "290bf4b1-9f71-85dd-8563-24419d04b2c1",
+      "direction": "receivable",
+      "principalCents": "22000",
+      "paidCents": "7500",
+      "remainingCents": "14500"
+    },
+    {
+      "debtId": "f1c22738-df9b-8d22-85e6-ebadccb9e4e0",
+      "contactId": "46312533-20a4-8e28-82c9-b85d22fec72d",
+      "direction": "receivable",
+      "principalCents": "11500",
+      "paidCents": "11500",
+      "remainingCents": "0"
+    },
+    {
+      "debtId": "20fd5575-4b6d-8610-8059-6d8a2e8fefb9",
+      "contactId": "46312533-20a4-8e28-82c9-b85d22fec72d",
+      "direction": "receivable",
+      "principalCents": "23000",
+      "paidCents": "7500",
+      "remainingCents": "15500"
+    },
+    {
+      "debtId": "53ac0650-36dd-8a2e-8eb5-098a26dd7ab4",
+      "contactId": "f38284e8-049f-8b0b-8800-0a9ffe6fe77a",
+      "direction": "payable",
+      "principalCents": "12000",
+      "paidCents": "12000",
+      "remainingCents": "0"
+    },
+    {
+      "debtId": "ce5144b1-0972-800b-89ab-622a6d77ab82",
+      "contactId": "f38284e8-049f-8b0b-8800-0a9ffe6fe77a",
+      "direction": "payable",
+      "principalCents": "24000",
+      "paidCents": "7500",
+      "remainingCents": "16500"
+    },
+    {
+      "debtId": "c4857866-f1f5-8ef4-8f2b-a8bb5215a64e",
+      "contactId": "bb97829d-81e9-8f3f-8e91-62bbe4d70a55",
+      "direction": "receivable",
+      "principalCents": "12500",
+      "paidCents": "5000",
+      "remainingCents": "7500"
+    },
+    {
+      "debtId": "bd2972a6-807b-8ef5-86a1-c65e9727a69d",
+      "contactId": "bb97829d-81e9-8f3f-8e91-62bbe4d70a55",
+      "direction": "receivable",
+      "principalCents": "25000",
+      "paidCents": "0",
+      "remainingCents": "25000"
+    },
+    {
+      "debtId": "795ea486-e141-8ea2-8dec-2586dc9827e2",
+      "contactId": "9a493add-dfff-8c1b-879a-1312039de887",
+      "direction": "receivable",
+      "principalCents": "13000",
+      "paidCents": "5000",
+      "remainingCents": "8000"
+    },
+    {
+      "debtId": "3492853c-eec3-8ad5-85db-298dd05ffd65",
+      "contactId": "9a493add-dfff-8c1b-879a-1312039de887",
+      "direction": "receivable",
+      "principalCents": "26000",
+      "paidCents": "0",
+      "remainingCents": "26000"
+    },
+    {
+      "debtId": "93abaa46-b2cb-8967-8b09-d0c5065dafa4",
+      "contactId": "afd83d8f-4500-8e1b-86df-bafd060dadfc",
+      "direction": "receivable",
+      "principalCents": "13500",
+      "paidCents": "5000",
+      "remainingCents": "8500"
+    },
+    {
+      "debtId": "2e4f5bf9-0c35-8392-8a64-d54000fc307d",
+      "contactId": "afd83d8f-4500-8e1b-86df-bafd060dadfc",
+      "direction": "receivable",
+      "principalCents": "27000",
+      "paidCents": "0",
+      "remainingCents": "27000"
+    },
+    {
+      "debtId": "78300795-2011-8057-8257-efc8473be4fb",
+      "contactId": "7b02f9ac-ef55-86b7-81f4-d65660ecd190",
+      "direction": "payable",
+      "principalCents": "14000",
+      "paidCents": "5000",
+      "remainingCents": "9000"
+    },
+    {
+      "debtId": "cdd8233d-3d82-8dbb-8c12-08203edcd68a",
+      "contactId": "7b02f9ac-ef55-86b7-81f4-d65660ecd190",
+      "direction": "payable",
+      "principalCents": "28000",
+      "paidCents": "0",
+      "remainingCents": "28000"
+    },
+    {
+      "debtId": "b94b2a32-52a0-8963-827a-e95f89ae2da6",
+      "contactId": "600f8937-e910-8f74-8544-1440b008f7d7",
+      "direction": "receivable",
+      "principalCents": "14500",
+      "paidCents": "5000",
+      "remainingCents": "9500"
+    },
+    {
+      "debtId": "db490278-c099-8144-85ba-f63dcebc8698",
+      "contactId": "600f8937-e910-8f74-8544-1440b008f7d7",
+      "direction": "receivable",
+      "principalCents": "29000",
+      "paidCents": "0",
+      "remainingCents": "29000"
+    },
+    {
+      "debtId": "093f1566-3c49-8f99-8a53-2bc4c0f987f2",
+      "contactId": "bc477608-f37e-8742-822f-d219927a64a5",
+      "direction": "receivable",
+      "principalCents": "15000",
+      "paidCents": "5000",
+      "remainingCents": "10000"
+    },
+    {
+      "debtId": "7b03dbaf-ee53-8686-8d8e-63420b278bef",
+      "contactId": "bc477608-f37e-8742-822f-d219927a64a5",
+      "direction": "receivable",
+      "principalCents": "30000",
+      "paidCents": "0",
+      "remainingCents": "30000"
+    },
+    {
+      "debtId": "b19c3d5a-41f1-85c9-8297-b5d32e24a901",
+      "contactId": "429cff90-f8fd-820c-830e-42809d14b174",
+      "direction": "receivable",
+      "principalCents": "15500",
+      "paidCents": "5000",
+      "remainingCents": "10500"
+    },
+    {
+      "debtId": "42e5fbed-2437-8967-84b7-b91d3959f508",
+      "contactId": "429cff90-f8fd-820c-830e-42809d14b174",
+      "direction": "receivable",
+      "principalCents": "31000",
+      "paidCents": "0",
+      "remainingCents": "31000"
+    },
+    {
+      "debtId": "05e9bc01-ee93-8b84-8245-bbad62f8f412",
+      "contactId": "128ba354-78f7-8d92-89e3-263fc0813640",
+      "direction": "payable",
+      "principalCents": "16000",
+      "paidCents": "5000",
+      "remainingCents": "11000"
+    },
+    {
+      "debtId": "962c95e8-3f7a-8638-8b12-8a1c6b2f82bb",
+      "contactId": "128ba354-78f7-8d92-89e3-263fc0813640",
+      "direction": "payable",
+      "principalCents": "32000",
+      "paidCents": "0",
+      "remainingCents": "32000"
+    },
+    {
+      "debtId": "f15784ea-c3ee-8de4-8141-355543b3f57e",
+      "contactId": "3e631763-6185-8336-8efd-54900ccbf9d4",
+      "direction": "receivable",
+      "principalCents": "16500",
+      "paidCents": "5000",
+      "remainingCents": "11500"
+    },
+    {
+      "debtId": "ba97fad2-7fd5-8967-8559-96ad52a245e5",
+      "contactId": "3e631763-6185-8336-8efd-54900ccbf9d4",
+      "direction": "receivable",
+      "principalCents": "33000",
+      "paidCents": "0",
+      "remainingCents": "33000"
+    },
+    {
+      "debtId": "4e7bfbb2-dfd7-8528-8fa4-b4058ca103c1",
+      "contactId": "75f632e0-ea74-8c6b-82e5-f27cce7b2e5a",
+      "direction": "receivable",
+      "principalCents": "17000",
+      "paidCents": "5000",
+      "remainingCents": "12000"
+    },
+    {
+      "debtId": "deb16232-a577-81a4-8ef1-fe5c85ed718c",
+      "contactId": "75f632e0-ea74-8c6b-82e5-f27cce7b2e5a",
+      "direction": "receivable",
+      "principalCents": "34000",
+      "paidCents": "0",
+      "remainingCents": "34000"
+    }
+  ],
+  "contacts": [
+    {
+      "schemaVersion": 1,
+      "operationId": "6ccdee44-cd41-8180-8b93-3bafec928420",
+      "entityId": "6b7dbe22-93fe-83d8-81ea-eaa7671715ad",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "أحمد التجريبي",
+        "phone": "",
+        "externalReference": "TEST-001",
+        "category": "مورد تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "58e8837b-0bb4-8bef-894d-fac11b2cb698",
+      "entityId": "4092fd3b-1b0d-8318-8729-fabdc04ae9ba",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "ليلى التجريبية",
+        "phone": "",
+        "externalReference": "TEST-002",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "db6459ac-9367-8005-854d-67686896aabb",
+      "entityId": "290bf4b1-9f71-85dd-8563-24419d04b2c1",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "محمد التجريبي",
+        "phone": "",
+        "externalReference": "TEST-003",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "c5861b85-b5e6-8fee-8cff-d479fd727de5",
+      "entityId": "46312533-20a4-8e28-82c9-b85d22fec72d",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "نور التجريبية",
+        "phone": "",
+        "externalReference": "TEST-004",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "654b9af8-680c-8580-8ddc-2dd76759d750",
+      "entityId": "f38284e8-049f-8b0b-8800-0a9ffe6fe77a",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "سامر التجريبي",
+        "phone": "",
+        "externalReference": "TEST-005",
+        "category": "مورد تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "bbaf7ed6-7829-8686-8690-2a99e9967510",
+      "entityId": "bb97829d-81e9-8f3f-8e91-62bbe4d70a55",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "هدى التجريبية",
+        "phone": "",
+        "externalReference": "TEST-006",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "983675e6-3e65-8e97-870b-7deb06ecae63",
+      "entityId": "9a493add-dfff-8c1b-879a-1312039de887",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "خالد التجريبي",
+        "phone": "",
+        "externalReference": "TEST-007",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "f9450db0-a9d8-827e-8ff2-844a474eb1b3",
+      "entityId": "afd83d8f-4500-8e1b-86df-bafd060dadfc",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "مريم التجريبية",
+        "phone": "",
+        "externalReference": "TEST-008",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "8ed72978-36e3-8918-88d2-8eb95f5e1d15",
+      "entityId": "7b02f9ac-ef55-86b7-81f4-d65660ecd190",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "عمر التجريبي",
+        "phone": "",
+        "externalReference": "TEST-009",
+        "category": "مورد تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "5749b35c-1061-881b-8e0e-0391e3e61e94",
+      "entityId": "600f8937-e910-8f74-8544-1440b008f7d7",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "سارة التجريبية",
+        "phone": "",
+        "externalReference": "TEST-010",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "d50de05b-98e5-801e-88c6-7557510a2167",
+      "entityId": "bc477608-f37e-8742-822f-d219927a64a5",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "يوسف التجريبي",
+        "phone": "",
+        "externalReference": "TEST-011",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "a0653be9-e874-81b4-894a-ae41b36e8d91",
+      "entityId": "429cff90-f8fd-820c-830e-42809d14b174",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "دانا التجريبية",
+        "phone": "",
+        "externalReference": "TEST-012",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "7c4567eb-aaa6-8d5a-8712-8f4c8fcff6d5",
+      "entityId": "128ba354-78f7-8d92-89e3-263fc0813640",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "مازن التجريبي",
+        "phone": "",
+        "externalReference": "TEST-013",
+        "category": "مورد تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "2a5b806b-09de-8de1-8e19-f5b3b1979ce9",
+      "entityId": "3e631763-6185-8336-8efd-54900ccbf9d4",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "ريم التجريبية",
+        "phone": "",
+        "externalReference": "TEST-014",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "20bc733e-952d-8a32-8890-057543ddf9f6",
+      "entityId": "75f632e0-ea74-8c6b-82e5-f27cce7b2e5a",
+      "type": "contact.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [],
+      "payload": {
+        "name": "حسن التجريبي",
+        "phone": "",
+        "externalReference": "TEST-015",
+        "category": "عميل تجريبي",
+        "note": "بيانات اصطناعية؛ لا مراسلات خارجية."
+      }
+    }
+  ],
+  "debts": [
+    {
+      "schemaVersion": 1,
+      "operationId": "337d04ad-8a9f-846c-8566-bce22ae7e939",
+      "entityId": "0422e272-3dcc-8eba-8467-080e5a6f27d5",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "6ccdee44-cd41-8180-8b93-3bafec928420"
+      ],
+      "payload": {
+        "contactId": "6b7dbe22-93fe-83d8-81ea-eaa7671715ad",
+        "direction": "payable",
+        "amountCents": 10000,
+        "dueDate": "2026-09-20",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "e16cb52e-666e-8445-869a-b91403f3265b",
+      "entityId": "14dce212-4d8b-8057-8b5f-efb1a3e41a95",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "6ccdee44-cd41-8180-8b93-3bafec928420"
+      ],
+      "payload": {
+        "contactId": "6b7dbe22-93fe-83d8-81ea-eaa7671715ad",
+        "direction": "payable",
+        "amountCents": 20000,
+        "dueDate": "2026-09-20",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "15991558-4bfb-857d-8f0c-f2122de1a30e",
+      "entityId": "fc5fdd9c-b25f-8322-88aa-a22f44c1828a",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "58e8837b-0bb4-8bef-894d-fac11b2cb698"
+      ],
+      "payload": {
+        "contactId": "4092fd3b-1b0d-8318-8729-fabdc04ae9ba",
+        "direction": "receivable",
+        "amountCents": 10500,
+        "dueDate": "2026-11-10",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "6f3473ff-6c6e-80f5-8c5d-251a947e752b",
+      "entityId": "bcc59e8e-39bb-879c-8864-25678551a58c",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "58e8837b-0bb4-8bef-894d-fac11b2cb698"
+      ],
+      "payload": {
+        "contactId": "4092fd3b-1b0d-8318-8729-fabdc04ae9ba",
+        "direction": "receivable",
+        "amountCents": 21000,
+        "dueDate": "2026-11-10",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "505c738e-8897-8390-8158-0bedccead1a4",
+      "entityId": "541cdf14-cacd-806a-83e2-ac13c09cd342",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "db6459ac-9367-8005-854d-67686896aabb"
+      ],
+      "payload": {
+        "contactId": "290bf4b1-9f71-85dd-8563-24419d04b2c1",
+        "direction": "receivable",
+        "amountCents": 11000,
+        "dueDate": "",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "a4547ed8-acf0-8e2c-8a1f-3d2a27dd9865",
+      "entityId": "ef6a5623-d47a-8aa4-8112-96ca66e8a204",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "db6459ac-9367-8005-854d-67686896aabb"
+      ],
+      "payload": {
+        "contactId": "290bf4b1-9f71-85dd-8563-24419d04b2c1",
+        "direction": "receivable",
+        "amountCents": 22000,
+        "dueDate": "",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "3cd8597a-2016-8976-8694-285f82b13f90",
+      "entityId": "f1c22738-df9b-8d22-85e6-ebadccb9e4e0",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "c5861b85-b5e6-8fee-8cff-d479fd727de5"
+      ],
+      "payload": {
+        "contactId": "46312533-20a4-8e28-82c9-b85d22fec72d",
+        "direction": "receivable",
+        "amountCents": 11500,
+        "dueDate": "2026-09-20",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "4ddc7e74-017d-8536-8637-a978df78819a",
+      "entityId": "20fd5575-4b6d-8610-8059-6d8a2e8fefb9",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "c5861b85-b5e6-8fee-8cff-d479fd727de5"
+      ],
+      "payload": {
+        "contactId": "46312533-20a4-8e28-82c9-b85d22fec72d",
+        "direction": "receivable",
+        "amountCents": 23000,
+        "dueDate": "2026-09-20",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "80e7f001-be9f-808d-899b-7782fa57a228",
+      "entityId": "53ac0650-36dd-8a2e-8eb5-098a26dd7ab4",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "654b9af8-680c-8580-8ddc-2dd76759d750"
+      ],
+      "payload": {
+        "contactId": "f38284e8-049f-8b0b-8800-0a9ffe6fe77a",
+        "direction": "payable",
+        "amountCents": 12000,
+        "dueDate": "2026-11-10",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "91894e2e-9279-862f-8d13-94b348bb0aeb",
+      "entityId": "ce5144b1-0972-800b-89ab-622a6d77ab82",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "654b9af8-680c-8580-8ddc-2dd76759d750"
+      ],
+      "payload": {
+        "contactId": "f38284e8-049f-8b0b-8800-0a9ffe6fe77a",
+        "direction": "payable",
+        "amountCents": 24000,
+        "dueDate": "2026-11-10",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "f8cf650d-f65a-80db-8828-703d2c1dce2b",
+      "entityId": "c4857866-f1f5-8ef4-8f2b-a8bb5215a64e",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "bbaf7ed6-7829-8686-8690-2a99e9967510"
+      ],
+      "payload": {
+        "contactId": "bb97829d-81e9-8f3f-8e91-62bbe4d70a55",
+        "direction": "receivable",
+        "amountCents": 12500,
+        "dueDate": "",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "dd02fcca-ab3e-8760-8a6a-cb551ec9ea47",
+      "entityId": "bd2972a6-807b-8ef5-86a1-c65e9727a69d",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "bbaf7ed6-7829-8686-8690-2a99e9967510"
+      ],
+      "payload": {
+        "contactId": "bb97829d-81e9-8f3f-8e91-62bbe4d70a55",
+        "direction": "receivable",
+        "amountCents": 25000,
+        "dueDate": "",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "1efca189-e52f-85d0-8d2f-fa91ff6c8599",
+      "entityId": "795ea486-e141-8ea2-8dec-2586dc9827e2",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "983675e6-3e65-8e97-870b-7deb06ecae63"
+      ],
+      "payload": {
+        "contactId": "9a493add-dfff-8c1b-879a-1312039de887",
+        "direction": "receivable",
+        "amountCents": 13000,
+        "dueDate": "2026-09-20",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "e9980f2e-11b7-8c99-86a1-d5060e20f910",
+      "entityId": "3492853c-eec3-8ad5-85db-298dd05ffd65",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "983675e6-3e65-8e97-870b-7deb06ecae63"
+      ],
+      "payload": {
+        "contactId": "9a493add-dfff-8c1b-879a-1312039de887",
+        "direction": "receivable",
+        "amountCents": 26000,
+        "dueDate": "2026-09-20",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "14948f24-830a-8882-8790-1e499bd10ec3",
+      "entityId": "93abaa46-b2cb-8967-8b09-d0c5065dafa4",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "f9450db0-a9d8-827e-8ff2-844a474eb1b3"
+      ],
+      "payload": {
+        "contactId": "afd83d8f-4500-8e1b-86df-bafd060dadfc",
+        "direction": "receivable",
+        "amountCents": 13500,
+        "dueDate": "2026-11-10",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "b1685be3-7e60-8cd2-86a1-47653afd5d7a",
+      "entityId": "2e4f5bf9-0c35-8392-8a64-d54000fc307d",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "f9450db0-a9d8-827e-8ff2-844a474eb1b3"
+      ],
+      "payload": {
+        "contactId": "afd83d8f-4500-8e1b-86df-bafd060dadfc",
+        "direction": "receivable",
+        "amountCents": 27000,
+        "dueDate": "2026-11-10",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "59b9c93b-1d1a-8ebe-8402-f77a643deee9",
+      "entityId": "78300795-2011-8057-8257-efc8473be4fb",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "8ed72978-36e3-8918-88d2-8eb95f5e1d15"
+      ],
+      "payload": {
+        "contactId": "7b02f9ac-ef55-86b7-81f4-d65660ecd190",
+        "direction": "payable",
+        "amountCents": 14000,
+        "dueDate": "",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "198986db-146a-8efc-83ac-70ebecde99b0",
+      "entityId": "cdd8233d-3d82-8dbb-8c12-08203edcd68a",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "8ed72978-36e3-8918-88d2-8eb95f5e1d15"
+      ],
+      "payload": {
+        "contactId": "7b02f9ac-ef55-86b7-81f4-d65660ecd190",
+        "direction": "payable",
+        "amountCents": 28000,
+        "dueDate": "",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "fce184a2-3750-870a-8ab5-bc88bd937bbd",
+      "entityId": "b94b2a32-52a0-8963-827a-e95f89ae2da6",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "5749b35c-1061-881b-8e0e-0391e3e61e94"
+      ],
+      "payload": {
+        "contactId": "600f8937-e910-8f74-8544-1440b008f7d7",
+        "direction": "receivable",
+        "amountCents": 14500,
+        "dueDate": "2026-09-20",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "bc155cef-97a1-8941-8fe4-5caab030575c",
+      "entityId": "db490278-c099-8144-85ba-f63dcebc8698",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "5749b35c-1061-881b-8e0e-0391e3e61e94"
+      ],
+      "payload": {
+        "contactId": "600f8937-e910-8f74-8544-1440b008f7d7",
+        "direction": "receivable",
+        "amountCents": 29000,
+        "dueDate": "2026-09-20",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "1d38dab7-daa2-8399-8704-76074960c137",
+      "entityId": "093f1566-3c49-8f99-8a53-2bc4c0f987f2",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "d50de05b-98e5-801e-88c6-7557510a2167"
+      ],
+      "payload": {
+        "contactId": "bc477608-f37e-8742-822f-d219927a64a5",
+        "direction": "receivable",
+        "amountCents": 15000,
+        "dueDate": "2026-11-10",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "aaad03ee-da9f-8b2e-80be-c4118098bd55",
+      "entityId": "7b03dbaf-ee53-8686-8d8e-63420b278bef",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "d50de05b-98e5-801e-88c6-7557510a2167"
+      ],
+      "payload": {
+        "contactId": "bc477608-f37e-8742-822f-d219927a64a5",
+        "direction": "receivable",
+        "amountCents": 30000,
+        "dueDate": "2026-11-10",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "807a73aa-8034-81a2-8bcb-fb44b70a6b31",
+      "entityId": "b19c3d5a-41f1-85c9-8297-b5d32e24a901",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "a0653be9-e874-81b4-894a-ae41b36e8d91"
+      ],
+      "payload": {
+        "contactId": "429cff90-f8fd-820c-830e-42809d14b174",
+        "direction": "receivable",
+        "amountCents": 15500,
+        "dueDate": "",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "b086339a-5ac5-8206-8b7c-b9ae5589084f",
+      "entityId": "42e5fbed-2437-8967-84b7-b91d3959f508",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "a0653be9-e874-81b4-894a-ae41b36e8d91"
+      ],
+      "payload": {
+        "contactId": "429cff90-f8fd-820c-830e-42809d14b174",
+        "direction": "receivable",
+        "amountCents": 31000,
+        "dueDate": "",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "94f43908-11fe-807c-8175-f77fa957f7ce",
+      "entityId": "05e9bc01-ee93-8b84-8245-bbad62f8f412",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "7c4567eb-aaa6-8d5a-8712-8f4c8fcff6d5"
+      ],
+      "payload": {
+        "contactId": "128ba354-78f7-8d92-89e3-263fc0813640",
+        "direction": "payable",
+        "amountCents": 16000,
+        "dueDate": "2026-09-20",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "7cff46e6-a9bc-88fd-8a34-75299afff0dd",
+      "entityId": "962c95e8-3f7a-8638-8b12-8a1c6b2f82bb",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "7c4567eb-aaa6-8d5a-8712-8f4c8fcff6d5"
+      ],
+      "payload": {
+        "contactId": "128ba354-78f7-8d92-89e3-263fc0813640",
+        "direction": "payable",
+        "amountCents": 32000,
+        "dueDate": "2026-09-20",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "abd260a9-dab0-83f7-8088-cf132265760a",
+      "entityId": "f15784ea-c3ee-8de4-8141-355543b3f57e",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "2a5b806b-09de-8de1-8e19-f5b3b1979ce9"
+      ],
+      "payload": {
+        "contactId": "3e631763-6185-8336-8efd-54900ccbf9d4",
+        "direction": "receivable",
+        "amountCents": 16500,
+        "dueDate": "2026-11-10",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "a0860b11-2962-8023-88ea-25ecddace279",
+      "entityId": "ba97fad2-7fd5-8967-8559-96ad52a245e5",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "2a5b806b-09de-8de1-8e19-f5b3b1979ce9"
+      ],
+      "payload": {
+        "contactId": "3e631763-6185-8336-8efd-54900ccbf9d4",
+        "direction": "receivable",
+        "amountCents": 33000,
+        "dueDate": "2026-11-10",
+        "note": "حساب إضافي تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "d060490a-141e-82b6-81cb-c33c4e572e0f",
+      "entityId": "4e7bfbb2-dfd7-8528-8fa4-b4058ca103c1",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "20bc733e-952d-8a32-8890-057543ddf9f6"
+      ],
+      "payload": {
+        "contactId": "75f632e0-ea74-8c6b-82e5-f27cce7b2e5a",
+        "direction": "receivable",
+        "amountCents": 17000,
+        "dueDate": "",
+        "note": "حساب مشتريات تجريبي"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "ded570e6-23d9-8eb7-89ab-362b0b7c9094",
+      "entityId": "deb16232-a577-81a4-8ef1-fe5c85ed718c",
+      "type": "debt.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "20bc733e-952d-8a32-8890-057543ddf9f6"
+      ],
+      "payload": {
+        "contactId": "75f632e0-ea74-8c6b-82e5-f27cce7b2e5a",
+        "direction": "receivable",
+        "amountCents": 34000,
+        "dueDate": "",
+        "note": "حساب إضافي تجريبي"
+      }
+    }
+  ],
+  "payments": [
+    {
+      "schemaVersion": 1,
+      "operationId": "3354e8e6-4aaa-8349-85d4-0ce6fe194ef2",
+      "entityId": "1d245c6d-5b78-8b87-86ab-6f3ef14f0b45",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "337d04ad-8a9f-846c-8566-bce22ae7e939"
+      ],
+      "payload": {
+        "debtId": "0422e272-3dcc-8eba-8467-080e5a6f27d5",
+        "amountCents": 10000,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "1a121eb1-bd8e-86ca-8224-eb37ae198340",
+      "entityId": "18256b4e-c1e9-82d7-855d-1065ada0272f",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "e16cb52e-666e-8445-869a-b91403f3265b"
+      ],
+      "payload": {
+        "debtId": "14dce212-4d8b-8057-8b5f-efb1a3e41a95",
+        "amountCents": 7500,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "d8cd861a-8ea0-8ac6-8c4b-0098b00e93db",
+      "entityId": "af4fdd5a-15eb-80d4-8aa5-b8d963272d02",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "15991558-4bfb-857d-8f0c-f2122de1a30e"
+      ],
+      "payload": {
+        "debtId": "fc5fdd9c-b25f-8322-88aa-a22f44c1828a",
+        "amountCents": 10500,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "aaa60a9f-01b6-834e-8106-8ec8bc619f42",
+      "entityId": "3d0a19b7-bbc9-8292-8bac-6df0cb0dca70",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "6f3473ff-6c6e-80f5-8c5d-251a947e752b"
+      ],
+      "payload": {
+        "debtId": "bcc59e8e-39bb-879c-8864-25678551a58c",
+        "amountCents": 7500,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "1c2e994c-9700-89db-8c06-c2712cef0697",
+      "entityId": "32576217-0fe2-8b36-8efc-7840cacc16ab",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "505c738e-8897-8390-8158-0bedccead1a4"
+      ],
+      "payload": {
+        "debtId": "541cdf14-cacd-806a-83e2-ac13c09cd342",
+        "amountCents": 11000,
+        "method": "wallet",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "c2c0622c-5b43-8aec-8524-33dfd17a1b4c",
+      "entityId": "f46b87ef-1a0b-8c7b-8009-6123b1eb4b69",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "a4547ed8-acf0-8e2c-8a1f-3d2a27dd9865"
+      ],
+      "payload": {
+        "debtId": "ef6a5623-d47a-8aa4-8112-96ca66e8a204",
+        "amountCents": 7500,
+        "method": "wallet",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "861d8bc8-85df-853e-8bab-3801a8d9d652",
+      "entityId": "ee842d37-f5fb-8f96-869c-3385ab287be6",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "3cd8597a-2016-8976-8694-285f82b13f90"
+      ],
+      "payload": {
+        "debtId": "f1c22738-df9b-8d22-85e6-ebadccb9e4e0",
+        "amountCents": 11500,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "d8de579f-97e7-84ed-8f54-c44d1caf1847",
+      "entityId": "03a71a2e-d06c-8f90-8870-d2a0c1ec76b3",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "4ddc7e74-017d-8536-8637-a978df78819a"
+      ],
+      "payload": {
+        "debtId": "20fd5575-4b6d-8610-8059-6d8a2e8fefb9",
+        "amountCents": 7500,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "5b1ef699-6ace-82ac-8470-790f9395d7e5",
+      "entityId": "e8ad1b4f-b3d1-8de3-8ac7-541f8d3b17ef",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "80e7f001-be9f-808d-899b-7782fa57a228"
+      ],
+      "payload": {
+        "debtId": "53ac0650-36dd-8a2e-8eb5-098a26dd7ab4",
+        "amountCents": 12000,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "fa08d749-fe82-836a-8b78-2dd70f3a8e8a",
+      "entityId": "2fd7ee23-3547-81a8-8f4b-954d3ce08bba",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "91894e2e-9279-862f-8d13-94b348bb0aeb"
+      ],
+      "payload": {
+        "debtId": "ce5144b1-0972-800b-89ab-622a6d77ab82",
+        "amountCents": 7500,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "b96aea65-82d7-8e7d-8095-70f17f0b90c1",
+      "entityId": "90c328e6-a1fa-8f62-8e5c-fbf7af2d18fe",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "f8cf650d-f65a-80db-8828-703d2c1dce2b"
+      ],
+      "payload": {
+        "debtId": "c4857866-f1f5-8ef4-8f2b-a8bb5215a64e",
+        "amountCents": 5000,
+        "method": "wallet",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "6670f689-fdfd-8b38-8174-13bde8241d6b",
+      "entityId": "dabf9dfb-dbfd-8708-8c1f-6ba3bc408482",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "1efca189-e52f-85d0-8d2f-fa91ff6c8599"
+      ],
+      "payload": {
+        "debtId": "795ea486-e141-8ea2-8dec-2586dc9827e2",
+        "amountCents": 5000,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "a756a430-356a-86e0-8a36-917633c826d2",
+      "entityId": "7fe27dd8-ba9d-8d1d-879c-b5ea37be3001",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "14948f24-830a-8882-8790-1e499bd10ec3"
+      ],
+      "payload": {
+        "debtId": "93abaa46-b2cb-8967-8b09-d0c5065dafa4",
+        "amountCents": 5000,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "d32bbb82-33a8-80f9-8c1d-a168f4bbc1e8",
+      "entityId": "df97b0d4-0370-8702-87f7-07ae710bc361",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "59b9c93b-1d1a-8ebe-8402-f77a643deee9"
+      ],
+      "payload": {
+        "debtId": "78300795-2011-8057-8257-efc8473be4fb",
+        "amountCents": 5000,
+        "method": "wallet",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "59c586d3-7444-8037-85b8-86ec476a1a3b",
+      "entityId": "602e9ec3-bf88-8c3b-80f6-58161b8b0ae3",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "fce184a2-3750-870a-8ab5-bc88bd937bbd"
+      ],
+      "payload": {
+        "debtId": "b94b2a32-52a0-8963-827a-e95f89ae2da6",
+        "amountCents": 5000,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "7efa78bf-b777-8210-83c7-4916490cd991",
+      "entityId": "45b20b26-1aa9-8139-821b-00c1e30b4614",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "1d38dab7-daa2-8399-8704-76074960c137"
+      ],
+      "payload": {
+        "debtId": "093f1566-3c49-8f99-8a53-2bc4c0f987f2",
+        "amountCents": 5000,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "f2e17eaf-c7c1-88e2-85de-03feea38aba6",
+      "entityId": "418ae14c-4e31-806e-81dd-a812a98fee51",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "807a73aa-8034-81a2-8bcb-fb44b70a6b31"
+      ],
+      "payload": {
+        "debtId": "b19c3d5a-41f1-85c9-8297-b5d32e24a901",
+        "amountCents": 5000,
+        "method": "wallet",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "7c07da32-573e-868b-8e91-cb42959da6ee",
+      "entityId": "c0c6006b-002f-8b51-8061-a84f83daf3e9",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "94f43908-11fe-807c-8175-f77fa957f7ce"
+      ],
+      "payload": {
+        "debtId": "05e9bc01-ee93-8b84-8245-bbad62f8f412",
+        "amountCents": 5000,
+        "method": "cash",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "7caa0d1d-ed00-8eec-80f2-d99fa8241ed3",
+      "entityId": "f8edd1c4-3baa-850b-8ad4-5767343e1235",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "abd260a9-dab0-83f7-8088-cf132265760a"
+      ],
+      "payload": {
+        "debtId": "f15784ea-c3ee-8de4-8141-355543b3f57e",
+        "amountCents": 5000,
+        "method": "bank",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "operationId": "0d8c1434-485b-819c-8583-52a26e12365c",
+      "entityId": "38da798f-6d3f-8990-8a9b-8e22cc2ae434",
+      "type": "payment.create",
+      "originInstallationId": "2e57839e-ab4c-410f-a821-502f3eaf1ac2",
+      "originGeneration": 1,
+      "createdAt": "2026-10-10T09:00:00+03:00",
+      "dependsOn": [
+        "d060490a-141e-82b6-81cb-c33c4e572e0f"
+      ],
+      "payload": {
+        "debtId": "4e7bfbb2-dfd7-8528-8fa4-b4058ca103c1",
+        "amountCents": 5000,
+        "method": "wallet",
+        "note": "دفعة اصطناعية للاختبار"
+      }
+    }
+  ]
+}

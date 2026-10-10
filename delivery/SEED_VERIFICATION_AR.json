@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "counts": {
+    "contacts": 15,
+    "debts": 30,
+    "payments": 20
+  },
+  "totals": {
+    "remainingReceivableCents": "356000",
+    "remainingPayableCents": "109000",
+    "netCents": "247000"
+  },
+  "cursor": 65,
+  "epoch": "be586e83-076e-419c-b8d7-300125d5b515",
+  "normalAuthenticatedPath": true,
+  "checkedEveryDebt": true
+}

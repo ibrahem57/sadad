@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-10",
+  "projectRef": "vhftjmiltqfwmrszdtgf",
+  "organizationPlan": "free",
+  "postgres": "17.6",
+  "functions": [
+    {
+      "name": "sadad-api",
+      "version": 3,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "sourceHash": "8f0a0379826c53b0b5bdd70d599d93b7563d1dc7fda6ef9c2438ee0501ed5bae"
+    },
+    {
+      "name": "sadad-auth",
+      "version": 3,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "sourceHash": "c25eae702806ce44c0fc182c9f732d86cbd52dca983e7d570126856556b92ca3"
+    },
+    {
+      "name": "sadid-ledger",
+      "version": 6,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "sourceHash": "266e005b01a45e8da3f2a3a9bd365f3a3db006577ebfe922969c578aae441080"
+    }
+  ],
+  "migrations": [
+    {
+      "version": "20261004085255",
+      "name": "sadad_commit_snapshot"
+    },
+    {
+      "version": "20261004085429",
+      "name": "sadad_admin_queries"
+    },
+    {
+      "version": "20261004085821",
+      "name": "sadad_restore_and_limits"
+    },
+    {
+      "version": "20261004085905",
+      "name": "sadad_restore_revision_guard"
+    },
+    {
+      "version": "20261004090028",
+      "name": "sadad_store_login"
+    },
+    {
+      "version": "20261004090416",
+      "name": "sadad_import_sequences"
+    },
+    {
+      "version": "20261004091341",
+      "name": "restrict_rls_auto_enable_execute"
+    },
+    {
+      "version": "20261010083959",
+      "name": "sadad_android_auth_bindings"
+    },
+    {
+      "version": "20261010101251",
+      "name": "sadid_v3_authorization_and_ledger"
+    },
+    {
+      "version": "20261010101304",
+      "name": "sadid_v3_installation_control"
+    },
+    {
+      "version": "20261010102142",
+      "name": "sadid_v3_authorization_hardening"
+    },
+    {
+      "version": "20261010102702",
+      "name": "sadid_v3_recovery_permits"
+    },
+    {
+      "version": "20261010104610",
+      "name": "sadid_v3_epoch_and_audited_support"
+    },
+    {
+      "version": "20261010105502",
+      "name": "sadid_v3_cutover_and_auth_identity"
+    },
+    {
+      "version": "20261010110947",
+      "name": "sadid_v3_performance_and_request_limits"
+    },
+    {
+      "version": "20261010134138",
+      "name": "sadid_v3_support_policy_initplan"
+    },
+    {
+      "version": "20261010135421",
+      "name": "sadid_v3_explicit_installation_revocation"
+    },
+    {
+      "version": "20261010140400",
+      "name": "sadid_v3_strict_operation_contract"
+    }
+  ],
+  "securityAdvisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 11,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+    }
+  ],
+  "performanceAdvisors": [
+    {
+      "name": "unused_index",
+      "level": "INFO",
+      "count": 12,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+    }
+  ],
+  "historyNote": "أوقات نسخ الترحيلات في MCP تختلف عن أسماء الملفات التي ولدها CLI محليًا. تمت المطابقة بالاسم؛ لا تعاود دفع الترحيلات إلى المشروع الحالي دون مصالحة سجل النسخ.",
+  "newMigrationCount": 10,
+  "initialFoundationDeployed": false
+}

@@ -14,7 +14,7 @@ const leaseJwk:JsonWebKey={kty:'EC',crv:'P-256',x:b64(leasePoint.subarray(1,33))
 const leaseSigningKey=await crypto.subtle.importKey('jwk',leaseJwk,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
 const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization,apikey,content-type,x-sadad-session,x-sadad-admin,x-sadad-installation,x-sadad-time,x-sadad-nonce,x-sadad-signature,x-sadad-recovery','Access-Control-Allow-Methods':'GET,POST,OPTIONS'};
 const respond=(status:number,data:unknown)=>new Response(JSON.stringify(data),{status,headers});
-const messages:Record<string,string>={authorization_required:'يلزم التحقق من الجلسة والجهاز.',installation_or_session_revoked:'الجلسة أو الجهاز غير معتمد.',installation_revoked:'تم إلغاء هذا الجهاز.',store_suspended:'المتجر موقوف؛ حُفظت الإدخالات المعلقة.',password_change_required:'غيّر كلمة المرور المؤقتة أولًا.',dependency_pending:'لم تصل العملية التي يعتمد عليها هذا الإدخال بعد.',operation_id_reused:'رقم العملية مستخدم بمحتوى مختلف.',overpayment:'الدفعة تتجاوز المتبقي.',admin_authorization_required:'يلزم حساب إدارة صالح.',ledger_not_initialized:'انتظر اعتماد الجهاز من الإدارة.'};
+const messages:Record<string,string>={authorization_required:'يلزم التحقق من الجلسة والجهاز.',installation_or_session_revoked:'الجلسة أو الجهاز غير معتمد.',installation_revoked:'تم إلغاء هذا الجهاز.',store_suspended:'المتجر موقوف؛ حُفظت الإدخالات المعلقة.',password_change_required:'غيّر كلمة المرور المؤقتة أولًا.',dependency_pending:'لم تصل العملية التي يعتمد عليها هذا الإدخال بعد.',operation_id_reused:'رقم العملية مستخدم بمحتوى مختلف.',overpayment:'الدفعة تتجاوز المتبقي.',admin_authorization_required:'يلزم حساب إدارة صالح.',ledger_not_initialized:'انتظر اعتماد الجهاز من الإدارة.',epoch_changed:'تغير إصدار استرداد الخادم؛ افحص الإيصالات وصالح الطابور قبل الإرسال.',request_rate_limited:'طلبات كثيرة؛ الإدخالات محفوظة، انتظر دقيقة ثم حاول مجددًا.',enrollment_rate_limited:'وصل عدد طلبات الأجهزة المعلقة إلى الحد. راجع الإدارة.',recovery_not_authorized:'الإدخال غير مشمول بتصريح استرداد صالح.',invalid_manifest:'قائمة الاسترداد أو السبب غير صالح.',invalid_input:'بيانات الطلب غير صالحة.',invalid_dependencies:'اعتمادات العملية غير صالحة.',invalid_operation:'نوع العملية غير صالح.',invalid_public_key:'مفتاح الجهاز غير صالح.',installation_key_changed:'مفتاح الجهاز مختلف؛ يلزم اعتماد تركيب جديد.',session_installation_conflict:'الجلسة مرتبطة بتركيب مختلف.',duplicate_operation_id:'قائمة الاسترداد تكرر رقم عملية.',invalid_ids:'قائمة أرقام العمليات غير صالحة.',installation_unavailable:'التركيب المطلوب غير موجود.',store_permission_denied:'لا توجد صلاحية لهذا الإجراء.',unsupported_schema:'إصدار الطلب غير مدعوم.',invalid_timestamp:'وقت الإدخال غير صالح.'};
 function requireData(r:any){if(r.error)throw r.error;return r.data;}
 function sessionId(jwt:string){try{return JSON.parse(atob(jwt.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).session_id||'';}catch{return '';}}
 Deno.serve(async(request:Request)=>{
@@ -23,13 +23,14 @@ Deno.serve(async(request:Request)=>{
  try{
   if(request.method!=='GET'&&request.method!=='POST')return respond(405,{ok:false,message:'طريقة الطلب غير مدعومة.'});
   const raw=request.method==='GET'?'':await request.text();
-  if(new TextEncoder().encode(raw).length>65536)return respond(413,{ok:false,message:'الطلب أكبر من الحد المسموح.'});
+  if(new TextEncoder().encode(raw).length>(route==='/admin/recovery/approve'?4000000:65536))return respond(413,{ok:false,message:'الطلب أكبر من الحد المسموح.'});
   let body:any={};try{body=raw?JSON.parse(raw):{};}catch{return respond(400,{ok:false,message:'صيغة البيانات غير صحيحة.'});}
   if(route.startsWith('/admin/')){
    const token=request.headers.get('x-sadad-admin')||'';if(!token)return respond(401,{ok:false,message:'سجّل دخول الإدارة.'});
    const hash=await sha256(token);
    if(route==='/admin/installations'&&request.method==='GET')return respond(200,{ok:true,installations:requireData(await db.rpc('sadid_pending_installations',{p_admin_hash:hash}))});
    if(route==='/admin/installations/approve'&&request.method==='POST')return respond(200,{ok:true,result:requireData(await db.rpc('sadid_approve_installation',{p_admin_hash:hash,p_installation:body.installationId,p_reason:body.reason}))});
+   if(route==='/admin/installations/revoke'&&request.method==='POST')return respond(200,{ok:true,result:requireData(await db.rpc('sadid_revoke_installation',{p_admin_hash:hash,p_installation:body.installationId,p_reason:body.reason}))});
    if(route==='/admin/recovery/approve'&&request.method==='POST')return respond(200,{ok:true,result:requireData(await db.rpc('sadid_approve_recovery',{p_admin_hash:hash,p_old:body.oldInstallationId,p_new:body.newInstallationId,p_manifest:body.commands,p_reason:body.reason}))});
    if(route==='/admin/ledger/read'&&request.method==='POST')return respond(200,{ok:true,snapshot:requireData(await db.rpc('sadid_support_snapshot',{p_admin_hash:hash,p_store:body.storeId,p_reason:body.reason}))});
    return respond(404,{ok:false,message:'المسار غير موجود.'});
@@ -71,8 +72,8 @@ Deno.serve(async(request:Request)=>{
   const result=requireData(await userDb.rpc(rpc,args));
   return respond(200,{ok:true,[scope==='read'?'snapshot':'result']:result});
  }catch(error:any){
-  const code=error?.code==='23505'?'replayed_request':Object.hasOwn(messages,error?.message)?error.message:error?.message==='invalid_public_key'?'invalid_public_key':'temporary_service_failure';
-  const status=code==='temporary_service_failure'?503:code==='dependency_pending'?409:403;
+  const code=error?.code==='23505'?'replayed_request':String(error?.code||'').startsWith('22')?'invalid_input':Object.hasOwn(messages,error?.message)?error.message:error?.message==='invalid_public_key'?'invalid_public_key':'temporary_service_failure';
+  const status=code==='temporary_service_failure'?503:code.endsWith('rate_limited')?429:['dependency_pending','epoch_changed','operation_id_reused','replayed_request','installation_key_changed','session_installation_conflict'].includes(code)?409:code.startsWith('invalid_')||code==='duplicate_operation_id'?400:403;
   return respond(status,{ok:false,code,message:messages[code]||'تعذر إتمام الطلب. احتفظ بالإدخال وحاول مجددًا.'});
  }
 });

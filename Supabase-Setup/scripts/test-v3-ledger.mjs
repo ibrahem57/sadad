@@ -20,7 +20,7 @@ async function capability(scope,request=null,permit=null){
 async function apply(cmd,permit=null){await capability('write',cmd,permit);return (await db.query('select public.sadid_apply($1) as result',[cmd])).rows[0].result;}
 try{
  await db.exec(`create role anon nologin;create role authenticated nologin;create role service_role nologin bypassrls;
- create schema auth;create table auth.users(id uuid primary key);create table auth.sessions(id uuid primary key,user_id uuid,not_after timestamptz);
+ create schema auth;create table auth.users(id uuid primary key,email text);create table auth.sessions(id uuid primary key,user_id uuid,not_after timestamptz);
  alter table auth.sessions enable row level security;
  grant usage on schema public to authenticated,service_role;`);
  await db.exec(readFileSync(new URL('202610040001_initial_sadad.sql',root),'utf8'));
@@ -30,6 +30,11 @@ try{
  await db.exec(readFileSync(new URL('20261010102007_sadid_v3_authorization_hardening.sql',root),'utf8'));
  await db.exec(readFileSync(new URL('20261010102342_sadid_v3_recovery_permits.sql',root),'utf8'));
  await db.exec(readFileSync(new URL('20261010104039_sadid_v3_epoch_and_audited_support.sql',root),'utf8'));
+ await db.exec(readFileSync(new URL('20261010105013_sadid_v3_cutover_and_auth_identity.sql',root),'utf8'));
+ await db.exec(readFileSync(new URL('20261010110853_sadid_v3_performance_and_request_limits.sql',root),'utf8'));
+ await db.exec(readFileSync(new URL('20261010134035_sadid_v3_support_policy_initplan.sql',root),'utf8'));
+ await db.exec(readFileSync(new URL('20261010135352_sadid_v3_explicit_installation_revocation.sql',root),'utf8'));
+ await db.exec(readFileSync(new URL('20261010140258_sadid_v3_strict_operation_contract.sql',root),'utf8'));
  await db.query('insert into auth.users values($1)',[user]);
  await db.query('insert into auth.sessions values($1,$2,null)',[session,user]);
  await db.exec("insert into public.stores(id,name,username,salt,password_hash,force_password_change,created_at) values(1,'تجربة','test','none','none',false,0);insert into public.sadid_ledger_state(store_id) values(1)");
@@ -38,11 +43,25 @@ try{
  await db.query("insert into sadid_private.installations(id,store_id,generation,public_key,status) values($1,1,1,'{}','active')",[installation]);
  await db.query('insert into sadid_private.installation_sessions values($1,$2,1,$3,1)',[session,user,installation]);
  const contact=command('contact.create',{name:'عميل تجربة',phone:'',externalReference:'TEST-001'});
+ await check('منع إدخال جديد دون إصدار الاسترداد الحالي',async()=>await assert.rejects(apply(command('contact.create',{name:'قديم'},{expectedEpoch:randomUUID()})),/epoch_changed/));
  await check('إنشاء الشخص',async()=>assert.equal((await apply(contact)).status,'accepted'));
  await check('تكرار الأمر يعيد النتيجة دون زيادة المؤشر',async()=>{const a=await apply(contact),b=await apply(contact);assert.deepEqual(a,b);});
  await check('رفض إعادة الرقم بمحتوى مختلف',async()=>{await assert.rejects(apply({...contact,payload:{name:'تغيير'}}),/operation_id_reused/);});
  const debt=command('debt.create',{contactId:contact.entityId,amountCents:50000,direction:'receivable'}, {dependsOn:[contact.operationId]});
  await check('إنشاء دين ٥٠٠ شيكل',async()=>assert.equal((await apply(debt)).status,'accepted'));
+ await check('فشل بعد إدخال المال يتراجع عن المال والإيصال والحدث والمؤشر',async()=>{
+ await db.exec("reset role;create function public.test_fail_event() returns trigger language plpgsql as $$ begin raise exception 'injected_failure';end $$;create trigger test_fail before insert on public.sadid_events for each row execute function public.test_fail_event()");
+ const before=(await db.query('select cursor from public.sadid_ledger_state where store_id=1')).rows[0].cursor;
+ const c=command('payment.create',{debtId:debt.entityId,amountCents:1,method:'cash'});
+ await assert.rejects(apply(c),/injected_failure/);await db.exec('reset role');
+ assert.equal((await db.query('select count(*) n from public.sadid_payments')).rows[0].n,0);
+ assert.equal((await db.query('select count(*) n from public.sadid_operations where operation_id=$1',[c.operationId])).rows[0].n,0);
+ assert.equal((await db.query('select cursor from public.sadid_ledger_state where store_id=1')).rows[0].cursor,before);
+ await db.exec('drop trigger test_fail on public.sadid_events;drop function public.test_fail_event()');
+ });
+ await check('إصدار العقد إلزامي وليس حقلًا اختياريًا',async()=>{const c=command('contact.create',{name:'طلب ناقص'});delete c.schemaVersion;await assert.rejects(apply(c),/unsupported_schema/);});
+ await check('الهاتف الموحد فريد حتى بعد الأرشفة',async()=>{await db.exec('reset role;begin');try{const a=command('contact.create',{name:'هاتف تحقق اصطناعي',phone:'+٩٩٩ ١٢٣٤٥٦٧٨٩'});assert.equal((await apply(a)).status,'accepted');assert.equal((await apply(command('contact.create',{name:'مكرر',phone:'+999123456789'}))).code,'duplicate_phone');assert.equal((await apply(command('contact.archive',{contactId:a.entityId,reason:'تحقق'},{expectedVersion:1}))).status,'accepted');assert.equal((await apply(command('contact.create',{name:'مكرر مؤرشف',phone:'+999123456789'}))).code,'duplicate_phone');}finally{await db.exec('reset role;rollback');}});
+ await check('طريقة دفع مفقودة ونوع أمر غير مدعوم يرفضان دون مال',async()=>{assert.equal((await apply(command('payment.create',{debtId:debt.entityId,amountCents:1}))).code,'invalid_input');assert.equal((await apply(command('unknown.operation',{}))).code,'unsupported_operation');});
  const payment=command('payment.create',{debtId:debt.entityId,amountCents:10000,method:'cash'},{dependsOn:[debt.operationId]});
  await check('دفع ١٠٠ شيكل',async()=>assert.equal((await apply(payment)).status,'accepted'));
  await check('رفض دفع زائد وحفظ الرفض',async()=>{const c=command('payment.create',{debtId:debt.entityId,amountCents:40001,method:'cash'});const r=await apply(c);assert.equal(r.code,'overpayment');assert.deepEqual(await apply(c),r);});
@@ -75,6 +94,8 @@ try{
   await check('رفض تغيير محتوى قائمة الاسترداد',async()=>await assert.rejects(apply({...recovered,payload:{name:'محتوى غير معتمد'}},permit),/recovery_not_authorized/));
   await check('قراءة الإدارة مسجلة وبلا صلاحية مالية',async()=>{await db.exec('reset role;set role service_role');const r=(await db.query('select public.sadid_support_snapshot($1,$2,$3) as result',['admin-test-hash',1,'مراجعة دعم للاختبار'])).rows[0].result;assert.equal(r.contacts.length,2);await db.exec('reset role');assert.equal((await db.query('select count(*) n from sadid_private.admin_access_events')).rows[0].n,1);await db.exec('set role sadid_support_reader');await assert.rejects(db.exec('insert into public.sadid_payments(store_id,id,debt_id,amount_cents,method,operation_id,created_at) values(1,gen_random_uuid(),gen_random_uuid(),1,\'cash\',gen_random_uuid(),now())'),/permission denied/);});
   await check('رفض القراءة بعد حذف جلسة Auth',async()=>{await capability('read');await db.exec('reset role');await db.query('delete from auth.sessions where id=$1',[newSession]);await db.exec('set role authenticated');assert.equal((await db.query('select * from public.sadid_contacts')).rows.length,0);});
+ await check('حد الطلبات يتراجع دون حفظ أرقام جزئية',async()=>{await db.exec('reset role');const before=(await db.query('select count(*) n from sadid_private.request_nonces')).rows[0].n;await assert.rejects(db.query("insert into sadid_private.request_nonces(installation_id,nonce) select $1,gen_random_uuid() from generate_series(1,301)",[newInstallation]),/request_rate_limited/);assert.equal((await db.query('select count(*) n from sadid_private.request_nonces')).rows[0].n,before);});
+ await check('إلغاء تركيب صريح مسجل ولا يقبله مستخدم متجر',async()=>{await db.exec('reset role');await db.query('insert into auth.sessions values($1,$2,null)',[newSession,user]);await db.query('insert into sadid_private.installation_sessions values($1,$2,1,$3,2)',[newSession,user,newInstallation]);await capability('read');await assert.rejects(db.query('select public.sadid_revoke_installation($1,$2,$3)',['admin-test-hash',newInstallation,'إلغاء اختبار']),/permission denied/);await db.exec('reset role;set role service_role');const result=(await db.query('select public.sadid_revoke_installation($1,$2,$3) as result',['admin-test-hash',newInstallation,'تعطل جهاز الاختبار'])).rows[0].result;assert.equal(result.status,'revoked');await assert.rejects(capability('read'),/installation_or_session_revoked/);await db.exec('reset role');assert.equal((await db.query("select count(*) n from sadid_private.control_events where kind='installation.revoked'")).rows[0].n,1);});
  await db.exec('reset role');
  console.log(JSON.stringify({engine:(await db.query('select version()')).rows[0].version,tests},null,2));
 }catch(error){console.error(JSON.stringify({message:error.message,code:error.code,where:error.where,tests},null,2));process.exitCode=1;}finally{await db.close();}

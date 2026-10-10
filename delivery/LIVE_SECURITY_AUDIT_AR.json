@@ -1,0 +1,174 @@
+{
+  "projectRef": "vhftjmiltqfwmrszdtgf",
+  "postgres": "17.6",
+  "tables": [
+    {
+      "relname": "sadid_adjustments",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_contacts",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_debts",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_events",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_ledger_state",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_operations",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_payments",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    },
+    {
+      "relname": "sadid_reversals",
+      "rls": true,
+      "force_rls": true,
+      "owner": "postgres",
+      "user_insert": false,
+      "user_update": false,
+      "user_delete": false,
+      "service_insert": false
+    }
+  ],
+  "securityAdvisors": {
+    "informational": "١١ جدولًا قديمًا مع RLS دون سياسات عميل؛ منع وصول العملاء مقصود.",
+    "warning": "حماية كلمات مرور Supabase Auth المسربة غير مفعلة. دخول المتجر والإدارة الحالي يستخدم جسر كلمات مرور منفصلًا؛ هذه الميزة لا تحمي كلمات مروره تلقائيًا.",
+    "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+  },
+  "performanceAdvisors": [
+    {
+      "name": "unused_index",
+      "level": "INFO",
+      "count": 12,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+    }
+  ],
+  "notes": "أُصلحت المفاتيح الأجنبية غير المفهرسة وتحذير إعادة تقييم متغير الجلسة. بقيت فهارس جديدة أو قديمة لم تستخدم إحصائيًا؛ لم تحذف.",
+  "migrations": [
+    {
+      "version": "20261004085255",
+      "name": "sadad_commit_snapshot"
+    },
+    {
+      "version": "20261004085429",
+      "name": "sadad_admin_queries"
+    },
+    {
+      "version": "20261004085821",
+      "name": "sadad_restore_and_limits"
+    },
+    {
+      "version": "20261004085905",
+      "name": "sadad_restore_revision_guard"
+    },
+    {
+      "version": "20261004090028",
+      "name": "sadad_store_login"
+    },
+    {
+      "version": "20261004090416",
+      "name": "sadad_import_sequences"
+    },
+    {
+      "version": "20261004091341",
+      "name": "restrict_rls_auto_enable_execute"
+    },
+    {
+      "version": "20261010083959",
+      "name": "sadad_android_auth_bindings"
+    },
+    {
+      "version": "20261010101251",
+      "name": "sadid_v3_authorization_and_ledger"
+    },
+    {
+      "version": "20261010101304",
+      "name": "sadid_v3_installation_control"
+    },
+    {
+      "version": "20261010102142",
+      "name": "sadid_v3_authorization_hardening"
+    },
+    {
+      "version": "20261010102702",
+      "name": "sadid_v3_recovery_permits"
+    },
+    {
+      "version": "20261010104610",
+      "name": "sadid_v3_epoch_and_audited_support"
+    },
+    {
+      "version": "20261010105502",
+      "name": "sadid_v3_cutover_and_auth_identity"
+    },
+    {
+      "version": "20261010110947",
+      "name": "sadid_v3_performance_and_request_limits"
+    },
+    {
+      "version": "20261010134138",
+      "name": "sadid_v3_support_policy_initplan"
+    },
+    {
+      "version": "20261010135421",
+      "name": "sadid_v3_explicit_installation_revocation"
+    },
+    {
+      "version": "20261010140400",
+      "name": "sadid_v3_strict_operation_contract"
+    }
+  ]
+}

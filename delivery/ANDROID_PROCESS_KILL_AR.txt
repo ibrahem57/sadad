@@ -1,0 +1,9 @@
+تم تفعيل وضع الطيران داخل المحاكي قبل الإضافة.
+INSTRUMENTATION_RESULT: evidence={"mode":"offline_prepare","tests":[{"name":"حفظ دفعة دون اتصال قبل نجاح الإجراء","status":"passed"}]}
+INSTRUMENTATION_CODE: 0
+
+نُفذ am force-stop بعد الحفظ وقبل إعادة فتح العملية.
+INSTRUMENTATION_RESULT: evidence={"mode":"offline_verify","tests":[{"name":"دفعة معلقة ورصيدها بقيا بعد قتل العملية","status":"passed"},{"name":"إلغاء الدفعة التي لم ترسل يحفظ تاريخها","status":"passed"}]}
+INSTRUMENTATION_CODE: 0
+
+أُلغي الإدخال غير المرسل، ثم أعيد اتصال المحاكي.

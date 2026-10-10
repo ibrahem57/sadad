@@ -1,3 +1,38 @@
+# سدد — دفتر مالي تجريبي
+
+تطبيق Android بواجهة عربية، مع دفتر مالي على Supabase، وطابور محلي مشفر، ومزامنة تحافظ على هوية العمليات، ولوحة إدارة للأجهزة والاسترداد.
+
+- مصدر Android: `Supabase-Setup/android-official/Sadad-AndroidStudio`.
+- وظائف الخادم والترحيلات: `Supabase-Setup/supabase`.
+- عقد العمليات: `Supabase-Setup/docs/V3_CONTRACT_AR.md`.
+- دليل التشغيل: [دليل التشغيل](delivery/SADID_RUNBOOK_AR.md).
+- نتائج التنفيذ والاختبارات: [تقرير التنفيذ](delivery/SADID_IMPLEMENTATION_REPORT_AR.md).
+
+البيانات المرفقة اصطناعية. هذه نسخة للتجربة؛ توقيع التطبيق تطويري، واختبار هاتف فعلي واستعادة قاعدة الخادم الكاملة ما زالا مطلوبين قبل الإنتاج.
+
+## البناء والاختبارات
+
+افتح مشروع Android في Android Studio، أو شغّل داخل مجلده:
+
+```powershell
+.\gradlew.bat assembleDebug assembleDebugAndroidTest -Pandroid.overridePathCheck=true
+```
+
+لتثبيت تبعية اختبارات قاعدة البيانات من جذر المستودع:
+
+```powershell
+npm install --prefix .local-tools --no-save @electric-sql/pglite@0.5.8
+npx --yes --package=node@22.16.0 node --max-old-space-size=256 Supabase-Setup/scripts/test-v3-ledger.mjs
+```
+
+توجد تفاصيل اختبارات Edge والمحاكي في دليل التشغيل. الترحيلات الجديدة منشورة على مشروع التجربة؛ طابق سجل الترحيلات قبل إعادة النشر.
+
+بيانات الدخول محفوظة في ملف محلي خاص خارج هذا المستودع.
+
+---
+
+## توثيق النسخة السابقة
+
 # سدد 2.5.10 — مشروع Android Studio
 
 For the Supabase backend work, admin dashboard connection, verification status and remaining tasks, start with [the continuation handoff](docs/CONTINUE_HERE.md).

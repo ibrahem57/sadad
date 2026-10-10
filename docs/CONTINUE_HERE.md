@@ -1,3 +1,11 @@
+# متابعة الإصدار الثالث
+
+اكتمل تنفيذ النسخة التجريبية الجديدة. ابدأ من [تقرير التنفيذ](../delivery/SADID_IMPLEMENTATION_REPORT_AR.md) و[دليل التشغيل](../delivery/SADID_RUNBOOK_AR.md). المصدر الحالي في Supabase-Setup/android-official/Sadad-AndroidStudio ووظائف الخادم في Supabase-Setup/supabase. بيانات الدخول خارج المستودع.
+
+التوثيق التالي محفوظ كسجل سابق؛ حالة التسليم الحالية في التقرير أعلاه.
+
+---
+
 # Sadid continuation handoff — 10 October 2026
 
 The published Android 2.5.10 source is at the repository root. The ongoing Supabase and Android v3 work from the local project is preserved in `Supabase-Setup/`. That work was still being tested in another chat when this snapshot was saved; review it before replacing the published root Android project. `Sadad-Flutter/` preserves the separate Flutter implementation for reference.

@@ -133,7 +133,6 @@ function subscriptionState(store: Json, now = Date.now()): Json {
   return { mode: "timed", active: expiresAt > now, expiresAt: expiresAt || null, remainingMs: Math.max(0, expiresAt - now) };
 }
 async function refreshStoreStatus(store: Json): Promise<Json> {
-  if (store.archived_at) return store;
   const subscription = subscriptionState(store);
   if ((!subscription.active || subscription.mode === "paused") && store.status === "active") {
     dataOrThrow(await db.from("stores").update({ status: "suspended", suspend_until: null }).eq("id", store.id));
@@ -165,7 +164,7 @@ async function requireSession(request: Request, kind: "admin" | "store"): Promis
       await db.from("sessions").delete().eq("token_hash", hashToken(token));
       throw new HttpError(401, "تم إلغاء تسجيل هذا الجهاز من الإدارة. سجّل الدخول مجددًا.");
     }
-    if (user.archived_at || user.status !== "active") throw new HttpError(423, "الحساب موقوف أو مؤرشف من الإدارة. تبقى العمليات المحفوظة على الجهاز حتى معالجة الحالة.", { code: "store_inactive" });
+    if (user.status !== "active") throw new HttpError(423, "الحساب موقوف من الإدارة. تواصل مع الدعم.");
   }
   return { kind, token, session, user, device };
 }
@@ -179,51 +178,13 @@ async function accountForStore(store: Json): Promise<Json> {
   if (devicesResult.error) throw devicesResult.error;
   const state = subscriptionState(store);
   return {
-    id: store.id, name: store.name, username: store.username, verified: !!store.verified, ledgerVersion: Number(store.ledger_version || 2),
+    id: store.id, name: store.name, username: store.username, verified: !!store.verified,
     permissions: parseJsonObject(store.permissions), debtorLimit: Number(store.debtor_limit), whatsappEnabled: !!store.whatsapp_enabled,
     subscriptionMode: state.mode, subscriptionExpiresAt: state.expiresAt, subscriptionRemainingMs: state.remainingMs,
     maxDevices: Number(store.allowed_devices || 1), boundDevices: devicesResult.count || 0,
   };
 }
-function requireV3(store: Json): void {
-  if (Number(store.ledger_version) !== 3) throw new HttpError(409, "يلزم ترحيل سجل هذا المتجر قبل استخدام الإصدار الجديد.", { code: "migration_required" });
-}
-async function makeV3Snapshot(store: Json, url?: URL): Promise<Json> {
-  requireV3(store);
-  const after = url?.searchParams.get("after") ?? null;
-  const epoch = url?.searchParams.get("epoch") ?? null;
-  if (after !== null && !/^\d{1,18}$/.test(after)) throw new HttpError(400, "مؤشر المزامنة غير صالح.", { code: "invalid_request" });
-  if (epoch !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(epoch)) throw new HttpError(400, "معرّف نسخة الخادم غير صالح.", { code: "invalid_request" });
-  const result = dataOrThrow(await db.rpc("sadad_v3_snapshot", { p_store_id: store.id, p_after: after, p_epoch: epoch }));
-  const account = await accountForStore(store);
-  if (result.snapshot) result.snapshot.account = account;
-  // Account permissions may change without any financial transaction/cursor change.
-  return { ...result, account, forcePasswordChange: !!store.force_password_change };
-}
-function v3Result(result: Json): Json {
-  if (result?.ok === false) {
-    const statuses: Record<string, number> = { invalid_request: 400, forbidden: 403, session_expired: 401, store_inactive: 423, store_not_found: 404 };
-    throw new HttpError(statuses[result.code] || 409, result.message || "تعذّر اعتماد العملية. احتفظ بالإدخال للمراجعة.", result);
-  }
-  return result;
-}
-async function applyV3(store: Json, auth: Principal, command: Json): Promise<Json> {
-  requireV3(store);
-  if (JSON.stringify(command).length > 32_000) throw new HttpError(413, "العملية أكبر من الحد المسموح.", { code: "invalid_request" });
-  return v3Result(dataOrThrow(await db.rpc("sadad_v3_apply", { p_store_id: store.id, p_session_hash: hashToken(auth.token), p_command: command })));
-}
-function v3Archives(snapshot: Json): Json[] {
-  return snapshot.contacts.filter((c: Json) => c.archivedAt).map((c: Json) => {
-    const debts = snapshot.debts.filter((d: Json) => d.contactId === c.id);
-    const ids = new Set(debts.map((d: Json) => d.id));
-    return { id: c.id, contactId: c.id, contactName: c.name, version: c.version, archivedAt: c.archivedAt, reason: c.archiveReason || "", debtCount: debts.length, paymentCount: snapshot.payments.filter((p: Json) => ids.has(p.debtId)).length };
-  });
-}
-function v3Activity(snapshot: Json): Json[] {
-  return snapshot.transactions.map((event: Json) => ({ ...event, action: event.kind, actor: event.createdBy || event.actor || "", description: `${event.contactName || ""} · ${event.note || event.reason || ""}`, deviceId: event.deviceId || "" })).sort((a: Json, b: Json) => Number(b.createdAt) - Number(a.createdAt));
-}
 async function makeSnapshot(store: Json): Promise<Json> {
-  if (Number(store.ledger_version) === 3) return (await makeV3Snapshot(store)).snapshot;
   const [account, contactRows, debtRows, paymentRows] = await Promise.all([
     accountForStore(store),
     db.from("contacts").select("*").eq("store_id", store.id).order("name", { ascending: true }).order("id", { ascending: true }),
@@ -302,7 +263,6 @@ function assertIds(rows: Json[], label: string): Set<number> {
 function paymentKey(contactId: number, createdAt: number, method: string): string { return `${contactId}|${createdAt}|${method}`; }
 
 async function syncSnapshot(store: Json, input: Json, baseRevision: unknown, device: Json): Promise<Json> {
-  if (Number(store.ledger_version) === 3) throw new HttpError(410, "حدّث التطبيق. هذا الحساب يستخدم العمليات المحفوظة ولا يقبل استبدال السجل بنسخة الجهاز.", { code: "snapshot_writes_disabled" });
   if (!input || !Array.isArray(input.contacts) || !Array.isArray(input.debts) || !Array.isArray(input.payments)) throw new HttpError(400, "بيانات المزامنة غير مكتملة. لم يتم تغيير السجل.");
   const contacts: Json[] = input.contacts, debts: Json[] = input.debts, payments: Json[] = input.payments;
   if (contacts.length > 50_000 || debts.length > 100_000 || payments.length > 500_000) throw new HttpError(413, "عدد السجلات أكبر من الحد.");
@@ -450,7 +410,6 @@ async function syncSnapshot(store: Json, input: Json, baseRevision: unknown, dev
 function publicStore(store: Json): Json {
   const state = subscriptionState(store);
   return { id: Number(store.id), name: store.name, username: store.username, status: store.status, suspendUntil: store.suspend_until,
-    ledgerVersion: Number(store.ledger_version || 2), archivedAt: store.archived_at || null, archiveReason: store.archive_reason || "",
     verified: !!store.verified, debtorLimit: Number(store.debtor_limit), permissions: parseJsonObject(store.permissions),
     whatsappEnabled: !!store.whatsapp_enabled, revision: Number(store.revision), createdAt: Number(store.created_at),
     subscriptionMode: state.mode, subscriptionStartedAt: store.subscription_started_at || null,
@@ -538,9 +497,9 @@ async function route(request: Request): Promise<Response> {
     const username = text(body.username, 80), password = String(body.password || "");
     if (!safeUsername(username) || password.length < ADMIN_PASSWORD_MIN || password.length > PASSWORD_MAX) throw new HttpError(400, `اسم المستخدم يجب أن يكون صالحًا وكلمة مرور الأدمن بين ${ADMIN_PASSWORD_MIN} و${PASSWORD_MAX} خانة.`);
     const hashed = await passwordHash(password);
-    const admin = dataOrThrow(await db.from("admins").insert({ username, salt: hashed.salt, password_hash: hashed.hash, force_password_change: false, created_at: Date.now() }).select("id,username,force_password_change").single());
+    const admin = dataOrThrow(await db.from("admins").insert({ username, salt: hashed.salt, password_hash: hashed.hash, force_password_change: true, created_at: Date.now() }).select("id,username,force_password_change").single());
     await clearLoginFailures(request, "admin-setup");
-    return ok({ ...(await makeSession("admin", Number(admin.id))), admin: { username: admin.username }, forcePasswordChange: false });
+    return ok({ ...(await makeSession("admin", Number(admin.id))), admin: { username: admin.username }, forcePasswordChange: true });
   }
 
   if (request.method === "POST" && pathname === "/admin/login") {
@@ -595,6 +554,7 @@ async function route(request: Request): Promise<Response> {
     }
     const session = { token, expiresAt }, deviceRecord = createdSession.data;
     store = dataOrThrow(await db.from("stores").select("*").eq("id", store.id).single());
+    if (!store) throw new HttpError(401, "جلسة المتجر غير صالحة.");
     const snapshot = await makeSnapshot(store);
     const deviceInfo = { staffName: deviceRecord.staff_name || "صاحب المتجر", permissions: { registerPayments: true, deleteRecords: true, deleteContacts: true, ...parseJsonObject(deviceRecord.permissions) } };
     return ok({ ...session, forcePasswordChange: !!store.force_password_change, snapshot, account: snapshot.account, device: deviceInfo, deviceStaffName: deviceInfo.staffName });
@@ -747,7 +707,7 @@ async function route(request: Request): Promise<Response> {
         const deviceId = decodeURIComponent(devicePermissionsMatch[1]);
         const device = dataOrThrow(await db.from("store_devices").select("*").eq("store_id", storeId).eq("device_id", deviceId).maybeSingle());
         if (!device) throw new HttpError(404, "الجهاز غير معروف لهذا الحساب.");
-        const body = await bodyJson(request), permissions = { registerPayments: true, deleteRecords: true, deleteContacts: true, ...parseJsonObject(device.permissions) };
+        const body = await bodyJson(request); const permissions: Json = { registerPayments: true, deleteRecords: true, deleteContacts: true, ...parseJsonObject(device.permissions) };
         for (const key of ["registerPayments", "deleteRecords", "deleteContacts"]) if (typeof body[key] === "boolean") permissions[key] = body[key];
         dataOrThrow(await db.from("store_devices").update({ permissions }).eq("store_id", storeId).eq("device_id", deviceId));
         return ok({ permissions });
@@ -861,6 +821,7 @@ async function route(request: Request): Promise<Response> {
       dataOrThrow(await db.from("sessions").delete().eq("kind", "store").eq("principal_id", store.id).neq("token_hash", hashToken(auth.token)));
       return ok({ forcePasswordChange: false });
     }
+    if (dataOrThrow(await db.rpc("sadid_is_v3_store", { p_store: store.id })) && pathname !== "/mobile/logout") throw new HttpError(409, "هذا المتجر يستخدم السجل المعتمد. حدّث التطبيق إلى الإصدار الثالث؛ احتفظ بأي إدخالات قديمة دون حذفها.", { code: "legacy_ledger_read_only" });
     if (request.method === "GET" && pathname === "/mobile/activity") {
       const events = dataOrThrow(await db.from("audit_events").select("actor,action,description,created_at").eq("store_id", store.id).order("created_at", { ascending: false }).order("id", { ascending: false }).limit(300));
       return ok({ events: events.map((item: Json) => ({ actor: item.actor, action: item.action, description: item.description, createdAt: item.created_at })) });
@@ -869,6 +830,7 @@ async function route(request: Request): Promise<Response> {
     if (request.method === "POST" && pathname === "/mobile/sync") {
       requirePermission(store, "contacts"); requirePermission(store, "debts");
       const body = await bodyJson(request);
+      if (!auth.device) throw new HttpError(401, "الجهاز غير معتمد.");
       const result = await syncSnapshot(store, body.snapshot || {}, body.baseRevision, auth.device);
       return ok(result);
     }
@@ -925,3 +887,4 @@ Deno.serve(async (request: Request) => {
   try { return await route(request); }
   catch (error) { return fail(error); }
 });
+

@@ -1,0 +1,3 @@
+INSTRUMENTATION_RESULT: evidence={"mode":"sync","tests":[{"name":"المحاكي يقرأ بيانات Supabase الأصلية","status":"passed"},{"name":"تحقق ترخيص الأيام السبعة الموقع","status":"passed"}]}
+INSTRUMENTATION_RESULT: scope=vhftjmiltqfwmrszdtgf|2|097a79a8-abe3-4de5-811f-70fb82bb8725
+INSTRUMENTATION_CODE: 0

@@ -16,11 +16,11 @@
 
 قراءة المستخدم عبر RLS تتطلب تفويض قراءة قصير مرتبطًا بجلسة Auth والتركيب؛ غياب التفويض يعطي صفر صفوف. صلاحية القراءة لا تمنح صلاحية كتابة. إدارة الحسابات تستخدم مسارًا مستقلًا، والقراءة المالية للإدارة تمر بدالة مسجلة في سجل الوصول.
 
-النموذج المحلي اختُبر في PGlite 0.5.8 / PostgreSQL 18.3؛ قاعدة المشروع PostgreSQL 17.6. يلزم اختبار توافق وصلاحيات مباشر على المشروع. النموذج الأولي لا يثبت توقيع الجهاز أو سلامة HTTP.
+النموذج المحلي اختُبر في PGlite 0.5.8 / PostgreSQL 18.3؛ قاعدة المشروع PostgreSQL 17.6. أُنجزت اختبارات صلاحيات وHTTP مباشرة على PostgreSQL 17 في المشروع، واختبارات توقيع وقراءة Android الفعلية موثقة منفصلة.
 
 ## الأوامر
 
-المسار المقترح POST /mobile/v3/operations. يحتوي الأمر schemaVersion=1 وoperationId وtype وentityId وoriginInstallationId وoriginGeneration وcreatedAt وdependsOn وpayload، ومع expectedVersion للتصحيحات. أسماء الحقول البرمجية ثابتة للتوافق؛ النصوص البشرية عربية.
+المسار المنشور POST /mobile/v3/operations. يحتوي الأمر schemaVersion=1 وoperationId وtype وentityId وoriginInstallationId وoriginGeneration وcreatedAt وdependsOn وexpectedEpoch وpayload، ومع expectedVersion للتصحيحات. أسماء الحقول البرمجية ثابتة للتوافق؛ النصوص البشرية عربية.
 
 الأنواع: contact.create، debt.create، payment.create، debt.correct، payment.reverse، contact.archive، contact.restore. الثلاثة الأولى قابلة للحفظ دون اتصال؛ الباقي يحتاج اتصالًا وتفويضًا جديدًا.
 
@@ -30,7 +30,7 @@
 
 ## القراءة والمصالحة
 
-GET /mobile/v3/snapshot يعيد نسخة متسقة تحت قفل المتجر: epoch وcursor وcontacts وdebts وpayments وadjustments وreversals مع confirmedTotals. استعلام النتائج بالأرقام الأصلية مستقل عن إعادة التنفيذ. المبالغ الرئيسية تشمل الإسقاط المعلق، والإيصال لا يوقف الإسقاط حتى يغطيه مؤشر النسخة المؤكدة.
+GET /mobile/v3/snapshot يعيد نسخة متسقة تحت قفل المتجر: epoch وcursor وcontacts وdebts وpayments وadjustments وreversals مع debtBalances والنتائج الأصلية outcomes؛ يحسب العميل الإجماليات المؤكدة والمتوقعة بأعداد صحيحة. استعلام النتائج بالأرقام الأصلية مستقل عن إعادة التنفيذ. المبالغ الرئيسية تشمل الإسقاط المعلق، والإيصال لا يوقف الإسقاط حتى يغطيه مؤشر النسخة المؤكدة.
 
 ## التركيب والاسترداد
 

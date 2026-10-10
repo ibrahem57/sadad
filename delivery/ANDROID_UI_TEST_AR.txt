@@ -1,0 +1,2 @@
+INSTRUMENTATION_RESULT: evidence={"mode":"ui","tests":[{"name":"واجهة WebView تعرض ١٥ شخصًا والرصيد الحقيقي بالعربية","status":"passed"}]}
+INSTRUMENTATION_CODE: 0
