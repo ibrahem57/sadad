@@ -7,6 +7,7 @@ import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -33,6 +34,7 @@ class Sessions(
     private val now: () -> Instant = Instant::now,
 ) {
   private val access = MutableStateFlow<AuthSession?>(null)
+  private val syncAccess = ConcurrentHashMap<String, AuthSession>()
   private val mutex = Mutex()
 
   /** Signs in, creates the store's account on first sign-in, and opens its scope. */
@@ -50,6 +52,46 @@ class Sessions(
    * the store out; being offline keeps the token and the sealed refresh token.
    */
   suspend fun accessToken(): String? = mutex.withLock { validLocked()?.accessToken }
+
+  /**
+   * A worker requests this store's session without switching the store shown on screen. IO failures
+   * propagate to sync; forceRefresh is used once after an authorization refusal.
+   */
+  suspend fun syncSession(storeUserId: String, forceRefresh: Boolean = false): AuthSession? =
+      mutex.withLock {
+        val refresh = accounts.refreshToken(storeUserId) ?: return@withLock null
+        val cached = syncAccess[storeUserId]
+        if (
+            !forceRefresh &&
+                cached != null &&
+                Duration.between(now(), cached.expiresAt) >= REFRESH_MARGIN
+        ) {
+          return@withLock cached
+        }
+        try {
+          val refreshed = auth.refresh(refresh)
+          if (refreshed.userId != storeUserId) throw ApiException(401, "authorization_required")
+          accounts.saveRefreshToken(storeUserId, refreshed.refreshToken)
+          syncAccess[storeUserId] = refreshed
+          if (accounts.file().activeStoreUserId == storeUserId) access.value = refreshed
+          refreshed
+        } catch (refused: ApiException) {
+          if (refused.status != 400 && refused.status != 401) throw refused
+          invalidateLocked(storeUserId)
+          null
+        }
+      }
+
+  /** Forget refused credentials only for the worker's store; never close another store's scope. */
+  suspend fun invalidateForSync(storeUserId: String) = mutex.withLock {
+    invalidateLocked(storeUserId)
+  }
+
+  private suspend fun invalidateLocked(storeUserId: String) {
+    accounts.clearRefreshToken(storeUserId)
+    syncAccess.remove(storeUserId)
+    if (access.value?.userId == storeUserId) access.value = null
+  }
 
   /** Changes the password, then refreshes and stores the new tokens. */
   suspend fun changePassword(current: String, new: String): Unit = mutex.withLock {
@@ -71,7 +113,7 @@ class Sessions(
       }
     }
     val storeUserId = accounts.file().activeStoreUserId
-    if (storeUserId != null) accounts.clearRefreshToken(storeUserId)
+    if (storeUserId != null) invalidateLocked(storeUserId)
     access.value = null
     host.close()
   }
@@ -93,6 +135,7 @@ class Sessions(
 
   /** Drops the in-memory token for a store the graph is removing. */
   internal fun leave(storeUserId: String) {
+    syncAccess.remove(storeUserId)
     if (access.value?.userId == storeUserId) access.value = null
   }
 
@@ -115,6 +158,7 @@ class Sessions(
 
   private suspend fun storeLocked(session: AuthSession) {
     accounts.saveRefreshToken(session.userId, session.refreshToken)
+    syncAccess[session.userId] = session
     access.value = session
   }
 
@@ -152,7 +196,7 @@ class Sessions(
 
   private suspend fun signedOutLocked() {
     val storeUserId = accounts.file().activeStoreUserId
-    if (storeUserId != null) accounts.clearRefreshToken(storeUserId)
+    if (storeUserId != null) invalidateLocked(storeUserId)
     access.value = null
     host.close()
   }

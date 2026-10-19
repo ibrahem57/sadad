@@ -1,0 +1,46 @@
+name: Unblock tickets
+
+# When a ticket issue closes (its PR merged into main with "Closes #N"), every open `blocked` issue
+# whose "**Blocked by:**" issues are all closed becomes `ready-for-agent`. The scan is idempotent,
+# so it also runs on merged PRs (an issue closed by a merge may not fire `issues`) and by hand.
+
+on:
+  issues:
+    types: [closed]
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: unblock-tickets
+
+jobs:
+  unblock:
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Flip blocked issues whose blockers are all closed
+        run: |
+          gh issue list --state open --label blocked --limit 200 --json number,body \
+            --jq '.[] | "\(.number)\t\(.body | split("\n") | map(select(startswith("**Blocked by:**"))) | first // "")"' |
+          while IFS=$'\t' read -r n line; do
+            refs=$(grep -o '#[0-9]\+' <<<"$line" | tr -d '#')
+            [[ -n $refs ]] || { echo "#$n: no Blocked by line; left blocked"; continue; }
+            open=""
+            for r in $refs; do
+              [[ $(gh issue view "$r" --json state --jq .state) == CLOSED ]] || open="$open #$r"
+            done
+            if [[ -z $open ]]; then
+              gh issue edit "$n" --remove-label blocked --add-label ready-for-agent >/dev/null
+              echo "#$n is now ready-for-agent"
+            else
+              echo "#$n still blocked by$open"
+            fi
+          done

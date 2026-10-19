@@ -1,6 +1,7 @@
 name: Android, admin site and edge-function checks
 
-# App, dashboard, Edge, database, formatting, status page and AGENTS.md changes run checks; other docs-only changes do not.
+# On main, app, dashboard, Edge, database, formatting, status page and AGENTS.md changes run checks;
+# other docs-only pushes do not. Every pull request runs them.
 # Debug builds are checks only; android-release.yml publishes release.
 
 on:
@@ -26,27 +27,9 @@ on:
       - 'AGENTS.md'
       - 'docs/CONTINUE_HERE.md'
       - '.editorconfig'
+  # Every PR runs, so the required `ci-ok` check always reports (a path-skipped required check
+  # stays pending and blocks the merge).
   pull_request:
-    paths:
-      - 'app/**'
-      - 'ledger-core/**'
-      - 'contract/**'
-      - 'gradle/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'gradle.properties'
-      - 'gradlew'
-      - 'server/public/**'
-      - 'tools/check.sh'
-      - 'Supabase-Setup/supabase/functions/**'
-      - 'Supabase-Setup/supabase/migrations/**'
-      - 'Supabase-Setup/scripts/**'
-      - '.github/workflows/android-ci.yml'
-      - '.github/workflows/android-release.yml'
-      - '.github/workflows/admin-pages.yml'
-      - 'AGENTS.md'
-      - 'docs/CONTINUE_HERE.md'
-      - '.editorconfig'
   workflow_dispatch:
   workflow_call:
 
@@ -144,3 +127,14 @@ jobs:
           node-version: '22'
       - name: Test migration and RPC contracts in isolated databases
         run: ./tools/check.sh database
+
+  # The one required status check for merging into main (repository ruleset).
+  ci-ok:
+    if: always()
+    needs: [docs-and-format, admin-site, android, edge-functions, database]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail unless every check job succeeded
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1
+      - run: echo "all check jobs succeeded"

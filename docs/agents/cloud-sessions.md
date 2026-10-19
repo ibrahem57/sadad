@@ -15,12 +15,18 @@ Cloud sessions (claude.ai/code) and teammates clone `Abdalrahman-py/sadad` from 
 - Labels: `ready-for-agent` = every `Blocked by` ticket is merged into `main`; `blocked` = at least one is not; `claimed` = someone is on it; `ready-for-human` = the maintainer does it (cutover, phone runs).
 - Start an issue labelled `ready-for-agent`. Claim it before any edit: assign yourself, remove `ready-for-agent`, add `claimed`.
 - Stacking: you may also start a `blocked` issue whose only missing blockers are your own open PRs. Branch from that PR's branch, and name the base PR in your PR body ("Stacked on #<pr>"). Never stack on someone else's unmerged branch.
-- Do not merge your own PR. The maintainer reviews and merges it, then marks the next tickets `ready-for-agent`.
+- Merging: a teammate on Codex merges their own ticket PR through the `take-ticket` skill (`.agents/skills/take-ticket/`), once its review is answered and the required checks `ci-ok` and `scope` pass. Otherwise the maintainer reviews and merges. Either way the `Unblock tickets` workflow then labels every issue whose `Blocked by` issues are all closed `ready-for-agent`.
 - Work on a branch named `ticket-NN`, and keep to the ticket's "Files you may edit".
 - Deliver a pull request into `main` that says `Closes #<issue>`. Put the ticket's proofs (red and green output, `./tools/check.sh` result, sizes) in the PR body.
 - Where a ticket says to write in its Comments or Status, comment on the issue instead.
 - Paths like `/home/jade/...`, `.scratch/...` and `ticket start/merge` in a ticket are local-only; ignore them. The Phase 3 planning notes that tickets cite (`decisions.md` Q1–Q11, `gap.md` §0–§8) are in `docs/phase-3/`.
 - A teammate on their own clone uses `gh issue ...` and `gh pr ...` normally; the proxy limits below apply only to cloud sessions.
+
+## One-time setup for a teammate on Codex
+
+- Codex CLI; `gh` signed in with push access to `Abdalrahman-py/sadad`; JDK 21, the Android SDK and Deno for single-file tests.
+- Codex code review on GitHub: in Codex settings, connect GitHub and turn on code review for `Abdalrahman-py/sadad`, so `@codex review` on a PR gets an answer.
+- Then ask Codex in the clone to "take the next ticket".
 
 ## GitHub from a cloud session
 
@@ -37,7 +43,7 @@ gh api -X POST $R/pulls -f title='...' -f head=ticket-23 -f base=main -f body='C
 
 ## Skills
 
-`.claude/skills/` holds `tdd`, `diagnosing-bugs` and `code-review` (from mattpocock/skills, MIT; see `LICENSE-mattpocock-skills`). The human's other skills and plugins (ponytail, supabase, Context7) are not in the cloud. Library versions are fixed in `docs/versions.md`, so no docs lookup is needed to pick them.
+`.claude/skills/` holds `tdd`, `diagnosing-bugs` and `code-review` (from mattpocock/skills, MIT; see `LICENSE-mattpocock-skills`). Codex reads `.agents/skills/` instead, where those three are symlinks to `.claude/skills/` (on Windows, clone with `core.symlinks=true` and Developer Mode on, or use WSL), next to Codex's `graphify` variant and `take-ticket`. The human's other skills and plugins (ponytail, supabase, Context7) are not in the cloud. Library versions are fixed in `docs/versions.md`, so no docs lookup is needed to pick them.
 
 ## Rules that also apply locally
 

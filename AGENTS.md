@@ -74,6 +74,8 @@
 Issues and specs live as local markdown under `.scratch/` (gitignored, not pushed). See `docs/agents/issue-tracker.md`.
 Without `.scratch/` (a Claude Code cloud session, or a teammate's clone) the ticket is a GitHub issue on `Abdalrahman-py/sadad`. See `docs/agents/cloud-sessions.md`.
 
+A teammate on Codex takes a ticket with the `take-ticket` skill (`.agents/skills/`), which implements, reviews and merges its own PR.
+
 ### Triage labels
 
 Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
@@ -88,8 +90,18 @@ Use only: tdd, diagnosing-bugs, code-review, ponytail, supabase skills, writing-
 
 ### Code graph (graphify)
 
-The `graphify` skill (`.claude/skills/graphify`, `.opencode/skills/graphify`) maps the codebase into a knowledge graph in `graphify-out/`, gitignored and built per clone or worktree.
+The `graphify` skill (`.claude/skills/graphify`, `.opencode/skills/graphify`, `.agents/skills/graphify` for Codex) maps the codebase into a knowledge graph in `graphify-out/`, gitignored and built per clone or worktree.
 
 - Setup, once per developer: `uv tool install "graphifyy[sql]"` (or `pipx install "graphifyy[sql]"`; the `sql` extra parses `schemas/*.sql`). Then build the graph offline: `graphify extract . --code-only`.
 - When `graphify-out/graph.json` exists, start a codebase question with `graphify query "<question>"`, `graphify path "<A>" "<B>"` or `graphify explain "<symbol>"`, then read only the files it names. After code edits, run `graphify update .`.
-- Upgrade: `uv tool upgrade graphifyy`, then `./tools/graphify-skills.sh`, and commit both skill directories. The script replaces `graphify install`, which also rewrites `CLAUDE.md`, `AGENTS.md` and hook settings.
+- Upgrade: `uv tool upgrade graphifyy`, then `./tools/graphify-skills.sh`, and commit the three skill directories. The script replaces `graphify install`, which also rewrites `CLAUDE.md`, `AGENTS.md` and hook settings.
+
+## Review guidelines
+
+Codex reads this section when it reviews a pull request (`@codex review`).
+
+- Spec: the PR's `Closes #N` issue is the ticket. Check every "Test first" test and "Steps" item against the diff, and every decision under "Decisions already made".
+- Scope: changed paths stay inside the issue's "Files you may edit".
+- Clean cut: flag any upgrade path, fallback, compatibility shim or legacy handling (`docs/ARCHITECTURE.md` Part 3). All data is test data.
+- Flag secrets (`sb_secret_...`, `service_role`, passwords) and any `supabase db push`, `functions deploy` or other cloud change.
+- Money, auth, crypto and sync code: flag rounding, missing tests for refusal paths, and anything logged that holds a passphrase or key.
